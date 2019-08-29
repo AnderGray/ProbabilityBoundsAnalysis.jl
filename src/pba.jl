@@ -19,10 +19,7 @@ import Base: show, -,
     <, >, ⊆, ^,
     rand
 
-
-
-
-import Statistics: mean, var
+import Statistics: mean, var, std
 
 
 
@@ -87,5 +84,7 @@ include("pbox/arithmetic.jl")
 include("pbox/distributions.jl")
 include("pbox/special.jl")
 include("pbox/plot_recipes.jl")
+include("intervalStatistics/IntervalStatistics.jl")
+
 
 end # module pba

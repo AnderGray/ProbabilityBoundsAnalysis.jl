@@ -27,6 +27,19 @@ isvacuous(x::AbstractInterval) = return ((x.lo == -Inf) && (x.hi == Inf));
 straddles(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<=0) && (0>=right(x)));   # includes zero
 straddlingzero(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<0) && (0>right(x)));   # neglects zero as an endpoint
 
+function noNesting(x::Array{<:AbstractInterval})
+
+    N = length(x);
+    a=copy(x);
+    sort!(a,lt=compareByLo);
+
+    for i =2:N
+        if a[i].hi < a[i-1].hi
+            return false
+        end
+    end
+    return true
+end
 
 
 
