@@ -6,6 +6,8 @@
 #
 ##
 
+using IntervalArithmetic, Statistics
+
 
 # For saving upper or lower bound information
 struct BoundItem
