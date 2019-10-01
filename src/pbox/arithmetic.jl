@@ -100,17 +100,17 @@ function convOpposite(x::Real, y::Real, op = +)
         cu = map(op, x.u[:], y.u[end:-1:1]);
         cd = map(op, x.d[:], y.d[end:-1:1]);
     end
-    cu = sort(cu);
-    cd = sort(cd);
+    scu = sort(cu);
+    scd = sort(cd);
 
-    return pbox(cu, cd, dids = "$(x.dids) $(y.dids)")
+    return pbox(scu, scd, dids = "$(x.dids) $(y.dids)")
 end
 
 function convFrechet(x::Real, y::Real, op = +)
 
     if (op == -) return (convFrechet(x,negate(y),+));end
     if (op == /) return (convFrechet(x,reciprocate(y),*));end
-    #if (op==*) if (straddlingzero(x) || straddlingzero(y)) return (imp(balchprod(x,y),convFrechetNaive(x,y,*))); end
+    if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (imp(balchProd(x,y), convFrechetNaive(x, y, *))); end; end
     ## Unsure about the above line. It looks like if it straddles 0, we need to do the naive frechet and the balch prod (?) and impose one on the other
 
     x = makepbox(x);
@@ -164,31 +164,34 @@ function complement(x::pbox)
     return pbox(1 .-x.d[end:-1:1],1 .-x.u[end:-1:1],shape=s,name = "", ml=1-x.mh, mh=1-x.ml, vl=x.vl, vh=x.vh, dids=x.dids, bob=oppositedep(x));
 end
 
-function reciprocate(x::pbox)
+function reciprocate(x)
+    if ispbox(x)
+        if ((x.shape)∈(["Cauchy","{min, max, median}","{min, max, percentile}","{min, max}"]))  sh = x.shape;
+        elseif (x.shape == "pareto")    sh = "power function";
+        elseif (x.shape == "power function")    sh = "pareto";
+        else sh = "";
+        end
 
-    if ((x.shape)∈(["Cauchy","{min, max, median}","{min, max, percentile}","{min, max}"]))  sh = x.shape;
-    elseif (x.shape == "pareto")    sh = "power function";
-    elseif (x.shape == "power function")    sh = "pareto";
-    else sh = "";
+        #=
+        if (left(x) <= 0 && right(x) >= 0)
+            return NaN
+        else if (left(x)>0)
+            myMean = transformMean(x,reciprocate(), false, true);
+            myVar = transformVar(x,reciprocate(), false, true);
+        else
+            myMean = transformMean(x,reciprocate(), false, false);
+            myVar = transformVar(x,reciprocate(), false, false);
+        end
+        =#
+
+        myMean = interval(x.ml, x.mh);
+        myVar = interval(x.vl, x.vh);
+
+        return pbox(1 ./reverse(x.d[:]), 1 ./ reverse(x.u[:]), shape = sh, name="", ml=left(myMean), mh=right(myMean), vl=left(myVar), vh=right(myVar), dids=x.dids, bob=oppositedep(x));
     end
-
-    #=
-    if (left(x) <= 0 && right(x) >= 0)
-        return NaN
-    else if (left(x)>0)
-        myMean = transformMean(x,reciprocate(), false, true);
-        myVar = transformVar(x,reciprocate(), false, true);
-    else
-        myMean = transformMean(x,reciprocate(), false, false);
-        myVar = transformVar(x,reciprocate(), false, false);
-    end
-    =#
-
-    myMean = interval(x.ml, x.mh);
-    myVar = interval(x.vl, x.vh);
-
-    return pbox(1 ./reverse(x.d[:]), 1 ./ reverse(x.u[:]), shape = sh, name="", ml=left(myMean), mh=right(myMean), vl=left(myVar), vh=right(myVar), dids=x.dids, bob=oppositedep(x));
+    return 1/x;
 end
+
 
 
 -(x::pbox) = negate(x);
@@ -250,7 +253,7 @@ perfectopposite(m, x::pbox) = if (m<0) return oppositedep(x); else return perfec
 ##################################################################################
 
 
-function convFrechetNaive(x::pbox, y::pbox, op = *)
+function convFrechetNaive(x::Real, y::Real, op = *)
 
     if (op == +) return (convFrechet(x, y,+));end
     if (op == -) return (convFrechet(x,negate(y),+));end
@@ -292,4 +295,32 @@ end
 #   Still needed
 ###
 
-function balchProd(x::pbox, y::pbox) return x; end
+function balchProd(x::pbox, y::pbox)
+
+    if (straddles(x) && straddles(y))
+        x0 = left(x);
+        y0 = left(y);
+        xx0 = x - x0;
+        yy0 = y - y0;
+        a = convFrechet(xx0, yy0, *);
+        b = convFrechet(y0 * xx0, x0 * yy0, +);
+        return convFrechet(a,b,+) + x0 * y0;
+    end
+
+    if straddles(x)
+        x0 = left(x);
+        xx0 = x - x0;
+        a = convFrechet(xx0, y, *);
+        b = x0 * y;
+        return convFrechet(a,b,+);
+    end
+
+    if straddles(y)
+        y0 = left(y)
+        yy0 = y - y0
+        a = convFrechet(x, yy0, *)
+        b = x * y0
+        return convFrechet(a,b,+)
+    end
+    return convFrechet(x,y,*);
+end
