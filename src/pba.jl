@@ -33,7 +33,7 @@ global steps = 200              # discretization levels of probability
 global bOt = 0.001              # smallest quamtile to use if left tail is unbounded
 global tOp = 0.999              # largest quamtile to use if right tail is unbounded
 global plotting = true          # if TRUE, p-pboxes are plotted whenever they are "show"
-global plottingEvery = false    # if TRUE, every p-box that's created is automatically plotted
+global plottingEvery = true     # if TRUE, every p-box that's created is automatically plotted
 global cumulative = true        # if TRUE, plot CDFs, if FALSE, plot CCDFs (exceedance risks)
 global pboxes = 0               # number of p-boxes that have been created
 global verbose = 2              # how much warning messaging is wanted
@@ -68,19 +68,23 @@ end
 
 export
     Interval, interval, AbstractInterval, AbstractPbox, pbox,
-    plotpbox, makepbox, ispbox, isinterval,
+    plotpbox, makepbox, ispbox, isinterval, isscalar, straddles, straddlingzero,
     mean, var, std, sideVariance, dwmean, dwVariance,
-    conv, convFrechet, convPerfect, convOpposite,
+    conv, convFrechet, convPerfect, convOpposite, convFrechetNaive,
     +, -, /, *,
     normal, gaussian, N, Normal,
     isequal,
     rand,
-    cut
+    cut,
+    left, right,
+    VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper,
+    env, imp
 
 
 
 include("pbox/pbox.jl")
 include("pbox/arithmetic.jl")
+include("pbox/MomentTransformations.jl")
 include("pbox/distributions.jl")
 include("pbox/special.jl")
 include("pbox/plot_recipes.jl")

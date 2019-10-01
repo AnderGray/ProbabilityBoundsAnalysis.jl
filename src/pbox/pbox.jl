@@ -6,6 +6,25 @@
 #           University of Liverpool
 ######
 
+
+#####
+#   Known Bugs:
+#
+#   ->  After using a pbox in a computation, the shape is no loger saved. For example normal(0,1) + 1, should still be a normal
+#   ->  env() between two scalars should return interval. Works but returned variance is [0,0]
+#   ->  Giving pboxes to the interval constructor should return envelope
+#
+#   Severe:
+#       ->  makepbox() won't work when both a pbox and an interval type are introduced as arguments
+###
+
+#####
+#   Fixed Bugs wrt. pba.r:
+#
+#   ->  When passing a pbox to the pbox constructor, mean and variance not saved and recalculated from bounds
+#
+###
+
 abstract type AbstractPbox <: Real end
 
 mutable struct pbox <: AbstractPbox
@@ -40,6 +59,7 @@ mutable struct pbox <: AbstractPbox
             mh = p.mh;
             vl = p.vl;
             vh = p.vh;
+            shape = p.shape;
         else
 
             if (!(typeof(u)<:Union{Array{<:Real},Real}) || !(typeof(d)<:Union{Array{<:Real},Real}))
@@ -96,11 +116,13 @@ uniquePbox() = ( pba.setPboxes(pba.pboxes+1); return pba.pboxes );
 
 function makepbox(x...)
 
+
+    # This line is causing alot of problems with the interval package. Interval package converts all elements of the array to the same type Interval{<:Float64} etc
     elts :: Array{Any} = [x...];
     # Not sure about this line, if you input a Tuple you can still use the function as expected
-    #if (typeof(x[1])<:Tuple) elts = x[1]; end
+    # if (typeof(x[1])<:Tuple) elts = x[1]; end
     if (length(elts)==1) return pbox(x...);end
-    #elts = convert(Array{Any},elts);
+    # elts = convert(Array{Any},elts);
     for i=1:length(elts)
         if (!ispbox(elts[i]))
             elts[i] = pbox(elts[i]);

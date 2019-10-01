@@ -6,6 +6,8 @@
 #           University of Liverpool
 ######
 
+interval(a::AbstractInterval, b :: AbstractInterval) = interval(a.lo, b.hi);
+
 left(x::Real) = x;
 right(x::Real) = x;
 
@@ -21,11 +23,18 @@ isinterval(x) = return (typeof(x)<:AbstractInterval ||
 
 ispbox(x) = return typeof(x)<:AbstractPbox
 
+function isscalar(x)
+    if (ispbox(x) && (left(x) == right(x))) return true; end
+    if (isinterval(x) && (left(x) == right(x))) return true; end
+    if (isa(x, Number) && (length(x) == 1) && !isinterval(x) && !ispbox(x)) return true; end
+    return false
+end
+
 isvacuous(x::AbstractPbox) = return ((all(x.u .== -Inf)) && (all(x.d .== Inf)));
 isvacuous(x::AbstractInterval) = return ((x.lo == -Inf) && (x.hi == Inf));
 
-straddles(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<=0) && (0>=right(x)));   # includes zero
-straddlingzero(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<0) && (0>right(x)));   # neglects zero as an endpoint
+straddles(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<=0) && (0<=right(x)));   # includes zero
+straddlingzero(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<0) && (0<right(x)));   # neglects zero as an endpoint
 
 function noNesting(x::Array{<:AbstractInterval})
 
@@ -39,6 +48,12 @@ function noNesting(x::Array{<:AbstractInterval})
         end
     end
     return true
+end
+
+function touching(a,b)
+    if (isscalar(a) && isscalar(b)) return a == b; end
+    if (straddles(a - b)) return true; end
+    return false
 end
 
 
@@ -55,7 +70,7 @@ end
 
 # Only checks sides and moments, for stricter use ==
 
-#= Not working yet. Requires definition of ==
+#= Not working yet. Requires redefinition of ==
 
 function isequal(x::pbox, y::pbox)
     if (x.u == y.u && x.d == y.d && x.ml == y.ml && x.mh == y.mh && x.vl == y.vl && x.vh == y.vh)

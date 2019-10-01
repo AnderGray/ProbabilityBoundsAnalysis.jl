@@ -14,11 +14,12 @@
 
 function conv(x::Real, y::Real, op = +)
 
-    x = makepbox(x);
-    y = makepbox(y);
-
     if (op == -) return conv(x, negate(y), +);end
     if (op == /) return conv(x, reciprocate(y), *);end
+
+
+    x = makepbox(x);
+    y = makepbox(y);
 
     m = x.n;
     p = y.n;
@@ -149,15 +150,44 @@ function convFrechet(x::Real, y::Real, op = +)
     return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, dids = "$(x.dids) $(y.dids) ");
 end
 
-
-function negate(x::pbox)
-    if ((x.shape)∈(["uniform", "normal", "cauchy", "triangular"])) s = x.shape; else s = ""; end
-    return pbox(-x.d[end:-1:1],-x.u[end:-1:1],shape=s,name = "", ml=-x.mh, mh=-x.ml, vl=x.vl, vh=x.vh, dids=x.dids, bob=oppositedep(x));
+function negate(x)
+    if (ispbox(x))
+        if ((x.shape)∈(["uniform", "normal", "cauchy", "triangular"])) s = x.shape; else s = ""; end
+        return pbox(-x.d[end:-1:1],-x.u[end:-1:1],shape=s,name = "", ml=-x.mh, mh=-x.ml, vl=x.vl, vh=x.vh, dids=x.dids, bob=oppositedep(x));
+    end
+    return -x;
 end
+
 
 function complement(x::pbox)
     if ((x.shape)∈(["uniform", "normal", "cauchy", "triangular", "skew-normal"])) s = x.shape; else s = ""; end
     return pbox(1 .-x.d[end:-1:1],1 .-x.u[end:-1:1],shape=s,name = "", ml=1-x.mh, mh=1-x.ml, vl=x.vl, vh=x.vh, dids=x.dids, bob=oppositedep(x));
+end
+
+function reciprocate(x::pbox)
+
+    if ((x.shape)∈(["Cauchy","{min, max, median}","{min, max, percentile}","{min, max}"]))  sh = x.shape;
+    elseif (x.shape == "pareto")    sh = "power function";
+    elseif (x.shape == "power function")    sh = "pareto";
+    else sh = "";
+    end
+
+    #=
+    if (left(x) <= 0 && right(x) >= 0)
+        return NaN
+    else if (left(x)>0)
+        myMean = transformMean(x,reciprocate(), false, true);
+        myVar = transformVar(x,reciprocate(), false, true);
+    else
+        myMean = transformMean(x,reciprocate(), false, false);
+        myVar = transformVar(x,reciprocate(), false, false);
+    end
+    =#
+
+    myMean = interval(x.ml, x.mh);
+    myVar = interval(x.vl, x.vh);
+
+    return pbox(1 ./reverse(x.d[:]), 1 ./ reverse(x.u[:]), shape = sh, name="", ml=left(myMean), mh=right(myMean), vl=left(myVar), vh=right(myVar), dids=x.dids, bob=oppositedep(x));
 end
 
 
@@ -180,7 +210,7 @@ end
 -(x :: AbstractInterval, y :: AbstractPbox) = -y + x;
 
 *(x :: AbstractPbox, y :: AbstractInterval) = conv(x,y,*);
-*(x :: AbstractInterval, y :: AbstractPbox) = y*x;
+*(x :: AbstractInterval, y :: AbstractPbox) = y * x;
 
 /(x :: AbstractPbox, y :: AbstractInterval) = conv(x,y,/);
 /(x :: AbstractInterval, y :: AbstractPbox) = reciprocate(y) * x;
@@ -208,20 +238,58 @@ perfectdep(x::pbox) = x.bob;
 perfectopposite(m, x::pbox) = if (m<0) return oppositedep(x); else return perfectdep(x);end
 
 
+##################################################################################
+#
+# This (naive) Frechet convolution will work for multiplication of distributions
+# that straddle zero.  Note, however, that it is NOT optimal. It can probably be
+# improved considerably.  It does use the Frechet moment propagation formulas.
+# Unfortunately, moment propagation has not be implemented yet in the R library.
+# To get OPTIMAL bounds for the envelope, we probably must use Berleant's linear
+# programming solution for this problem.
+#
+##################################################################################
+
+
+function convFrechetNaive(x::pbox, y::pbox, op = *)
+
+    if (op == +) return (convFrechet(x, y,+));end
+    if (op == -) return (convFrechet(x,negate(y),+));end
+    if (op == /) return (convFrechetNaive(x,reciprocate(y),*));end
+
+    x = makepbox(x);
+    y = makepbox(y);
+    n = x.n;
+
+    Y = repeat(y.d[:], inner = n);
+    X = repeat(x.d[:], outer = n);
+    c = sort(map(op,X,Y));
+    Zd = c[(n*n - n + 1): n*n];
+
+    Y = repeat(y.u[:], inner = n);
+    X = repeat(x.u[:], outer = n);
+    c = sort(map(op,X,Y));
+    Zu = c[1:n];
+
+    #mean
+    m = mean(x) * mean(y);          # Should maybe be op(mean(x),mean(y))
+    a = sqrt(var(x) * var(y));      # Simularly
+    ml = m - a;
+    mh = m + a;
+
+    VK = VKmeanproduct(x,y);
+    m = imp(pbox(interval(ml,mh)), VK);
+
+    # Variance
+    vl = 0;
+    vh = Inf;
+
+    return pbox(Zu, Zd,  ml = left(m), mh = right(m), vl=vl, vh=vh, dids="$(x.dids) $(y.dids)");
+
+end
+
+
 ###
 #   Still needed
 ###
 
-function reciprocate(x::pbox)
-
-    if ((x.shape)∈(["Cauchy","{min, max, median}","{min, max, percentile}","{min, max}"]))  sh = x.shape;
-    elseif (x.shape == "pareto")    sh = "power function";
-    elseif (x.shape == "power function")    sh = "pareto";
-    else sh = "";
-    end
-
-    return x;
-end
-function convFrechetNaive(x::pbox, y::pbox) return x;end
-function imp(x::pbox, y:: pbox) return x; end
 function balchProd(x::pbox, y::pbox) return x; end
