@@ -85,6 +85,8 @@ function convPerfect(x::Real, y::Real, op = +)
     scu = sort(cu);
     scd = sort(cd);
 
+    # Here we will also need the moment propagation
+
     if (all(cu == scu) && all(cd == scd))
         return pbox(scu, scd,  dids="$(x.dids) $(y.dids) ", bob=x.bob)
     else return pbox(scu, scd,  dids="$(x.dids) $(y.dids) ")
@@ -102,6 +104,8 @@ function convOpposite(x::Real, y::Real, op = +)
     end
     scu = sort(cu);
     scd = sort(cd);
+
+    # Here we will also need the moment propagation
 
     return pbox(scu, scd, dids = "$(x.dids) $(y.dids)")
 end
@@ -133,7 +137,8 @@ function convFrechet(x::Real, y::Real, op = +)
 
     ml = -Inf;
     mh = Inf;
-    if (op)∈([+,-])                 # We should be able to include * /  once we have momemnt prop
+
+    if (op)∈([+,-])                 # We should be able to include * /  once we have momement prop
         ml = map(op,x.ml,y.ml)
         mh = map(op,x.mh,y.mh)
     end
@@ -150,6 +155,18 @@ function convFrechet(x::Real, y::Real, op = +)
     return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, dids = "$(x.dids) $(y.dids) ");
 end
 
+function shift(x :: pbox, ss :: Real)
+     if (x.shape) ∈ (["uniform","normal","cauchy","triangular","skew-normal"]) s = x.shape; else s = ""; end
+    return pbox(ss .+ x.u, ss .+ x.d, shape=s, name="", ml = x.ml+ss, mh=x.mh+ss, vl=x.vl, vh=x.vh, dids=x.dids, bob=perfectdep(x))
+end
+
+function mult(x::pbox, m :: Real)
+    if (x.shape) ∈ (["uniform","normal","cauchy","triangular","skew-normal"]) s = x.shape; else s = ""; end
+    if ((x.shape) ∈ (["exponential","lognormal"]) && 0 <= x.u[1]) s = x.shape; else s = ""; end
+    if (m < 0) return negate(mult(x,abs(m))) end
+    return pbox(m*x.u, m*x.d, shape=s, name="", ml=m*x.ml, mh=m*x.mh, vl=(m^2)*x.vl, vh=(m^2)*x.vh, dids=x.dids, bob=perfectopposite(m,x))   ################## mean if m<0
+end
+
 function negate(x)
     if (ispbox(x))
         if ((x.shape)∈(["uniform", "normal", "cauchy", "triangular"])) s = x.shape; else s = ""; end
@@ -157,7 +174,6 @@ function negate(x)
     end
     return -x;
 end
-
 
 function complement(x::pbox)
     if ((x.shape)∈(["uniform", "normal", "cauchy", "triangular", "skew-normal"])) s = x.shape; else s = ""; end
@@ -195,6 +211,7 @@ end
 
 
 -(x::pbox) = negate(x);
+/(x::pbox) = reciprocate(x);
 
 +(x::AbstractPbox, y::AbstractPbox) = conv(x,y,+); # if(x==y) return 2*x; ????
 -(x::AbstractPbox, y::AbstractPbox) = conv(x,y,-); # if(x==y) return 0;   ????
@@ -223,16 +240,16 @@ end
 ###
 
 # Probably will only need shift for + and - with reals
-+(x :: AbstractPbox, y :: Real) = conv(x,y,+);
++(x :: AbstractPbox, y :: Real) = shift(x, y);
 +(x :: Real, y :: AbstractPbox) = y + x;
 
--(x :: AbstractPbox, y :: Real) = conv(x,y,-);
+-(x :: AbstractPbox, y :: Real) = shift(x,-y);
 -(x :: Real, y :: AbstractPbox) = -y + x;
 
-*(x :: AbstractPbox, y :: Real) = conv(x,y,*);
+*(x :: AbstractPbox, y :: Real) = mult(x,y);
 *(x :: Real, y :: AbstractPbox) = y*x;
 
-/(x :: AbstractPbox, y :: Real) = conv(x,y,/);
+/(x :: AbstractPbox, y :: Real) = mult(x,1/y);
 /(x :: Real, y :: AbstractPbox) = reciprocate(y) * x;
 
 

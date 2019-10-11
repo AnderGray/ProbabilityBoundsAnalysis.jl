@@ -70,7 +70,7 @@ export
     Interval, interval, AbstractInterval, AbstractPbox, pbox,
     plotpbox, makepbox, ispbox, isinterval, isscalar, straddles, straddlingzero,
     mean, var, std, sideVariance, dwmean, dwVariance,
-    conv, convFrechet, convPerfect, convOpposite, convFrechetNaive,
+    conv, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
     +, -, /, *,
     normal, gaussian, N, Normal,
     isequal,

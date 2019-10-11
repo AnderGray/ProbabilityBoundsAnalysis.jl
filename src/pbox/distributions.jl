@@ -132,6 +132,13 @@ end
 
 U = uniform(min, max, x...) = env24(Suniform,min,max,x ...)
 
+###
+#   Distribution-free constructors for pboxes
+##
+
+
+
+
 
 function cut(x, p :: Real; tight :: Bool = true)
 

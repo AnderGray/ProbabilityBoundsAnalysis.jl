@@ -13,6 +13,8 @@
 #   ->  After using a pbox in a computation, the shape is no loger saved. For example normal(0,1) + 1, should still be a normal
 #   ->  env() between two scalars should return interval. Works but returned variance is [0,0]
 #   ->  Giving pboxes to the interval constructor should return envelope
+#   ->  Potential error with reciprocate function. No mean and variance transformations yet
+#   -> cut(pbox([0,1]),0.5) returns [0.5026256564141035, 0.4973743435858965]. Right side larger!
 #
 #   Severe:
 #       ->  makepbox() won't work when both a pbox and an interval type are introduced as arguments
@@ -198,7 +200,7 @@ function computeMoments(x :: pbox)
     x.mh = min(x.mh,mean(x.d));
     if (isinterval(x))
         x.vl = max(x.vl,0);
-        x.vh = min(x.vh, ((x.u-x.d).^2/4)...);
+        x.vh = min(x.vh, ((x.u-x.d).^2/4)...); # Should be changed (µ - lo)(µ - hi) if mu is included? What if it is bounded?
         return x;
     end
 
