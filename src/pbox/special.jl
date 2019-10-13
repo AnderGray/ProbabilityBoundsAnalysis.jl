@@ -4,6 +4,12 @@
 # Definition of auxiliary and miscilaneous function
 #
 #           University of Liverpool
+#                                           Author: Ander Gray
+#                                           Email:  ander.gray@liverpool.ac.uk
+#
+#   Port of R code pba.r by Scott Ferson
+#   Origional code available at:
+#   Based on the paper:
 ######
 
 interval(a::AbstractInterval, b :: AbstractInterval) = interval(a.lo, b.hi);

@@ -1,10 +1,18 @@
-##
-#   Change this:
+######
+# This file is part of the pba.jl package
 #
-#   Written By Ander Gray. Method of Matching moments for computing interval mean and variance from and interval data set.
-#   As described in S. Ferson (2007), "Experimental Uncertainty Estimation and Statistics for Data Having Interval Uncertainty"
+#   Definition of pbox class with constructor methdos
 #
-##
+#           University of Liverpool
+#                                           Author: Ander Gray
+#                                           Email:  ander.gray@liverpool.ac.uk
+#
+#   Port of C++ by Scott Ferson (2007)
+#   Origional code available at:
+#   Based on the paper: "Experimental Uncertainty Estimation and Statistics for
+#                               Data Having Interval Uncertainty"
+#
+######
 
 using IntervalArithmetic, Statistics
 

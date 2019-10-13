@@ -4,6 +4,13 @@
 #   Definition of pbox class with constructor methdos
 #
 #           University of Liverpool
+#                                           Author: Ander Gray
+#                                           Email:  ander.gray@liverpool.ac.uk
+#
+#   Port of R code pba.r by Scott Ferson
+#   Origional code available at:
+#   Based on the paper:
+#
 ######
 
 
@@ -14,7 +21,8 @@
 #   ->  env() between two scalars should return interval. Works but returned variance is [0,0]
 #   ->  Giving pboxes to the interval constructor should return envelope
 #   ->  Potential error with reciprocate function. No mean and variance transformations yet
-#   -> cut(pbox([0,1]),0.5) returns [0.5026256564141035, 0.4973743435858965]. Right side larger!
+#   ->  Cut(pbox([0,1]),0.5) returns [0.5026256564141035, 0.4973743435858965]. Right side larger!
+#   ->  Multiplication of pboxes with intervals not working as expected.
 #
 #   Severe:
 #       ->  makepbox() won't work when both a pbox and an interval type are introduced as arguments

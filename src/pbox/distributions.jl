@@ -4,6 +4,12 @@
 # Functions to construct pboxes using distributions
 #
 #           University of Liverpool
+#                                           Author: Ander Gray
+#                                           Email:  ander.gray@liverpool.ac.uk
+#
+#   Port of R code pba.r by Scott Ferson
+#   Origional code available at:
+#   Based on the paper:
 ######
 
 ii()    = [        0; collect((1:(pba.steps-1)) / pba.steps)];

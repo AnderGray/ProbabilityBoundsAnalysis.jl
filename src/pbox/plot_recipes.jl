@@ -4,6 +4,12 @@
 # Definition of plotting recipes
 #
 #           University of Liverpool
+#                                           Author: Ander Gray
+#                                           Email:  ander.gray@liverpool.ac.uk
+#
+#   Port of R code pba.r by Scott Ferson
+#   Origional code available at:
+#   Based on the paper:
 ######
 
 function plotpbox(s ::pbox; cumulative=pba.cumulative, name = missing, col = missing)
