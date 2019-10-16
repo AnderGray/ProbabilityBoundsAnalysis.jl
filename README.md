@@ -1,5 +1,5 @@
 # pba.jl
-[Probability bounds analysis](https://en.wikipedia.org/wiki/Probability_bounds_analysis) in Julia, a package for performing arithmetic between uncertain numbers. `pba.jl` is a julia package for projecting partial information about random variables through mathematical expressions. 
+[Probability bounds analysis](https://en.wikipedia.org/wiki/Probability_bounds_analysis) in Julia, a package for performing arithmetic between uncertain numbers. `pba.jl` computes guaranteed bounds on functions of random variables, given only partial information about their marginals and dependence. Considered to be a form of rigorous computing with random variables.
 
 The mayority of this code is a port from [pba.r](https://github.com/AnderGray/pba.jl) by Scott Ferson and Jason O'Rawe, Applied Biomathematics
 
@@ -10,6 +10,18 @@ Supported uncertain numbers:
   * [intervals](https://en.wikipedia.org/wiki/Interval_arithmetic)
   * [probability boxes](https://en.wikipedia.org/wiki/Probability_box)
 
+Supported arithmetic operations:
+
+
+Supported dependent arithmetic between uncertain numbers
+
+|                           |     independent    | dependency known   | dependency unknown | perfect/opposite     | partial information  |
+|---------------------------|:------------------:|--------------------|--------------------|----------------------|----------------------|
+| intervals                 | not known to exist | not known to exist |         yes        | some solutions exist | some solutions exist |
+| probability distributions |         yes        |         tbc        |         yes        |          yes         |          tbc         |
+| probability boxes         |         yes        |         tbc        |         yes        |          yes         |          tbc         |
+
+**tbc: to be continued. General solutions exits and will be implemented.**
 
 
 Installation
@@ -60,7 +72,7 @@ Bibliography
 * [pba.r](https://github.com/AnderGray/pba.jl): (needs link) R version of this software.
 * [RAMAS® RiskCalc](https://www.ramas.com/riskcalc): a comerical software for distribution-free risk analysis.
 * [IntervalArithmetic.jl](https://github.com/JuliaIntervals/IntervalArithmetic.jl): the interval arithmetic package used in this software.
-* [ValidatedNumerics.jl](https://github.com/JuliaIntervals/ValidatedNumerics.jl): a suite of julia packages for performing rigorous computations.
+* [ValidatedNumerics.jl](https://github.com/JuliaIntervals/ValidatedNumerics.jl): a suite of julia packages for rigorous computations.
 
 Acknowledgements
 ---
