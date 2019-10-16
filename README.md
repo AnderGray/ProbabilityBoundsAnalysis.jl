@@ -10,7 +10,7 @@ Supported uncertain numbers:
   * [intervals](https://en.wikipedia.org/wiki/Interval_arithmetic)
   * [probability boxes](https://en.wikipedia.org/wiki/Probability_box)
 
-Supported arithmetic operations:
+Supported arithmetic operations: **(Maybe we don't mention this here)**
 
 
 Supported dependent arithmetic between uncertain numbers:
@@ -51,7 +51,7 @@ A probability distribution can be using it's shape and parameters:
 
 ```julia
 julia> a = normal(0,1)
-Pbox: 	  ~ normal ( range=[-3.090232306167818,3.090232306167818], mean=0.0, var=1.0)
+Pbox: 	  ~ normal ( range=[-3.090232,3.090232], mean=0.0, var=1.0)
 ```
 In `pba.jl` probability distributions are p-boxes, but with equal bounds and precise moments.
 
@@ -73,23 +73,69 @@ There are a number of ways that p-boxes can be created. For example they are the
 
 ```julia
 julia> c = normal(interval(0,1),1)
-Pbox: 	  ~ normal ( range=[-3.090232306167818,4.0902323061678185], mean=[0.0,1.0], var=1.0)
+Pbox: 	  ~ normal ( range=[-3.09023,4.0902322], mean=[0.0,1.0], var=1.0)
 ```
 or by taking the envelope over a number of uncertain numbers:
 ```julia
 julia> d = normal(-1,1); 
 julia> e = normal(1, interval(1,2));
 julia> f = env(d,e)
-Pbox: 	  ~ normal ( range=[-5.180464612335636,7.180464612335636], mean=[-1.0,1.0], var=[1.0,4.0])
+Pbox: 	  ~ normal ( range=[-5.18046,7.1804646], mean=[-1.0,1.0], var=[1.0,4.0])
 ```
 and may be plotted as follows:
 
 ```julia
 julia> plotpbox(f)
 ```
+![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/pboxExample1.png "a probability box")
 
+In `pba.jl` all plots of uncertain numbers are of their cdfs.
 
 ### Arithmetic
+
+Most of the basic binary operations binary operations can be performed between uncertain numbers of all types:
+
+```julia
+julia> a = normal(-1,1); 
+julia> b = interval(1,2);
+julia> a + b
+Pbox: 	  ~  ( range=[-3.09023,4.090232], mean=[0.0,1.0], var=[1.0,1.25])
+
+julia> a - b
+Pbox: 	  ~  ( range=[-6.090232,1.0902323], mean=[-3.0,-2.0], var=[1.0,1.25])
+
+julia> a * b
+Pbox: 	  ~  ( range=[-4.090232,4.180464], mean=[-1.015451,-1.9690], var=[0.99763,3.99053])
+
+julia> a / b
+Pbox: 	  ~  ( range=[-2.045116,2.0902323], mean=[-0.50772,-0.984548], var=[0.249408,0.99763])
+```
+
+All of the above operations assume independence. For unknown dependence:
+```julia
+julia> convFrechet(a,b,+)
+Pbox: 	  ~  ( range=[-3.09023,4.090232], mean=[0.0,1.0], var=[0.383917,2.1086384])
+
+julia> convFrechet(a,b,-)
+Pbox: 	  ~  ( range=[-6.09023,1.090232], mean=[-3.0,-2.0], var=[0.383917,2.108638])
+```
+
+The resulting p-boxes are much wider than the independence case.
+
+Perfect and opposite convolutions can also be performed:
+```julia
+julia> a = normal(0,1);
+julia> b = normal(1,1);
+julia> convPerfect(a,b,+)
+Pbox: 	  ~  ( range=[-5.18046,7.18046], mean=[0.96909,1.030903], var=[3.80050,4.18248])
+
+julia> convOpposite(a,b)
+Pbox: 	  ~  ( range=[0.48559,1.51440], mean=[0.96909,1.03090], var=[0.0,0.00840])
+```
+
+
+
+
 
 
 Interval statistics 
@@ -130,4 +176,7 @@ For interval statistics:
 Acknowledgements
 ---
 
-For all those who believe in honest computation (add funders)
+For all those who believe in honest computation 
+
+
+(also add funders)
