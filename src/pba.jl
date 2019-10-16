@@ -7,10 +7,26 @@
 #                                           Author: Ander Gray
 #                                           Email:  ander.gray@liverpool.ac.uk
 #
-#   Port of R code pba.r by Scott Ferson
+#   Port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
 #   Origional code available at:
 #   Based on the paper:
 ######
+
+#####
+#       To use:
+#           ->  either download package directly from github:
+#
+#               julia> ]                                                     (opens package manager)
+#               (v1.0) pkg> add https://github.com/AnderGray/pba.jl.git      (when released will be "add pba")
+#               julia> using pba
+#
+#           ->  or if you have source code
+#
+#               julia> include("directory/of/source/src/pba.jl")
+#               julia> using Main.pba
+#
+#
+####
 
 __precompile__(true)
 

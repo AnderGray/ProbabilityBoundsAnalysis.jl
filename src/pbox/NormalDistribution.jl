@@ -176,6 +176,14 @@ end
 
 
 function bivariate_cdf(a,b,p)
+
+  if a == -Inf; return 0;end                # The following lines partially remove
+  if b == -Inf; return 0;end                # NaNs calculated at extreme values
+  if a ==  Inf && b ==  Inf; return 1;end
+
+  if a == Inf; a = sqrt(prevfloat(Inf));end
+  if b == Inf; b = sqrt(prevfloat(Inf));end
+
   if abs(p) < 0.3
    NG = 1
    LG = 3
