@@ -129,7 +129,7 @@ julia> b = normal(1,1);
 julia> convPerfect(a,b,+)
 Pbox: 	  ~  ( range=[-5.18046,7.18046], mean=[0.96909,1.030903], var=[3.80050,4.18248])
 
-julia> convOpposite(a,b)
+julia> convOpposite(a,b,+)
 Pbox: 	  ~  ( range=[0.48559,1.51440], mean=[0.96909,1.03090], var=[0.0,0.00840])
 ```
 
