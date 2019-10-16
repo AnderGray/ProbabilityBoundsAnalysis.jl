@@ -28,7 +28,7 @@ Installation
 ---
 Two ways to install and use:
 
-1. From the julia package manager
+**1. From the julia package manager**
 ```julia
 julia> ]
 (v1.0) pkg> add https://github.com/AnderGray/pba.jl.git
@@ -36,7 +36,7 @@ julia> using pba
 ```
 (will be `add pba` when full package is released)
 
-2. Downloading Source code
+**2. Downloading the source code**
 ```julia
 julia> include("directory/of/source/src/pba.jl")
 julia> using Main.pba
@@ -47,7 +47,7 @@ Once installed, uncertain numbers can be created
 Uncertain numbers
 ---
 
-A probability distribution can be using it's shape and parameters:
+A probability distribution can be created by using it's shape and parameters:
 
 ```julia
 julia> a = normal(0,1)
@@ -93,7 +93,7 @@ In `pba.jl` all plots of uncertain numbers are of their cdfs.
 
 ### Arithmetic
 
-Most of the basic binary operations binary operations can be performed between uncertain numbers of all types:
+Most of the basic binary operations can be performed between uncertain numbers of all types:
 
 ```julia
 julia> a = normal(-1,1); 
