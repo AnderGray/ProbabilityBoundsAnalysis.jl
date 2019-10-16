@@ -13,11 +13,11 @@ Supported uncertain numbers:
 Supported arithmetic operations:
 
 
-Supported dependent arithmetic between uncertain numbers
+Supported dependent arithmetic between uncertain numbers:
 
 |                           |     independent    | dependency known   | dependency unknown | perfect/opposite     | partial information  |
 |---------------------------|:------------------:|--------------------|--------------------|----------------------|----------------------|
-| intervals                 | not known to exist | not known to exist |         yes        | some solutions exist | some solutions exist |
+| intervals                 | not known to exist | no solution exists |         yes        | some solutions exist | some solutions exist |
 | probability distributions |         yes        |         tbc        |         yes        |          yes         |          tbc         |
 | probability boxes         |         yes        |         tbc        |         yes        |          yes         |          tbc         |
 
@@ -48,7 +48,7 @@ Uncertain numbers
 ---
 
 
-### Arithemtic
+### Arithmetic
 
 
 Interval statistics 
