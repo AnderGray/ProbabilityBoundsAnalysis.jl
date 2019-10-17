@@ -93,7 +93,7 @@ In `pba.jl` all plots of uncertain numbers are of their cdfs.
 
 ### Arithmetic
 
-Most of the basic binary operations can be performed between uncertain numbers of all types:
+Most of the fundamental binary operations can be performed between uncertain numbers of all types:
 
 ```julia
 julia> a = normal(-1,1); 
@@ -166,6 +166,12 @@ For probability bound analysis:
 For interval statistics:
 * [*Ferson, Scott, et al. "Experimental uncertainty estimation and statistics for data having interval uncertainty." Sandia National Laboratories, Report SAND2007-0939 162 (2007)*](https://www.researchgate.net/file.PostFileLoader.html?id=52b1b418d3df3e110f8b45b1&assetKey=AS%3A272184528834564%401441905256417)
 
+For dependency modelling:
+* [*Ferson, S., R. Nelsen, J. Hajagos, D. Berleant, J. Zhang, W.T. Tucker, L. Ginzburg and W.L. Oberkampf. 2004. Dependence in Probabilistic Modeling, Dempster-Shafer Theory, and Probability Bounds Analysis. Sandia National Laboratories, SAND2004-3072, Albuquerque, NM*](https://www.osti.gov/servlets/purl/1427286)
+
+* *Nelsen, Roger B. An introduction to copulas. Springer Science & Business Media, 2007*
+
+
 ### related packages:
 * [puffin](https://github.com/AnderGray/pba.jl): (needs link) uncertainty compiler. Converts scientific codes in to one readable by a package like this.
 * [pba.r](https://github.com/AnderGray/pba.jl): (needs link) R version of this software.
@@ -179,4 +185,3 @@ Acknowledgements
 For all those who believe in honest computation 
 
 
-(also add funders)
