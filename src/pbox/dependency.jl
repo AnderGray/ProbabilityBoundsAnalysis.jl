@@ -1,7 +1,7 @@
 ######
 # This file is part of the pba.jl package.
 #
-#   Definition of bivariate copula class plus methods
+#   Definition of bivariate copula class, joint distribution class and methods
 #
 #           University of Liverpool
 #                                           Author: Ander Gray
@@ -19,15 +19,23 @@
 #
 #   Or can we do it as sums of the Frechet bounds? (Shuffles of M)
 #   See: Nelson page 68.
+#
+#   For algebra of random variables, including algebra of covaraince See https://en.wikipedia.org/wiki/Algebra_of_random_variables
+#       -> The above link is also useful for moment propagation. Could you perform covariance algebra when the covarainces are partially known
+#
+#
+#   One model for dependency trancking, is to assume a copula family, and compute the covariance of the results of opartaions with their inputs
+#   using the arithemtic of covaraince described above. For this we would need an interval covaraince algebra, and a way of performing convolutions with it.
+#  
 ###
 
 ###
 #
 #   Known bugs:
-#                   ->  The differentiation for the sampling should not depend on n. May request values x>1 or x<0 (Partially solved)
+#                   ->  The differentiation for the sampling should not depend on n. May request values x>1 or x<0  (Solved)
 #                   ->  eps() should be used for differentiation. Liams code. (Solved)
-#                   ->  Linear interpolator not working...
-#                   ->  Bilinear interpolartor?
+#                   ->  Linear interpolator not working... (Solved)
+#                   ->  Bilinear interpolartor? (Solved)
 #
 ###
 
@@ -59,8 +67,9 @@ mutable struct copula <: AbstractCopula
         if (ismissing(cdf) && ismissing(density)) throw(ArgumentError("Cdf and/or density must be provided")) end
         if (ismissing(cdf)); cdf = calcCdf(density); end
         C = new(cdf,density,func,param)
-        if (ismissing(density)); density = calcDensity(C);end
-        new(cdf,density, func, param)
+        if (ismissing(density)); density = calcDensity(C); end
+
+        return new(cdf,density, func, param)
 
     end
 end
@@ -79,7 +88,7 @@ function (obj::copula)(X,Y, useInterp = false)             # Evaluating the copu
     end
 
     cdf = interpolate(obj.cdf, BSpline(Quadratic(Line(OnCell()))))
-
+    #println("interpolator used")
     x = X * (n-1)  .+ 1;
     y = Y * (n-1)  .+ 1;
     return cdf(x,y);
@@ -102,7 +111,7 @@ function sample(C :: AbstractCopula, N = 1; plot = false)
 
     # if (!ismissing(C.func) && n < 10^5) m = 10^5; end  # If function is provided more acurate sampling, otherwise must use interpolator
     e = sqrt(eps());      ygrid = range(0,1,length = m);
-    if (C.func == Gau) useInterp = true ;end
+    if (C.func == Gau) useInterp = true ;end    # Should actually use cholesky for sampling gaussian copula
 
     conditional = (C(x .+ e/2,ygrid, useInterp) - C(x .- e/2,ygrid, useInterp))./e
 
@@ -236,6 +245,8 @@ opp(X, Y)   = [max(x+y-1,0) for x in X, y in Y];
 F(X,Y,s = 1)      = [log(1+(s^x-1)*(s^y-1)/(s-1))/log(s) for x in X, y in Y]
 Cla(X,Y, t = 0) = [max((x^(-t)+y^(-t)-1)^(-1/t),0) for x in X, y in Y]
 Gau(X,Y, corr = 0)  = [bivariate_cdf(quantile.(Normal(),x),quantile.(Normal(),y), corr) for x in X, y in Y];
+
+Arch1(X,Y,theta = 0) = [1 - ((1-x)^theta + (1-y)^theta - (1-x)^theta * (1-y)^theta )^theta for x in X, y in Y];
 
 mvNormCdf(X,Y,cor) = [bivariate_cdf(x,y,cor) for x in X, y in Y];
 
@@ -422,12 +433,14 @@ function plot4(J :: AbstractJoint, CDF = true)    # Won't work if n!=200
 
 end
 
-slice(x,y) = pycall(pybuiltin("slice"), PyObject, x, y)
-function scatter(a :: Array{Float64,2})
+slice(x,y) = pycall(pybuiltin("slice"), PyObject, x, y)         # For performing python array slicing for
+
+function scatter(a :: Array{Float64,2}; title = "samples")
 
     x = a[:,1];
     y = a[:,2];
-    fig = plt.figure("Samples", figsize=(10, 10))
+
+    fig = plt.figure(title, figsize=(10, 10))
     grid = plt.GridSpec(4, 4, hspace=0.2, wspace=0.2)
     main_ax = fig.add_subplot(get(grid, (slice(1,4),slice(0,3))))
     y_hist  = fig.add_subplot(get(grid, (slice(1,4),3)), xticklabels=[], sharey=main_ax)
