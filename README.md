@@ -151,6 +151,27 @@ julia> include("directory/of/source/src/IntervalStatistics/IntervalStatistics.jl
 
 Dependency modelling
 ----
+The dependency package is not yet a part of the main module. To use
+```julia
+julia> include("directory/of/source/src/pbox/dependency.jl")
+```
+
+Any possible multivariate dependence can be incoded in a copula. Copulas, sometimes called dependency functions, is a joint cdf with standard uniform marginals, and is a way to encode dependency independently of marginal distributions. A copula C is the function \[C: [0,1]^{d} \rightarrow [0,1]\], where d is the dimension of the copula.
+
+The supported copulas are:
+
+  * π: independence
+  * M: perfect dependence and the upper Frechét bound
+  * W: perfect dependence and the lower Frechét bound
+  * Gaussian: family with correlation coefficient r (-1 for W, 0 for π, 1 for M)
+  * Frank: family with parameter s (0 for W, 1 for π, Inf for M)
+  * Clayton: family with parameter t (-1 for W, 0 for π, Inf for M)
+
+
+
+Given any marginal distributions F(x) and F(y) and a copla C( : ), a joint distribution can be created: H(x,y) = C(F(x),F(y)).
+
+
 
 
 
