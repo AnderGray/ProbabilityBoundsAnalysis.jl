@@ -175,6 +175,7 @@ Copula ~ Gau(r=0.7)
 
 julia> plotCdf(a)
 ```
+![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/GaussianCopula.png "Gaussian copula with a correlation of 0.7")
 
 The density can be plotted using the `plotDensity()` function. The copula can be evaluated and sampled in the following way:
 
@@ -199,6 +200,7 @@ Joint ~ Gau( r=0.7, Beta{Float64}(α=4.0, β=2.0), Beta{Float64}(α=4.0, β=2.0)
 
 julia> plotDensity(J)
 ```
+![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/JointDist1.png "Bivariate Beta with gaussian copula with correlation of 0.7")
 
 A joint distribution can also be sampled:
 
@@ -206,7 +208,7 @@ A joint distribution can also be sampled:
 julia> Jsamps = sample(J,10^6)
 julia> scatter(Jsamps)
 ```
-
+![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/Jsamples.png "Scatter plot of samples of J")
 
 
 
