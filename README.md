@@ -156,7 +156,7 @@ The dependency package is not yet a part of the main module. To use
 julia> include("directory/of/source/src/pbox/dependency.jl")
 ```
 
-Any possible multivariate dependence can be incoded in a copula. Copulas, sometimes called dependency functions, is a joint cdf with standard uniform marginals, and is a way to encode dependency independently of marginal distributions. A copula C is the function \[C: [0,1]^{d} \rightarrow [0,1]\], where d is the dimension of the copula.
+Any possible multivariate dependence can be incoded in a copula. Copulas, sometimes called dependency functions, is a joint cdf with standard uniform marginals, and is a way to encode dependency independently of marginal distributions. 
 
 The supported copulas are:
 
@@ -177,7 +177,8 @@ julia> plotCdf(a)
 ```
 ![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/GaussianCopula.png "Gaussian copula with a correlation of 0.7")
 
-The density can be plotted using the `plotDensity()` function. The copula can be evaluated and sampled in the following way:
+The density can be plotted using the `plotDensity()` function. A copula C is the function C:[0,1] &rarr;[0,1]<sup>d</sup>, where d is the dimension of the copula. The copula can be evaluated and sampled in the following way:
+
 
 ```julia
 julia> C(0.5,0.5)
@@ -192,7 +193,7 @@ julia> C([0.2,0.6],[0.3,0.7])
 julia> samps = sample(C,10^6);
 ```
 
-Given any marginal distributions F(x) and F(y) and a copla C( : ), a joint distribution can be created: H(x,y) = C(F(x),F(y)).  In `pba.jl` a joint distribution can be created by passing marginals to the copula. For example, a distribution with Beta marginals and a gaussian copula:
+Given any marginal distributions F<sub>X</sub>(x) and F<sub>Y</sub>(y) and a copla C( : ), a joint distribution can be created: H(x,y) = C(F<sub>X</sub>(x),F<sub>Y</sub>(y)).  In `pba.jl` a joint distribution can be created by passing marginals to the copula. For example, a distribution with Beta marginals and a gaussian copula:
 
 ```julia
 julia> J = C(Beta(4,2),Beta(4,2))
