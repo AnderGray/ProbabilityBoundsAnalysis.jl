@@ -177,7 +177,7 @@ julia> plotCdf(a)
 ```
 ![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/GaussianCopula.png "Gaussian copula with a correlation of 0.7")
 
-The density can be plotted using the `plotDensity()` function. A copula C is the function C:[0,1] &rarr;[0,1]<sup>d</sup>, where d is the dimension of the copula. The copula can be evaluated and sampled in the following way:
+The density can be plotted using the `plotDensity()` function. A copula C is the function C:[0,1]<sup>d</sup> &rarr;[0,1], where d is the dimension of the copula. Only bivariate copulas are considered so far in `pba.jl`. A copula can be evaluated and sampled in the following way:
 
 
 ```julia
