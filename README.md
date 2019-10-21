@@ -156,7 +156,7 @@ The dependency package is not yet a part of the main module. To use
 julia> include("directory/of/source/src/pbox/dependency.jl")
 ```
 
-Any possible multivariate dependence can be incoded in a copula. Copulas, sometimes called dependency functions, is a joint cdf with standard uniform marginals, and is a way to encode dependency independently of marginal distributions. 
+Any possible multivariate dependence can be encoded in a copula. Copulas, sometimes called dependency functions, are a joint cdf with standard uniform marginals, and are a way to model dependency independently of marginal distributions. 
 
 The supported copulas are:
 
@@ -193,7 +193,7 @@ julia> C([0.2,0.6],[0.3,0.7])
 julia> samps = sample(C,10^6);
 ```
 
-Given any marginal distributions F<sub>X</sub>(x) and F<sub>Y</sub>(y) and a copla C( : ), a joint distribution can be created: H(x,y) = C(F<sub>X</sub>(x),F<sub>Y</sub>(y)).  In `pba.jl` a joint distribution can be created by passing marginals to the copula. For example, a distribution with Beta marginals and a gaussian copula:
+Given any marginal distributions F<sub>X</sub>(x) and F<sub>Y</sub>(y) and a copla C( : ), a joint distribution can be created: H(x,y) = C(F<sub>X</sub>(x),F<sub>Y</sub>(y)).  In `pba.jl` a joint distribution can be created by passing marginals to the copula. For example, a distribution with beta marginals and a gaussian copula:
 
 ```julia
 julia> J = C(Beta(4,2),Beta(4,2))
