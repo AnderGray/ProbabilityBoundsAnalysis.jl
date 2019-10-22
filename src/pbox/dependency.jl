@@ -26,7 +26,7 @@
 #
 #   One model for dependency trancking, is to assume a copula family, and compute the covariance of the results of opartaions with their inputs
 #   using the arithemtic of covaraince described above. For this we would need an interval covaraince algebra, and a way of performing convolutions with it.
-#  
+#
 ###
 
 ###
@@ -101,9 +101,11 @@ end
 function sample(C :: AbstractCopula, N = 1; plot = false)
 
     if plot return samplePlot(C,N);end
+    if (C.func == Gau) return CholeskyGaussian(N, C.param) ;end     # Use Cholesky decompostition of the Cov matrix for gaussian copula sampling
+
     x = rand(N);    y = rand(N);
     ux = x;         uy = zeros(N);
-    m = n;          useInterp = false;
+    m = n;          useInterp = false;      # Set true to use interpolator
 
     if C.func   == perf return hcat(ux,ux); end
     if C.func   == opp return hcat(ux,1 .- ux); end
@@ -111,7 +113,8 @@ function sample(C :: AbstractCopula, N = 1; plot = false)
 
     # if (!ismissing(C.func) && n < 10^5) m = 10^5; end  # If function is provided more acurate sampling, otherwise must use interpolator
     e = sqrt(eps());      ygrid = range(0,1,length = m);
-    if (C.func == Gau) useInterp = true ;end    # Should actually use cholesky for sampling gaussian copula
+
+    #if (C.func == Gau) useInterp = true ;end           # Should you not want to use Cholesky and interpolator has better performance for gaussian
 
     conditional = (C(x .+ e/2,ygrid, useInterp) - C(x .- e/2,ygrid, useInterp))./e
 
@@ -129,6 +132,17 @@ function sample(C :: AbstractCopula, N = 1; plot = false)
         uy[i] = linInterp(conditional[i,:], y[i]);
     end
     return hcat(ux,uy);
+end
+
+function CholeskyGaussian(N = 1, correlation = 0)
+
+    Cov = ones(2,2); Cov[1,2] = Cov[2,1] = correlation;
+    a = cholesky(Cov).L;
+    z = transpose(rand(Normal(),N,2))
+    x = a * z;
+    u = transpose(cdf.(Normal(),x))
+
+    return hcat(u[:,1],u[:,2])
 end
 
 function conditional(C :: AbstractCopula, xVal :: Real; plot = false)   # May also work for joint? xVal will be take from invCdf(M1, u1)
