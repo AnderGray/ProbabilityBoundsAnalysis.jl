@@ -1,7 +1,7 @@
 # pba.jl
 [Probability bounds analysis](https://en.wikipedia.org/wiki/Probability_bounds_analysis) in Julia, a package for performing arithmetic between uncertain numbers. `pba.jl` computes guaranteed bounds on functions of random variables, given only partial information about their marginals and dependence. Considered to be a form of rigorous computing with random variables.
 
-The mayority of this code is a port from [pba.r](https://github.com/AnderGray/pba.jl) by Scott Ferson and Jason O'Rawe, Applied Biomathematics (2006)
+The mayority of this code is a port from [pba.r](https://github.com/ScottFerson/pba.r) by Scott Ferson and Jason O'Rawe, Applied Biomathematics (2006)
 
 Supported uncertain numbers: 
 
@@ -235,8 +235,8 @@ For dependency modelling:
 
 ### related packages:
 * [puffin](https://github.com/AnderGray/pba.jl): (needs link) uncertainty compiler. Converts scientific codes in to one readable by a package like this.
-* [pba.r](https://github.com/AnderGray/pba.jl): (needs link) R version of this software.
-* [RAMAS® RiskCalc](https://www.ramas.com/riskcalc): a comerical software for distribution-free risk analysis.
+* [pba.r](https://github.com/ScottFerson/pba.r): R version of this software.
+* [RAMAS® RiskCalc](https://www.ramas.com/riskcalc): a commerical software for distribution-free risk analysis.
 * [IntervalArithmetic.jl](https://github.com/JuliaIntervals/IntervalArithmetic.jl): the interval arithmetic package used in this software.
 * [ValidatedNumerics.jl](https://github.com/JuliaIntervals/ValidatedNumerics.jl): a suite of julia packages for rigorous computations.
 
