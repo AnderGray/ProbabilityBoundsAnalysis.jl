@@ -14,7 +14,7 @@
 include("../src/pbox/dependency.jl")
 
 #   Define Marginals and copula
-a = π(Normal(10,2),Normal());
+a = W(Beta(4,2),Beta(4,2));
 
 samps = sample(a,10^6);
 

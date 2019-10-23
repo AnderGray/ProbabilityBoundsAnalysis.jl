@@ -8,8 +8,7 @@
 #                                           Email:  ander.gray@liverpool.ac.uk
 #
 #   Port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
-#   Origional code available at:
-#   Based on the paper:
+#   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
 ###
