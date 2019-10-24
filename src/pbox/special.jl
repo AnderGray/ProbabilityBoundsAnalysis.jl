@@ -62,6 +62,38 @@ function touching(a,b)
 end
 
 
+# Sorts item, and sorts follow the same way. Function changes item and follow
+function doublequick(item :: Array{<:Real,1}, follow :: Array{<:Real,1}, left = 1, right = length(item))
+
+    i = left;
+    j = right;
+
+    x = item[Int(round((left+right)/2))];
+
+    while (i<=j)
+        while (item[i] < x && i < right) i+=1;end
+        while (x < item[j] && j > left) j -=1;end
+        if (i <= j)
+
+			y = item[i];
+			item[i] = item[j];
+			item[j] = y;
+
+            y = follow[i];
+			follow[i] = follow[j];
+			follow[j] = y;
+
+			i+=1;
+			j-=1;
+        end
+    end
+
+	if (left < j) doublequick(item, follow, left,j);end
+	if (i < right) doublequick(item, follow, i,right);end
+
+end
+
+
 
 function Base.show(io::IO, z::pbox)
 

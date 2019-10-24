@@ -40,11 +40,11 @@
 ###
 
 using Distributions
-using PyPlot
+#using PyPlot
 using PyCall
 using LinearAlgebra
 using Interpolations
-using3D()
+#using3D()
 include("NormalDistribution.jl")
 
 global  n  = 200;        # Number of descretizations

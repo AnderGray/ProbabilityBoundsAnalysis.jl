@@ -99,17 +99,20 @@ export
     cut,
     left, right,
     VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper,
-    env, imp
+    env, imp,
+    AbstractCopula, copula
 
 
 
 include("pbox/pbox.jl")
+include("pbox/dependency.jl")
 include("pbox/arithmetic.jl")
 include("pbox/MomentTransformations.jl")
 include("pbox/distributions.jl")
 include("pbox/special.jl")
 include("pbox/plot_recipes.jl")
 include("intervalStatistics/IntervalStatistics.jl")
+
 
 
 end # module pba

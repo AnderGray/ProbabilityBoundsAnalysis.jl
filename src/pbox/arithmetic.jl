@@ -45,7 +45,7 @@ function conv(x::Real, y::Real, op = +)
     c = sort(c);
     Zd = c[Int.(((k .- 1) .* L) .+ L)];
 
-    ll = c;
+    ll = c;	# Probably can remove
 
     Y = repeat(y.u[:], inner = m);
     c = zeros(length(Y));
@@ -78,6 +78,95 @@ function conv(x::Real, y::Real, op = +)
     return pbox(Zu, Zd, ml = ml, mh = mh, vl=vl, vh=vh, dids="$(x.dids) $(y.dids)");
     #return ([Zu, Zd, ml, mh, vl, vh, "$(x.dids) $(y.dids)"]);
 
+end
+
+
+function conv(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the same as the conv function except the condensation is different
+
+
+	if (op == -) return conv(x, negate(y), C, +);end
+    if (op == /) return conv(x, reciprocate(y), C, *);end
+
+    x = makepbox(x);
+    y = makepbox(y);
+
+    m = x.n;
+    p = y.n;
+    n = min(pba.steps, m*p);
+    L = m * p / n;
+    c = zeros(m*p);
+    Zu = ones(n);
+    Zd = ones(n);
+
+	#Probs from copula
+    pdf = reshape(C.density,:,1);	# Should be vector of length n*n
+	pdf = pdf[:] ./(n*n)					# Gets rid of 2nd array dimension from reshape
+	pdfsave = deepcopy(pdf);
+
+    k = 1:n;
+
+    Y = repeat(y.d[:], inner = m);
+    for i=1:p
+        c[m*(i-1)+1:m*i] = map(op, x.d[:], Y[m*(i-1)+1:m*i]);
+    end
+
+	doublequick(c,pdf);
+	Zd = condense_d(c, pdf);
+
+	Y = repeat(y.u[:], inner = m);
+	c = zeros(length(Y));
+	for i=1:p
+		c[m*(i-1)+1:m*i] = map(op, x.u[:], Y[m*(i-1)+1:m*i]);
+	end
+
+	doublequick(c,pdfsave);
+	Zu = condense_u(c, pdfsave);
+
+	# Moment propagation needs to be included here
+
+	return pbox(Zu, Zd, dids="$(x.dids) $(y.dids)");
+
+end
+
+
+function condense_d(x :: Array{<:Real,1}, probs :: Array{<:Real,1})
+
+	n = pba.steps;	d = zeros(n);
+	cumulprob = 1.0;	z = n*n;
+	laststep = x[z];
+
+	for i = n:-1:1
+		pstep = i/n;
+		if z > 0
+			while ((pstep <= cumulprob) && (z > 0))
+				cumulprob = cumulprob - probs[z];			# Can we directly use the cdf?
+				z -= 1;
+			end
+		end
+		d[i] = laststep;
+		laststep = x[z+1];
+	end
+	return d
+end
+
+function condense_u(x :: Array{<:Real,1}, probs :: Array{<:Real,1})
+
+	n = pba.steps;	u = zeros(n);
+	cumulprob = 0.0; z = 1;
+  	laststep = x[z];
+
+	for i = 1:n
+		pstep = i/n
+		if z <= n*n
+			while (pstep >= cumulprob && z<=n*n)
+				cumulprob = cumulprob + probs[z];
+				z += 1;
+			end
+		end
+		u[i] = laststep;
+		laststep = x[z-1];
+	end
+	return u
 end
 
 function convPerfect(x::Real, y::Real, op = +)
