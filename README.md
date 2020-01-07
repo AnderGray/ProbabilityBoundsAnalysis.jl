@@ -10,8 +10,9 @@ Supported uncertain numbers:
   * [intervals](https://en.wikipedia.org/wiki/Interval_arithmetic)
   * [probability boxes](https://en.wikipedia.org/wiki/Probability_box)
 
+<!---
 Supported arithmetic operations: **(Maybe we don't mention this here)**
-
+--->
 
 Supported dependent arithmetic between uncertain numbers:
 
