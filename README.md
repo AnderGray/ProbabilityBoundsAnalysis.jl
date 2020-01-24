@@ -18,7 +18,7 @@ Supported dependent arithmetic between uncertain numbers:
 
 |                           |     independent    | dependency known   | dependency unknown | perfect/opposite     | partial information  |
 |---------------------------|:------------------:|--------------------|--------------------|----------------------|----------------------|
-| intervals                 | not known to exist | no solution exists |         yes        |  solutions exist |  solutions exist |
+| intervals                 | not known to exist |         tbc        |         yes        |  solutions exist |  solutions exist |
 | probability distributions |         yes        |         tbc        |         yes        |          yes         |          solutions exist         |
 | probability boxes         |         yes        |         tbc        |         yes        |          yes         |          solutions exist         |
 
@@ -91,6 +91,8 @@ julia> plotpbox(f)
 ![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/pboxExample1.png "a probability box")
 
 In `pba.jl` all plots of uncertain numbers are of their cdfs.
+
+**Currently only the normal distribution shaped p-boxes may be constructed like this. More to follow.**
 
 ### Arithmetic
 
