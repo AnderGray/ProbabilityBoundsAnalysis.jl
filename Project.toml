@@ -12,7 +12,8 @@ Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
 julia = "1.0"
-Plots = ">=0.29.4"
+Plots = "0.29"
 IntervalArithmetic = "0.15.2"
 Distributions = "0.23.1"
+Interpolations = "0.12"
 
