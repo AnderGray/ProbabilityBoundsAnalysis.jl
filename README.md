@@ -32,15 +32,15 @@ Two ways to install and use:
 **1. From the julia package manager**
 ```julia
 julia> ]
-(v1.0) pkg> add https://github.com/AnderGray/pba.jl.git
-julia> using pba
+(v1.0) pkg> add https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl.git
+julia> using ProbabilityBoundsAnalysis
 ```
-(will be `add pba` when full package is released)
+(will be `add ProbabilityBoundsAnalysis` when full package is released)
 
 **2. Downloading the source code**
 ```julia
-julia> include("directory/of/source/src/pba.jl")
-julia> using Main.pba
+julia> include("directory/of/source/src/ProbabilityBoundsAnalysis.jl")
+julia> using Main.ProbabilityBoundsAnalysis
 ```
 
 Once installed, uncertain numbers can be created
