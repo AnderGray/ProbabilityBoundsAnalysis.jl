@@ -12,6 +12,16 @@
 #
 ######
 
+#####
+#   Known Bugs:
+#
+#   ->  Convolution with a copula defined (sigma convolution) not quite working as exected for negative correlations.
+#		It could be the case that he imprints it with meanVarRange
+#
+#
+####
+
+
 
 
 ###########################
@@ -122,9 +132,22 @@ function conv(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the same a
 	doublequick(c,pdfsave);
 	Zu = condense_u(c, pdfsave);
 
+	# Mean tranforms the same as independence
+	ml = -Inf;
+    mh = Inf;
+
+    if (op)∈([+,-,*])
+        ml = map(op,x.ml,y.ml);
+        mh = map(op,x.mh,y.mh);
+    end
+
+    # Variance does not
+    vl = 0;
+    vh = Inf
+
 	# Moment propagation needs to be included here
 
-	return pbox(Zu, Zd, dids="$(x.dids) $(y.dids)");
+	return pbox(Zu, Zd, ml = ml, mh = mh, vl=vl, vh=vh, dids="$(x.dids) $(y.dids)");
 
 end
 
