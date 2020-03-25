@@ -10,9 +10,3 @@ IntervalArithmetic = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
-[compat]
-julia = ">=1.0"
-Plots = ">=0.29.4"
-IntervalArithmetic = ">=0.15.2"
-Distributions = ">=0.23.1"
-
