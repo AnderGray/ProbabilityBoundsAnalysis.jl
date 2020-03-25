@@ -54,7 +54,7 @@ A probability distribution can be created by using it's shape and parameters:
 julia> a = normal(0,1)
 Pbox: 	  ~ normal ( range=[-3.090232,3.090232], mean=0.0, var=1.0)
 ```
-In `pba.jl` probability distributions are p-boxes, but with equal bounds and precise moments.
+In `ProbabilityBoundsAnalysis.jl` probability distributions are p-boxes, but with equal bounds and precise moments.
 
 The `IntervalArithmetic.jl` package is used to create intervals:
 
@@ -63,7 +63,7 @@ julia> b = interval(0,1)
 [0, 1]
 ```
 
-`IntervalArithmetic.jl` will work natively with `pba.jl`, however an interval can be converted to a p-box in the following way:
+`IntervalArithmetic.jl` will work natively with `ProbabilityBoundsAnalysis.jl`, however an interval can be converted to a p-box in the following way:
 
 ```julia
 julia> b = makepbox(interval(0,1))
@@ -90,7 +90,7 @@ julia> plotpbox(f)
 ```
 ![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/pboxExample1.png "a probability box")
 
-In `pba.jl` all plots of uncertain numbers are of their cdfs.
+In `ProbabilityBoundsAnalysis.jl` all plots of uncertain numbers are of their cdfs.
 
 **Currently only the normal distribution shaped p-boxes may be constructed like this. More to follow.**
 
@@ -178,9 +178,9 @@ Copula ~ Gau(r=0.7)
 
 julia> plotCdf(a)
 ```
-![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/GaussianCopula.png "Gaussian copula with a correlation of 0.7")
+![alt text](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl/blob/master/doc/plots/GaussianCopula.png "Gaussian copula with a correlation of 0.7")
 
-The density can be plotted using the `plotDensity()` function. A copula C is the function C:[0,1]<sup>d</sup> &rarr;[0,1], where d is the dimension of the copula. Only bivariate copulas are considered so far in `pba.jl`. A copula can be evaluated and sampled in the following way:
+The density can be plotted using the `plotDensity()` function. A copula C is the function C:[0,1]<sup>d</sup> &rarr;[0,1], where d is the dimension of the copula. Only bivariate copulas are considered so far in `ProbabilityBoundsAnalysis.jl`. A copula can be evaluated and sampled in the following way:
 
 
 ```julia
@@ -196,7 +196,7 @@ julia> C([0.2,0.6],[0.3,0.7])
 julia> samps = sample(C,10^6);
 ```
 
-Given any marginal distributions F<sub>X</sub>(x) and F<sub>Y</sub>(y) and a copla C( : ), a joint distribution can be created: H(x,y) = C(F<sub>X</sub>(x),F<sub>Y</sub>(y)).  In `pba.jl` a joint distribution can be created by passing marginals to the copula. For example, a distribution with beta marginals and a gaussian copula:
+Given any marginal distributions F<sub>X</sub>(x) and F<sub>Y</sub>(y) and a copla C( : ), a joint distribution can be created: H(x,y) = C(F<sub>X</sub>(x),F<sub>Y</sub>(y)).  In `ProbabilityBoundsAnalysis.jl` a joint distribution can be created by passing marginals to the copula. For example, a distribution with beta marginals and a gaussian copula:
 
 ```julia
 julia> J = C(Beta(4,2),Beta(4,2))
@@ -204,7 +204,7 @@ Joint ~ Gau( r=0.7, Beta{Float64}(α=4.0, β=2.0), Beta{Float64}(α=4.0, β=2.0)
 
 julia> plotDensity(J)
 ```
-![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/JointDist1.png "Bivariate Beta with gaussian copula with correlation of 0.7")
+![alt text](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl/blob/master/doc/plots/JointDist1.png "Bivariate Beta with gaussian copula with correlation of 0.7")
 
 A joint distribution can also be sampled:
 
@@ -212,7 +212,7 @@ A joint distribution can also be sampled:
 julia> Jsamps = sample(J,10^6)
 julia> scatter(Jsamps)
 ```
-![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/Jsamples.png "Scatter plot of samples of J")
+![alt text](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl/blob/master/doc/plots/Jsamples.png "Scatter plot of samples of J")
 
 
 
