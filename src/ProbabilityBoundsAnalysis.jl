@@ -1,9 +1,10 @@
 ######
 # This file is part of the ProbabilityBoundsAnalysis.jl package.
 #
-# Definition of the ProbabilityBoundsAnalysis.jl module
+#   Definition of the ProbabilityBoundsAnalysis.jl module
 #
-#           University of Liverpool
+#           University of Liverpool, Institute for Risk and Uncertainty
+#
 #                                           Author: Ander Gray
 #                                           Email:  ander.gray@liverpool.ac.uk
 #

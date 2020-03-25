@@ -1,9 +1,10 @@
 ######
-# This file is part of the pba.jl package.
+# This file is part of the ProbabilityBoundsAnalysis.jl package.
 #
 #   Definition of bivariate copula class, joint distribution class and methods
 #
-#           University of Liverpool
+#           University of Liverpool, Institute for Risk and Uncertainty
+#
 #                                           Author: Ander Gray
 #                                           Email:  ander.gray@liverpool.ac.uk
 ######

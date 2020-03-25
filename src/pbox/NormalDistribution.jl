@@ -1,11 +1,20 @@
-"""
- Author - Liam T. Henry
+######
+# This file is part of the ProbabilityBoundsAnalysis.jl package.
+#
+#   Bivarte gaussian cdf function, by Gauss-Legendre quadrature
+#
+#           University of Liverpool, Institute for Risk and Uncertainty
+#
+#                                           Author: Liam T. Henry & Ander Gray
+#                                           Email:  ander.gray@liverpool.ac.uk
+#
+#   Port of Fortran code By A. Genz (2013)
+#   Original code at: http://www.math.wsu.edu/faculty/genz/homepage
+#   Based on the paper: Numerical computation of rectangular bivariate
+#                       and trivariate normal and t probabilities, A. Genz.
+######
 
- Port of Fortran code By A. Genz (2013)
- Original code at: http://www.math.wsu.edu/faculty/genz/homepage
- Based on the paper: Numerical computation of rectangular bivariate
-                     and trivariate normal and t probabilities, A. Genz.
-"""
+
 
 #Gauss Legendre points
 abscissae6  = [-0.9324695142031522
