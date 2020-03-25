@@ -1,7 +1,7 @@
 ######
-# This file is part of the pba.jl package.
+# This file is part of the ProbabilityBoundsAnalysis.jl package.
 #
-# Definition of the pba.jl module
+# Definition of the ProbabilityBoundsAnalysis.jl module
 #
 #           University of Liverpool
 #                                           Author: Ander Gray
@@ -12,24 +12,30 @@
 ######
 
 #####
-#       To use:
-#           ->  either download package directly from github:
+#       To install:
+#
+#			->  using package manager
+#
+#				julia> ]                                                     (opens package manager)
+#               (v1.0) pkg> add ProbabilityBoundsAnalysis
+#
+#           ->  download package directly from github:
 #
 #               julia> ]                                                     (opens package manager)
-#               (v1.0) pkg> add https://github.com/AnderGray/pba.jl.git      (when released will be "add pba")
+#               (v1.0) pkg> add https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl.git  
 #               julia> using pba
 #
 #           ->  or if you have source code
 #
-#               julia> include("directory/of/source/src/pba.jl")
-#               julia> using Main.pba
+#               julia> include("directory/of/source/src/ProbabilityBoundsAnalysis.jl")
+#               julia> using Main.ProbabilityBoundsAnalysis
 #
 #
 ####
 
 __precompile__(true)
 
-module pba
+module ProbabilityBoundsAnalysis
 
 using IntervalArithmetic, Distributions, Interpolations, Statistics, Plots
 
