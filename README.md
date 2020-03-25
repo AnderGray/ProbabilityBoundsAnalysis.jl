@@ -6,7 +6,7 @@ The mayority of this code is a port from [pba.r](https://github.com/ScottFerson/
 Supported uncertain numbers: 
 
   * scalars
-  * probability distributions
+  * [probability distributions](https://en.wikipedia.org/wiki/Cumulative_distribution_function)
   * [intervals](https://en.wikipedia.org/wiki/Interval_arithmetic)
   * [probability boxes](https://en.wikipedia.org/wiki/Probability_box)
 
@@ -238,6 +238,7 @@ For dependency modelling:
 
 ### related packages:
 * [puffin](https://github.com/AnderGray/pba.jl): (needs link) uncertainty compiler. Converts scientific codes into one readable by a package like this.
+* [pba.py](https://github.com/ngg1995/pba-for-python): Python version of this software
 * [pba.r](https://github.com/ScottFerson/pba.r): R version of this software.
 * [RAMAS® RiskCalc](https://www.ramas.com/riskcalc): a commerical software for distribution-free risk analysis.
 * [IntervalArithmetic.jl](https://github.com/JuliaIntervals/IntervalArithmetic.jl): the interval arithmetic package used in this software.
