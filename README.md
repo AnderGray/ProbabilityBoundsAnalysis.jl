@@ -8,7 +8,7 @@ Supported uncertain numbers:
   * scalars
   * [probability distributions](https://en.wikipedia.org/wiki/Cumulative_distribution_function)
   * [intervals](https://en.wikipedia.org/wiki/Interval_arithmetic)
-  * [probability boxes](https://en.wikipedia.org/wiki/Probability_box)(p-boxes)
+  * [probability boxes](https://en.wikipedia.org/wiki/Probability_box) (p-boxes)
 
 <!---
 Supported arithmetic operations: **(Maybe we don't mention this here)**
