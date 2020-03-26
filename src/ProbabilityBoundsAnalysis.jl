@@ -38,7 +38,7 @@ __precompile__(true)
 
 module ProbabilityBoundsAnalysis
 
-using IntervalArithmetic, Distributions, Interpolations, Statistics, Plots
+using IntervalArithmetic, Distributions, Interpolations, Statistics, Plots, PyCall
 
 import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
 
