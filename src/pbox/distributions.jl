@@ -12,10 +12,10 @@
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
-ii()    = [        0; collect((1:(pba.steps-1)) / pba.steps)];
-iii()   = [  pba.bOt; collect((1:(pba.steps-1)) / pba.steps)];
-jj()    = [           collect((1:(pba.steps-1)) / pba.steps); 1 ];
-jjj()   = [           collect((1:(pba.steps-1)) / pba.steps); pba.tOp ];
+ii()    = [        0; collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps)];
+iii()   = [  ProbabilityBoundsAnalysis.bOt; collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps)];
+jj()    = [           collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps); 1 ];
+jjj()   = [           collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps); ProbabilityBoundsAnalysis.tOp ];
 
 
 function env(x...; naRm = false )
@@ -77,8 +77,8 @@ function imp(x...; naRm = false )
 end
 
 function env24(dname, i , j,x...)
-    safe = pba.plottingEvery;
-    pba.setPlottingEvery(false);
+    safe = ProbabilityBoundsAnalysis.plottingEvery;
+    ProbabilityBoundsAnalysis.setPlottingEvery(false);
 
     a = env(
     map.(dname, left(i), left(j),x...),
@@ -86,7 +86,7 @@ function env24(dname, i , j,x...)
     map.(dname, left(i), right(j),x...),
     map.(dname, right(i), left(j),x...));
 
-    pba.setPlottingEvery(safe);
+    ProbabilityBoundsAnalysis.setPlottingEvery(safe);
     a.dids = "PB $(uniquePbox())";
     return a;
 

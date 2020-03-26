@@ -11,7 +11,7 @@
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
-function plotpbox(s ::pbox; cumulative=pba.cumulative, name = missing, col = missing)
+function plotpbox(s ::pbox; cumulative=ProbabilityBoundsAnalysis.cumulative, name = missing, col = missing)
     if (!isvacuous(s))
         if (ismissing(name)) name = s.name; end
 

@@ -40,7 +40,7 @@ function conv(x::Real, y::Real, op = +)
 
     m = x.n;
     p = y.n;
-    n = min(pba.steps, m*p);
+    n = min(ProbabilityBoundsAnalysis.steps, m*p);
     L = m * p / n;
     c = zeros(m*p);
     Zu = ones(n);
@@ -103,7 +103,7 @@ function conv(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the same a
 
     m = x.n;
     p = y.n;
-    n = min(pba.steps, m*p);
+    n = min(ProbabilityBoundsAnalysis.steps, m*p);
     L = m * p / n;
     c = zeros(m*p);
     Zu = ones(n);
@@ -155,7 +155,7 @@ end
 
 function condense_d(x :: Array{<:Real,1}, probs :: Array{<:Real,1})
 
-	n = pba.steps;	d = zeros(n);
+	n = ProbabilityBoundsAnalysis.steps;	d = zeros(n);
 	cumulprob = 1.0;	z = n*n;
 	laststep = x[z];
 
@@ -175,7 +175,7 @@ end
 
 function condense_u(x :: Array{<:Real,1}, probs :: Array{<:Real,1})
 
-	n = pba.steps;	u = zeros(n);
+	n = ProbabilityBoundsAnalysis.steps;	u = zeros(n);
 	cumulprob = 0.0; z = 1;
   	laststep = x[z];
 
@@ -239,13 +239,13 @@ function convFrechet(x::Real, y::Real, op = +)
     x = makepbox(x);
     y = makepbox(y);
 
-    zu = zeros(pba.steps);
-    zd = zeros(pba.steps);
+    zu = zeros(ProbabilityBoundsAnalysis.steps);
+    zd = zeros(ProbabilityBoundsAnalysis.steps);
 
-    for i = 1:pba.steps
+    for i = 1:ProbabilityBoundsAnalysis.steps
 
-        j = i:pba.steps;
-        k = pba.steps:-1:i;
+        j = i:ProbabilityBoundsAnalysis.steps;
+        k = ProbabilityBoundsAnalysis.steps:-1:i;
         zd[i] = minimum(map(op, x.d[j],y.d[k]));
 
         j = 1:i;

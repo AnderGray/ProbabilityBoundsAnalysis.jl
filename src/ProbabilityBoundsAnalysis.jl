@@ -24,7 +24,7 @@
 #
 #               julia> ]                                                     (opens package manager)
 #               (v1.0) pkg> add https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl.git  
-#               julia> using pba
+#               julia> using ProbabilityBoundsAnalysis
 #
 #           ->  or if you have source code
 #
@@ -122,4 +122,4 @@ include("intervalStatistics/IntervalStatistics.jl")
 
 
 
-end # module pba
+end # module ProbabilityBoundsAnalysis

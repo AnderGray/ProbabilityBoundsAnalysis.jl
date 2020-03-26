@@ -55,7 +55,7 @@ mutable struct pbox <: AbstractPbox
         vl = missing, vh = missing, interpolation = "linear",
         bob = missing, perfect = missing, opposite = missing, depends = missing, dids=missing)
 
-        steps = pba.steps;                  # Reading global varaibles costly, creating local for multiple use
+        steps = ProbabilityBoundsAnalysis.steps;                  # Reading global varaibles costly, creating local for multiple use
 
         if (ismissing(u) && ismissing(d))
             u = -∞;
@@ -78,7 +78,7 @@ mutable struct pbox <: AbstractPbox
             if (typeof(u)<:AbstractInterval) u = u.lo; end
             if (typeof(d)<:AbstractInterval) d = d.hi; end
 
-            # Should we always be interpolating? What if we convolve 2 pboxes of different steps and pba.steps is larger
+            # Should we always be interpolating? What if we convolve 2 pboxes of different steps and ProbabilityBoundsAnalysis.steps is larger
             # The resulting pbox should have the smaller of the 3
             if (length(u) != steps) u = Interpolate(u,interpolation,true);end
             if (length(d) != steps) d = Interpolate(d,interpolation,false);end
@@ -101,7 +101,7 @@ mutable struct pbox <: AbstractPbox
         if (!ismissing(perfect))    p.bob = perfect.bob;end
         if (!(ismissing(depends)))  p.dids = "$(p.id) $(depends.dids)";end
         if (!ismissing(name))       p.name = name;end
-        if (pba.plottingEvery)      plotpbox(p); end
+        if (ProbabilityBoundsAnalysis.plottingEvery)      plotpbox(p); end
 
         p = checkMoments(p);
 
@@ -121,7 +121,7 @@ pbox(;u::Union{Missing, Array{<:Real}, Real} = missing, d=u, shape = "", name = 
     bob = bob, perfect = perfect, opposite = opposite, depends = depends, dids = dids);
 
 =#
-uniquePbox() = ( pba.setPboxes(pba.pboxes+1); return pba.pboxes );
+uniquePbox() = ( ProbabilityBoundsAnalysis.setPboxes(ProbabilityBoundsAnalysis.pboxes+1); return ProbabilityBoundsAnalysis.pboxes );
 
 function makepbox(x...)
 
@@ -240,7 +240,7 @@ function checkMoments( x :: pbox)
       # use the observed mean
       x.ml = left(b)
       x.mh = right(b)
-      if (1<pba.verbose) println(pba.meanDisagreementMessage);end
+      if (1<ProbabilityBoundsAnalysis.verbose) println(ProbabilityBoundsAnalysis.meanDisagreementMessage);end
   end
 
   a = var(x);
@@ -252,7 +252,7 @@ function checkMoments( x :: pbox)
     # use the observed mean
     x.vl = left(b)
     x.vh = right(b)
-    if (1<pba.verbose) println(pba.varDisagreementMessage);end
+    if (1<ProbabilityBoundsAnalysis.verbose) println(ProbabilityBoundsAnalysis.varDisagreementMessage);end
 end
 
     return x;
@@ -287,11 +287,11 @@ end
 
 function linearInterpolation( V::Union{Array{<:Real},Real} )
 
-    steps = pba.steps;
+    steps = ProbabilityBoundsAnalysis.steps;
 
     m = length(V) - 1;
     if (m == 0) return ([V for i=1:steps]);end
-    if (pba.steps == 1) return [min(V), max(V)];end
+    if (ProbabilityBoundsAnalysis.steps == 1) return [min(V), max(V)];end
 
     d = 1/m;
     n = Int(round(d * steps * 20));
