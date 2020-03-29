@@ -101,7 +101,7 @@ mutable struct pbox <: AbstractPbox
         if (!ismissing(perfect))    p.bob = perfect.bob;end
         if (!(ismissing(depends)))  p.dids = "$(p.id) $(depends.dids)";end
         if (!ismissing(name))       p.name = name;end
-        if (ProbabilityBoundsAnalysis.plottingEvery)      plotpbox(p); end
+        #if (ProbabilityBoundsAnalysis.plottingEvery)      plotpbox(p); end
 
         p = checkMoments(p);
 
