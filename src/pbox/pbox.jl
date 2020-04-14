@@ -101,7 +101,6 @@ mutable struct pbox <: AbstractPbox
         if (!ismissing(perfect))    p.bob = perfect.bob;end
         if (!(ismissing(depends)))  p.dids = "$(p.id) $(depends.dids)";end
         if (!ismissing(name))       p.name = name;end
-        #if (ProbabilityBoundsAnalysis.plottingEvery)      plotpbox(p); end
 
         p = checkMoments(p);
 
@@ -277,9 +276,9 @@ end
 function Interpolate(x::Union{Array{<:Real},Real}, interpolation::String = "linear", left::Bool = true)
 
     if (interpolation == "linear") return linearInterpolation(x);
-    elseif (interpolation == "outer") return outerInterpolation(x,left);
-    elseif (interpolation == "step") return stepInterpolation(x);
-    elseif (interpolation == "spline") return splineInterpolation(x);
+    #elseif (interpolation == "outer") return outerInterpolation(x,left);
+    #elseif (interpolation == "step") return stepInterpolation(x);
+    #elseif (interpolation == "spline") return splineInterpolation(x);
     else throw(ArgumentError("Interpolation option not valid. The available schemes are linear, outer, step and spline"));
     end
 

@@ -38,7 +38,7 @@ __precompile__(true)
 
 module ProbabilityBoundsAnalysis
 
-using IntervalArithmetic, Distributions, Interpolations, Statistics, Plots, PyCall
+using IntervalArithmetic, Distributions, Interpolations, Statistics, PyPlot, PyCall
 
 import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
 
@@ -60,9 +60,9 @@ import Distributions: Normal
 global steps = 200              # discretization levels of probability
 global bOt = 0.001              # smallest quamtile to use if left tail is unbounded
 global tOp = 0.999              # largest quamtile to use if right tail is unbounded
-global plotting = false         # if TRUE, p-pboxes are plotted whenever they are "show"
-global plottingEvery = false    # if TRUE, every p-box that's created is automatically plotted
-global cumulative = true        # if TRUE, plot CDFs, if FALSE, plot CCDFs (exceedance risks)
+#global plotting = false         # if TRUE, p-pboxes are plotted whenever they are "show"
+#global plottingEvery = false    # if TRUE, every p-box that's created is automatically plotted
+#global cumulative = true        # if TRUE, plot CDFs, if FALSE, plot CCDFs (exceedance risks)
 global pboxes = 0               # number of p-boxes that have been created
 global verbose = 2              # how much warning messaging is wanted
 global meanDisagreementMessage = "Disagreement between theoretical and observed mean\n"
@@ -96,7 +96,7 @@ end
 
 export
     Interval, interval, AbstractInterval, AbstractPbox, pbox,
-    plotpbox, makepbox, ispbox, isinterval, isscalar, straddles, straddlingzero,
+    plot, makepbox, ispbox, isinterval, isscalar, straddles, straddlingzero,
     mean, var, std, sideVariance, dwmean, dwVariance,
     conv, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
     +, -, /, *,
@@ -106,7 +106,7 @@ export
     cut,
     left, right,
     VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper,
-    env, imp,
+    env, imp, isvacuous,
     AbstractCopula, copula
 
 

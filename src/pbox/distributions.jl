@@ -77,16 +77,13 @@ function imp(x...; naRm = false )
 end
 
 function env24(dname, i , j,x...)
-    safe = ProbabilityBoundsAnalysis.plottingEvery;
-    ProbabilityBoundsAnalysis.setPlottingEvery(false);
 
     a = env(
     map.(dname, left(i), left(j),x...),
     map.(dname, right(i), right(j),x...),
     map.(dname, left(i), right(j),x...),
     map.(dname, right(i), left(j),x...));
-
-    ProbabilityBoundsAnalysis.setPlottingEvery(safe);
+    
     a.dids = "PB $(uniquePbox())";
     return a;
 

@@ -11,6 +11,27 @@
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
+function plot(s ::pbox; name = missing, col = missing)
+    if (isvacuous(s)); throw(ArgumentError("Pbox is vacuous"));end
+    if (ismissing(name)) name = s.name; end
+
+    col1 = "red"; col2 = "black";
+    if !(ismissing(col)); col1 = col2 = col;end
+
+    fig, ax = PyPlot.subplots(1);
+    j = (0:(s.n-1))/s.n;
+
+    PyPlot.step([s.u[:];s.u[s.n];s.d[s.n]], [j;1;1], color = col1, where = "pre");
+
+    i = (1:(s.n))/s.n;
+    PyPlot.step([s.u[1];s.d[1];s.d[:]], [0;0;i], color = col2,     where = "post");
+
+    xlabel("Distribution range"); ylabel("CDF");
+
+
+end
+
+#=
 function plotpbox(s ::pbox; cumulative=ProbabilityBoundsAnalysis.cumulative, name = missing, col = missing)
     if (!isvacuous(s))
         if (ismissing(name)) name = s.name; end
@@ -30,6 +51,7 @@ function plotpbox(s ::pbox; cumulative=ProbabilityBoundsAnalysis.cumulative, nam
 
     end
 end
+=#
 
 
 
