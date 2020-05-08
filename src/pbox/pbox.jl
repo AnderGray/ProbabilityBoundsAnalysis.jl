@@ -124,10 +124,13 @@ function cdf(s :: pbox, x::Real)
 
     if x <u[1]; return 0;end;
     if x >d[end]; return 1;end;
+
     indUb = findfirst(x .<= u);
     indLb = findlast(x .>= d);
 
-    pub = indUb/n; plb = indLb/n;
+    pub = 1; plb = 0;
+    if x < u[end];  pub = indUb/n; end
+    if x > d[1];    plb = indLb/n; end
 
     return interval(plb, pub)
 end
