@@ -11,14 +11,15 @@
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
-function plot(s ::pbox; name = missing, col = missing)
+function plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2)
     if (isvacuous(s)); throw(ArgumentError("Pbox is vacuous"));end
-    if (ismissing(name)) name = s.name; end
+    if (ismissing(name)) name = s.id; end
 
-    col1 = "red"; col2 = "black";
-    if !(ismissing(col)); col1 = col2 = col;end
+    col1 = "red"; col2 = "black"; fillcol = "grey"
+    if !(ismissing(col)); col1 = col2 = fillcol = col;end
 
-    fig, ax = PyPlot.subplots(1);
+    fig = figure(name,figsize=(10,10))
+    ax = fig.add_subplot()
     j = (0:(s.n-1))/s.n;
 
     PyPlot.step([s.u[:];s.u[s.n];s.d[s.n]], [j;1;1], color = col1, where = "pre");
@@ -26,9 +27,62 @@ function plot(s ::pbox; name = missing, col = missing)
     i = (1:(s.n))/s.n;
     PyPlot.step([s.u[1];s.d[1];s.d[:]], [0;0;i], color = col2,     where = "post");
 
+    if fill
+        Xs, Ylb, Yub = prepFillBounds(s);
+        ax.fill_between(Xs, Ylb, Yub, alpha=alpha, color =fillcol)
+    end
+
     xlabel("Distribution range"); ylabel("CDF");
 
+end
 
+
+###
+#   Prepares bounds for use with fill between
+###
+function prepFillBounds(x)
+
+    d = x.d; u = x.u;
+
+    is = range(0,stop =1 , length = x.n+1)
+    di = is[2:end]; ui = is[1:end-1];
+
+    Xs = sort([d; d; u; u]);
+    nums = length(Xs)
+
+    Ylb = zeros(nums,1); Yub = zeros(nums,1);
+
+    for i = 1:2:nums
+        indLb = findfirst(Xs[i] .<= d)
+        indUb = findlast(Xs[i]  .>= u)
+
+        if ~isempty(indLb)
+            Ylb[i] = ui[indLb]
+            if Xs[i] ∈ d
+                Ylb[i+1] = di[indLb]
+            else
+                Ylb[i+1] = ui[indLb]
+            end
+        else
+            Ylb[i] = 1
+            Ylb[i+1]=1
+        end
+
+        if ~isempty(indUb)
+            Yub[i+1] = di[indUb]
+            if Xs[i] ∈ d
+                Yub[i] = di[indUb]
+            else
+                Yub[i] = ui[indUb]
+            end
+        else
+            Yub[i] = 0
+            Yub[i+1]=0
+        end
+
+    end
+
+    return Xs, Ylb[:], Yub[:]
 end
 
 #=
