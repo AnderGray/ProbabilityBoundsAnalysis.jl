@@ -86,7 +86,7 @@ Pbox: 	  ~ normal ( range=[-5.18046,7.1804646], mean=[-1.0,1.0], var=[1.0,4.0])
 and may be plotted as follows:
 
 ```julia
-julia> plotpbox(f)
+julia> plot(f)
 ```
 ![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/pboxExample1.png "a probability box")
 
