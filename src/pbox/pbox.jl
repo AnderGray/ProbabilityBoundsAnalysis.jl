@@ -109,17 +109,35 @@ mutable struct pbox <: AbstractPbox
 
 end
 
-# Outer constructor
+###
+#   If type is called, return cdf
+###
+function (obj::pbox)(x)
+    return cdf(obj,x)
+end
 
-#=
-pbox(;u::Union{Missing, Array{<:Real}, Real} = missing, d=u, shape = "", name = "", ml= missing, mh = missing,
-    vl = missing, vh = missing, interpolation = "linear",
-    bob = missing, perfect = missing, opposite = missing, depends = missing, dids=missing) =
-    pbox(u,d,shape = shape, name = name, ml = ml, mh = mh,
-    vl = vl, vh = vh, interpolation = interpolation,
-    bob = bob, perfect = perfect, opposite = opposite, depends = depends, dids = dids);
+###
+# Returns bounds on cdf. Upper bound may not be best possible
+###
+function cdf(s :: pbox, x::Real)   
+    d = s.d; u = s.u; n = s.n;
 
-=#
+    if x <u[1]; return 0;end;
+    if x >d[end]; return 1;end;
+    indUb = findfirst(x .<= u);
+    indLb = findlast(x .>= d);
+
+    pub = indUb/n; plb = indLb/n;
+
+    return interval(plb, pub)
+end
+
+function cdf(s :: pbox, x::Interval)
+    lb = left(cdf(s,left(x)));
+    ub = right(cdf(s,right(x)));
+    return interval(lb, ub)
+end
+
 uniquePbox() = ( ProbabilityBoundsAnalysis.setPboxes(ProbabilityBoundsAnalysis.pboxes+1); return ProbabilityBoundsAnalysis.pboxes );
 
 function makepbox(x...)
