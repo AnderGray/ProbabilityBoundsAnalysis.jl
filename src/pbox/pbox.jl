@@ -16,7 +16,7 @@
 #####
 #   Known Bugs:
 #
-#   ->  After using a pbox in a computation, the shape is no loger saved. For example normal(0,1) + 1, should still be a normal
+#   ->  After using a pbox in a computation, the shape is no longer saved. For example normal(0,1) + 1, should still be a normal
 #   ->  env() between two scalars should return interval. Works but returned variance is [0,0]
 #   ->  Giving pboxes to the interval constructor should return envelope
 #   ->  Potential error with reciprocate function. No mean and variance transformations yet
