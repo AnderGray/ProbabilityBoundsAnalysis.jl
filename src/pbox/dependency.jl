@@ -174,8 +174,8 @@ function calcDensity(C :: AbstractCopula)
     #x = range(2*e ,1 - 3e    ,length = n);
     #y = range(2*e ,1 - 3e    ,length = n);
 
-    x = range(0 ,1 - e    ,length = n);
-    y = range(0 ,1 - e    ,length = n);
+    x = range(0 , stop=1 - e    ,length = n);
+    y = range(0 , stop=1 - e    ,length = n);
 
 
     der1 = ( C(x .+ e, y)       - C(x, y)     )/e      # df/dx
@@ -238,17 +238,17 @@ end
 Pi() = π()
 
 function Frank(s = 1)                                     #   Frank copula
-    x = y = range(0,1,length = n);                          #   s>0; 0 for perfect, 1 for indep, inf for oposite
+    x = y = range(0,stop = 1,length = n);                          #   s>0; 0 for perfect, 1 for indep, inf for oposite
     return copula(F(x,y,s), func = F, param = s);
 end
 
 function Clayton(t = 0)                                  #   Clayton copula
-    x = y = range(0,1,length = n);                          #   t>-1; -1 for opposite, 0 for indep and inf for perfect
+    x = y = range(0,stop=1,length = n);                          #   t>-1; -1 for opposite, 0 for indep and inf for perfect
     return copula(Cla(x,y,t), func = Cla, param = t);
 end
 
 function Gaussian(corr = 0)
-    x = y = range(0,1,length = n);
+    x = y = range(0,stop = 1,length = n);
     cdf = Gau(x,y,corr);
     #cdf[:,end] = cdf[end,:] = x;    # This removes the NaNs from Liams mvNormCdf. We know the marginals must be uniform
     return copula(cdf, func = Gau, param = corr);

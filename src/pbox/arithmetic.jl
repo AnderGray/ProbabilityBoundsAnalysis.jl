@@ -91,6 +91,12 @@ function conv(x::Real, y::Real, op = +)
 
 end
 
+function conv(x::Real, y::Real, op = +; corr =0) 
+    if corr == 0; return conv(x,y,op); end
+    if corr == 1; return convPerfect(x,y,op);end
+    if corr ==-1; return convOpposite(x,y,op);end
+    return conv(x,y,Gaussian(corr), op)
+end
 
 function conv(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the same as the conv function except the condensation is different
 
