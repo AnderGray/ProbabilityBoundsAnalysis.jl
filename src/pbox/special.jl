@@ -23,6 +23,8 @@ right(x::AbstractInterval) = x.hi;
 left(x::AbstractPbox)   = x.u[1];
 right(x::AbstractPbox)  = x.d[end];
 
+lefts(x::AbstractPbox)   = x.u
+rights(x::AbstractPbox)  = x.d
 
 isinterval(x) = return (typeof(x)<:AbstractInterval ||
 (typeof(x) <: AbstractPbox &&  ((x.d[1]==x.d[x.n]) &&  (x.u[1]==x.u[(x.n)]))))
@@ -93,7 +95,6 @@ function doublequick(item :: Array{<:Real,1}, follow :: Array{<:Real,1}, left = 
 	if (i < right) doublequick(item, follow, i,right);end
 
 end
-
 
 
 function Base.show(io::IO, z::pbox)

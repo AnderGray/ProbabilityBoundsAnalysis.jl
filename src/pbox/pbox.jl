@@ -22,6 +22,7 @@
 #   ->  Potential error with reciprocate function. No mean and variance transformations yet
 #   ->  Cut(pbox([0,1]),0.5) returns [0.5026256564141035, 0.4973743435858965]. Right side larger!
 #   ->  Multiplication of pboxes with intervals not working as expected.
+#   ->  id and dids don't work. When a pbox is made, 4 is added to the id counter
 #
 #   Severe:
 #       ->  makepbox() won't work when both a pbox and an interval type are introduced as arguments
@@ -47,7 +48,7 @@ mutable struct pbox <: AbstractPbox
     vl :: Real                          # lower bound on variance
     vh :: Real                          # upper bound of variance
     name :: String                      # name
-    dids :: String
+    dids :: String                      # dependancy id, defines which pbox ids it's depedent to
     bob :: Int64                        # for dependancy tracking
 
 
@@ -83,7 +84,7 @@ mutable struct pbox <: AbstractPbox
             if (length(u) != steps) u = Interpolate(u,interpolation,true);end
             if (length(d) != steps) d = Interpolate(d,interpolation,false);end
 
-            unique = uniquePbox();
+            unique = uniquePbox();      # Here an error because will create multiple pboxes when distribution constructor is called
             id = "PB $unique";
 
             p = new(id,u,d,steps,"",-∞,∞,0,∞,"","",unique);
