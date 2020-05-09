@@ -12,12 +12,17 @@
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
+
+#ii()    = range(0, stop = (ProbabilityBoundsAnalysis.steps-1)/ProbabilityBoundsAnalysis.steps, length = ProbabilityBoundsAnalysis.steps)
+
 ii()    = [        0; collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps)];
 iii()   = [  ProbabilityBoundsAnalysis.bOt; collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps)];
 jj()    = [           collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps); 1 ];
 jjj()   = [           collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps); ProbabilityBoundsAnalysis.tOp ];
 
-
+##
+# Should be able to env an array of p-boxes. Feature to be added 
+##
 function env(x...; naRm = false )
     elts = makepbox(x...);
     u = elts[1].u;
@@ -76,7 +81,7 @@ function imp(x...; naRm = false )
 
 end
 
-function env24(dname, i , j,x...)
+function envConst(dname, i , j,x...)
 
     a = env(
     map.(dname, left(i), left(j),x...),
@@ -117,32 +122,66 @@ function Snormal(mean = missing, std=missing; median=missing, mode=missing,
     end
 end
 
-N = normal = gaussian(mean, std, x...) = env24(Snormal, mean, std, x...);
+N = normal = gaussian(mean, std, x...) = envConst(Snormal, mean, std, x...);
 Normal(mean :: Union{AbstractInterval,AbstractPbox}, std :: Union{AbstractInterval,AbstractPbox}, x...) = normal(mean, std, x...);
+
+#Normal(mean, std) = normal(mean, std)
+#Normal(mean, std, x...) = normal(mean, std, x...);
+
+###
+#   Uniform Distribtion
+###
+function Suniform(min, max, case = 1, name="")
+
+    if (case==1) && (max <= min); min = max; end
+    if max <= min; max = min; end
+
+    m = (min+max)/2;
+    v = (min-max)^2/12;
+    if max == min; return pbox(min,shape="uniform", name=name, ml=m, mh=m, vl=v, vh=v);end
+
+    return (pbox(quantile.(Uniform(min,max),ii()), quantile.(Uniform(min,max),jj()),
+    shape="uniform", name=name, ml=m, mh=m, vl=v, vh=v));
+
+end
+
+
+function envUnif(i , j,x...)
+
+    a = env(
+    map.(Suniform, left(i), left(j), 1, x...),
+    map.(Suniform, right(i), right(j),x...),
+    map.(Suniform, left(i), right(j), 1, x...),
+    map.(Suniform, right(i), left(j),x...));
+
+end
+
+U = uniform(min, max, x...) = envUnif(min,max, x...)
+
+
 
 ###
 #   Uniform Distribtion
 ###
 
-function Suniform(min, max, name="")
+function Sbeta(α, β,name="")
 
-    m = (min+max)/2;
-    v = (min-max)^2/12;
-    return (pbox(quantile.(Uniform(min,max),iii()), quantile.(Uniform(min,max),jjj()),
-    shape="uniform", name=name, ml=m, mh=m, vl=v, vh=v));
+    a = Beta(α, β);
+    m = mean(a); v = var(a);
+
+    return pbox(quantile.(a,ii()), quantile.(a,jj()),shape="beta", name=name, ml=m, mh=m, vl=v, vh=v)
 
 end
 
-U = uniform(min, max, x...) = env24(Suniform,min,max,x ...)
+beta(α, β, x...) = envConst(Sbeta, α, β)
 
 ###
 #   Distribution-free constructors for pboxes
-##
+###
 
 
 
-
-
+# This cut could be quicker, and should also allow interval arguments
 function cut(x, p :: Real; tight :: Bool = true)
 
     x = makepbox(x);
@@ -154,6 +193,8 @@ function cut(x, p :: Real; tight :: Bool = true)
     return interval(x.u[Int(max(lower,1))], x.d[Int(min(upper,long))]);
 
 end
+
+cut(x, p :: Interval; tight :: Bool = true) = interval(cut(x,left(p),tight=tight), cut(x,right(p),tight=tight))
 
 rand(a :: pbox, n :: Int64 = 1) = cut.(a,rand(n));
 

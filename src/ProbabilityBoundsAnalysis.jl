@@ -73,9 +73,9 @@ global varDisagreementMessage = "Disagreement between theoretical and observed v
 setSteps(t :: Int64) = (global steps = t)
 setBOt(t :: Float64) = (global bOt = t)
 setTOp(t:: Float64) = (global tOp = t)
-setPlotting(t :: Bool) = (global plotting = t)
-setPlottingEvery(t :: Bool) = (global plottingEvery = t)
-setCumulative(t :: Bool) = (global cumulative = t)
+#setPlotting(t :: Bool) = (global plotting = t)
+#setPlottingEvery(t :: Bool) = (global plottingEvery = t)
+#setCumulative(t :: Bool) = (global cumulative = t)
 setPboxes(t :: Int64) = (global pboxes = t)
 setVerbose(t:: Int) = (global verbose = t)
 setMeanDisagreementMessage(t :: String) = (global meanDisagreementMessage = t)
@@ -86,7 +86,7 @@ function showGlobals()
 
     println("\nShowing global variables:\n")
     println("Steps: $steps      ||  bOt: $bOt             ||  tOp: $tOp")
-    println("Plotting: $plotting  ||  plottingEvery: $plottingEvery   ||  cumulative: $cumulative")
+#    println("Plotting: $plotting  ||  plottingEvery: $plottingEvery   ||  cumulative: $cumulative")
     println("pboxes: $pboxes       ||  verbose: $verbose\n")
     print("meanDisagreementMessage: $meanDisagreementMessage")
     print("varDisagreementMessage:  $varDisagreementMessage")
@@ -101,6 +101,8 @@ export
     conv, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
     +, -, /, *,
     normal, gaussian, N, Normal,
+    U,uniform,
+    beta,
     isequal,
     rand,
     cut,
