@@ -318,7 +318,7 @@ kn(x...) = KN(x...)
 #   Chebyshev inequality and mean - var pbox
 ###
 
-function chebIneq(mean = 0, var = 1, name = "")
+function chebIneq(mean, var, name)
     p = iii();
     u = mean .- sqrt(var) .* sqrt.(1 ./p .-1)
     p = jjj();
@@ -350,7 +350,7 @@ meanStd(mean,std, name = "") = meanVar(mean, std^2, name)
 ###
 #   Markov inequality and mean - min pbox
 ###
-function markovIneq(mean = 1, min = 0, name = "")
+function markovIneq(mean, min, name)
 
     if mean < min; min = mean; end
     p = jjj(); numS = length(p);
@@ -358,16 +358,15 @@ function markovIneq(mean = 1, min = 0, name = "")
     return pbox(ones(numS)*min, d, shape = "markov", name = name, ml = mean, mh = mean, vl =0 , vh = Inf)
 end
 
-function meanMin(mean=1, min=0, name = "")
+function meanMin(mean = 1, min = 0, name = "")
+
     if !isa(mean, Interval) && !isa(min, Interval);
         return markovIneq(mean, min, name)
     end
 
     Envelope = env(
-        markovIneq(left(mean), left(min)),
-        markovIneq(left(mean), right(min)),
-        markovIneq(right(mean), left(min)),
-        markovIneq(right(mean), right(min)),
+        markovIneq(left(mean), left(min), name),
+        markovIneq(right(mean), left(min),name),
     )
     Envelope.shape = "markov"; Envelope.name = name;
     return Envelope
@@ -376,10 +375,40 @@ end
 Markov(x...)    = meanMin(x...);    markov(x...)    = meanMin(x...);
 MeanMin(x...)   = meanMin(x...);    meanmin(x...)   = meanMin(x...);
 
-function meanMinMax(mean, min, max, name = "")
+
+###
+#   Cantelli inequality and mean - min - max pbox
+###
+
+function cantelliIneq(mean, min, max, name)
+
+    if mean < min; min = mean; end
+    if mean > max; max = mean; end
+
+    mid = (max - mean) / (max - min);
+    p = ii();   
+    u = ifelse.(p .<= mid, min, (mean - max) ./p .+ max )
+    p = jj();
+    d = ifelse.(mid .<= p, max, (mean .- min .*p ) ./(1 .- p))
+    
+    return pbox(u, d, shape = "cantelli", name = name, ml = mean, mh = mean, vl = 0, vh = (max-min)*(max-mean)-(max-mean)*(max-mean))
+
+end
+function meanMinMax(mean = 0.5, min = 0, max = 1, name = "")
+
+    if !isa(mean, Interval) && !isa(min, Interval);
+        return cantelliIneq(mean, min,max, name)
+    end
+    Envelope = env(
+        cantelliIneq(left(mean), left(min), right(max),name),
+        cantelliIneq(right(mean), left(min), right(max),name)
+    )
+    Envelope.shape = "cantelli"; Envelope.name = name;
+    return Envelope
 end
 
-Cantelli(x...) = cantelli(x...) = MeanMinMax(x...) = meanminmax(x...) = meanMinMax(x...)
+Cantelli(x...)      = meanMinMax(x...);     cantelli(x...)      = meanMinMax(x...);
+MeanMinMax(x...)    = meanMinMax(x...);     meanminmax(x...)    = meanMinMax(x...);
 
 function meanMinMaxVar(mean, min, max, var, name = "")
 end

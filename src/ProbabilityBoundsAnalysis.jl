@@ -115,6 +115,8 @@ export
 
     meanMin, MeanMin, meanmin, Markov, markov,
 
+    meanMinMax, MeanMinMax, meanminmax, Cantelli, cantelli,
+
     isequal,
     rand,
     cut,
