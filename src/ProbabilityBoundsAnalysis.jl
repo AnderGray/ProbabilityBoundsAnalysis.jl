@@ -95,14 +95,10 @@ end
 
 
 export
-    Interval, interval, AbstractInterval, AbstractPbox, pbox,
-    plot, makepbox, ispbox, isinterval, isscalar, straddles, straddlingzero,
-    mean, var, std, sideVariance, dwmean, dwVariance,
-    conv, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
-    +, -, /, *,
+    # Constructors
+    Interval, interval, AbstractInterval, AbstractPbox, pbox, makepbox, 
 
-    negate, reciprocate, complement, shift,
-
+    # Parametric
     normal, gaussian, N, Normal,
     U,uniform,
     beta, betaPrime, biweight, cauchy, 
@@ -110,26 +106,50 @@ export
     exponential, fDist, frechet, gamma, ksdist,
     laplace, levy, lognormal,
 
+    # C-boxes
     KN,
 
-    meanVar, MeanVar, minvar, meanVar, meanStd,
+    # Distribution free 
+    meanVar, MeanVar, minvar, meanVar, meanStd,                             # Chebyshev
     Chebyshev, chebyshev, cheb,
+    
+    meanMin, MeanMin, meanmin, meanMax, MeanMax, meanmax,                   # Markov
+    Markov, markov, 
 
-    meanMin, MeanMin, meanmin, Markov, markov,
-    meanMax, MeanMax, meanmax,
+    meanMinMax, MeanMinMax, meanminmax,                                     # Cantelli
+    Cantelli, cantelli, 
 
-    meanMinMax, MeanMinMax, meanminmax, Cantelli, cantelli,
+    minMaxMeanVar, MinMaxMeanVar, minmaxmeanvar,                            # Ferson
+    Ferson, ferson, 
 
-    isequal,
-    rand,
-    cut,
-    cdf,
-    left, right,
-    lefts, rights,
+    # Moments
+    mean, var, std, sideVariance, dwmean, dwVariance,
+
+    # Arithmetic, binary
+    conv, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
     VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper,
-    env, imp, isvacuous,
-    AbstractCopula, copula
+    +, -, /, *,
 
+    # Arithmetic, uniary
+    negate, reciprocate, complement, shift,
+
+    # Set based operations  
+    env, imp, # Union, Intersection
+
+    # Plots
+    plot,
+
+    # Checks
+    ispbox, isinterval, isscalar, isvacuous, isequal,
+    straddles, straddlingzero,
+
+    # Sampling and cdf
+    rand, cut, cdf,
+
+    left, right, lefts, rights,
+
+    # Copulas
+    AbstractCopula, copula
 
 
 include("pbox/pbox.jl")

@@ -51,7 +51,9 @@ function env(x...; naRm = false )
 end
 
 
-
+###
+#   Computes the imprint (imposition)
+###
 function imp(x...; naRm = false )
     elts = makepbox(x...);
     u = elts[1].u;
@@ -74,7 +76,7 @@ function imp(x...; naRm = false )
         dids = "$dids $(elts[i].dids)"
     end
 
-    if (any(d[:] < u[:])) throw(ArgumentError("Imposition does not exist"));
+    if (any(d[:] < u[:])) throw(ArgumentError("Imprint does not exist"));
     else
         return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, dids=dids)
     end
@@ -123,7 +125,9 @@ function Snormal(mean = missing, std=missing; median=missing, mode=missing,
     end
 end
 
-N = normal = gaussian(mean, std, x...) = envConstruct(Snormal, mean, std, x...);
+normal(mean = 0, std = 1, x...) = envConstruct(Snormal, mean, std, x...);
+N = gaussian = normal
+
 #Normal(mean :: Union{AbstractInterval,AbstractPbox}, std :: Union{AbstractInterval,AbstractPbox}, x...) = normal(mean, std, x...);
 
 #Normal(mean, std) = normal(mean, std)
@@ -293,9 +297,9 @@ laplace(    μ=0,    θ=1,    name = "")      = envConstFunc(     Laplace,    μ
 levy(       μ=0,    θ=1,    name = "")      = envConstFunc(     Levy,       μ, θ, name, "levy",         [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
 lognormal(  μ=0,    θ=1,    name = "")      = envConstFunc(     lognormal,  μ, θ, name, "lognormal",    [true,false])   # http://en.wikipedia.org/wiki/Log-normal_distribution
 
-###
+###############################
 #   Confidence boxes
-###
+###############################
 
 function KN(k, n)
     if left(k) < 0
@@ -309,16 +313,16 @@ end
 
 kn(x...) = KN(x...)
 
-###
+###############################
 #   Distribution-free constructors for pboxes
-###
+###############################
 
 
 ###
 #   Chebyshev inequality and mean - var pbox
 ###
 
-function chebIneq(mean, var, name)
+function chebIneq(mean = 0, var = 1, name = "")
     p = iii();
     u = mean .- sqrt(var) .* sqrt.(1 ./p .-1)
     p = jjj();
@@ -350,7 +354,7 @@ meanStd(mean,std, name = "") = meanVar(mean, std^2, name)
 ###
 #   Markov inequality and mean - min pbox
 ###
-function markovIneq(mean, min, name)
+function markovIneq(mean = 1, min = 0, name = "")
 
     if mean < min; min = mean; end
     p = jjj(); numS = length(p);
@@ -365,8 +369,8 @@ function meanMin(mean = 1, min = 0, name = "")
     end
 
     Envelope = env(
-        markovIneq(left(mean), left(min), name),
-        markovIneq(right(mean), left(min),name),
+        markovIneq(left(mean), left(min)),
+        markovIneq(right(mean), left(min)),
     )
     Envelope.shape = "markov"; Envelope.name = name;
     return Envelope
@@ -381,7 +385,7 @@ MeanMax(x...) = meanMax(x...);      meanmax(x...)= meanMax(x...);
 ###
 #   Cantelli inequality and mean - min - max pbox
 ###
-function cantelliIneq(mean, min, max, name)
+function cantelliIneq(mean = 0.5, min = 0, max = 1, name = "")
 
     if mean < min; min = mean; end
     if mean > max; max = mean; end
@@ -395,14 +399,15 @@ function cantelliIneq(mean, min, max, name)
     return pbox(u, d, shape = "cantelli", name = name, ml = mean, mh = mean, vl = 0, vh = (max-min)*(max-mean)-(max-mean)*(max-mean))
 
 end
+
 function meanMinMax(mean = 0.5, min = 0, max = 1, name = "")
 
     if !isa(mean, Interval) && !isa(min, Interval);
         return cantelliIneq(mean, min,max, name)
     end
     Envelope = env(
-        cantelliIneq(left(mean), left(min), right(max),name),
-        cantelliIneq(right(mean), left(min), right(max),name)
+        cantelliIneq(left(mean), left(min), right(max)),
+        cantelliIneq(right(mean), left(min), right(max))
     )
     Envelope.shape = "cantelli"; Envelope.name = name;
     return Envelope
@@ -413,14 +418,37 @@ MeanMinMax(x...)    = meanMinMax(x...);     meanminmax(x...)    = meanMinMax(x..
 
 
 ###
-#   Ferson Pbox (mean - min - max - var)
+#   Ferson Pbox (min - max - mean - var)
 ###
+function FersonEvalEasy(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
 
-#function Fersonal()
-function meanMinMaxVar(mean, min, max, var, name = "")
+    if mean < min; min = mean; end      # Not sure about this yet. If mean is outside bounds, expand bounds
+    if mean > max; max = mean; end
+
+    fer = pbox(imp(meanVar(mean,var), imp(meanmin(mean,min),meanmax(mean,max))),
+    ml = left(mean), mh = right(mean), vl = left(var), vh =right(var))
+    fer.shape = "ferson"; fer.name = name;
+    
+    return fer
 end
 
-Ferson(x...) = ferson(x...) = MeanMinMaxVar(x...) = meanminmaxvar(x...) = meanMinMaxVar(x...)
+function minMaxMeanVar(min = 0, max = 1, mean = 0.5, var = 0.1, name = "")
+
+    if all(!isa([min, max, mean, var], Interval));
+        return FersonEvalEasy(min,max,mean,var,name);
+    end
+
+    Envelope = env(
+        FersonEvalEasy(left(min), right(max), left(mean), right(var)),            # pba.r has it like this (left(var) not used?)
+        FersonEvalEasy(left(min), right(max), right(mean), right(var)),
+    )
+    Envelope.shape = "ferson"; Envelope.name = name;
+    return Envelope
+
+end
+
+Ferson(x...)        = minMaxMeanVar(x...);         ferson(x...) = minMaxMeanVar(x...);
+MinMaxMeanVar(x...) = minMaxMeanVar(x...);  minmaxmeanvar(x...) = minMaxMeanVar(x...);
 
 
 # This cut could be quicker, and should also allow interval arguments
