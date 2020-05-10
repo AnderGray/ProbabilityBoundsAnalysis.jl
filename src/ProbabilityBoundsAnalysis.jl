@@ -51,7 +51,7 @@ import Statistics: mean, var, std
 
 
 
-import Distributions: Normal
+#import Distributions: Normal, Beta, Uniform
 
 
 
@@ -100,13 +100,20 @@ export
     mean, var, std, sideVariance, dwmean, dwVariance,
     conv, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
     +, -, /, *,
+
     normal, gaussian, N, Normal,
     U,uniform,
-    beta,
+    beta, betaPrime, biweight, cauchy, 
+    chi, chisq, cosine,epanechnikov, erlang,
+    exponential, fDist, frechet, gamma, ksdist,
+    laplace, levy, lognormal,
+
     isequal,
     rand,
     cut,
+    cdf,
     left, right,
+    lefts, rights,
     VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper,
     env, imp, isvacuous,
     AbstractCopula, copula

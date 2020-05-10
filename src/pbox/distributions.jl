@@ -81,13 +81,19 @@ function imp(x...; naRm = false )
 
 end
 
-function envConst(dname, i , j,x...)
+
+###
+#   Constructs a pbox from a parametric distribution. Takes endpoints of given intervals.
+#   Requires a dname function, which will give quantiles to the pbox. 
+#   envConstFunc is a version of this function which does not require a dname function
+###
+function envConstruct(dname, i , j, x...)
 
     a = env(
-    map.(dname, left(i), left(j),x...),
-    map.(dname, right(i), right(j),x...),
-    map.(dname, left(i), right(j),x...),
-    map.(dname, right(i), left(j),x...));
+    map.(dname, left(i), left(j), x...),
+    map.(dname, right(i), right(j), x...),
+    map.(dname, left(i), right(j), x...),
+    map.(dname, right(i), left(j), x...));
     
     a.dids = "PB $(uniquePbox())";
     return a;
@@ -97,12 +103,6 @@ end
 ###
 #   Normal Distribution
 ###
-
-function Snormal0(normmean, normstd, name="")
-    return pbox(quantile.(Normal(normmean,normstd),iii()), quantile.(Normal(normmean,normstd),jjj()),
-    shape="normal", name=name, ml=normmean, mh=normmean, vl=normstd^2, vh=normstd^2)
-end
-
 function Snormal(mean = missing, std=missing; median=missing, mode=missing,
     cv=missing, iqr=missing, var=missing, name="", x...)
 
@@ -116,14 +116,15 @@ function Snormal(mean = missing, std=missing; median=missing, mode=missing,
         std = mean * cv;
     end
     if (!ismissing(mean) && !ismissing(std))
-        return Snormal0(mean,std,name)
+        return pbox(quantile.(Normal(mean,std),iii()), quantile.(Normal(mean,std),jjj()),
+        shape="normal", name=name, ml=mean, mh=mean, vl=std^2, vh=std^2)
     else
         throw(ArgumentError("not enough information to specify the normal distribution"));
     end
 end
 
-N = normal = gaussian(mean, std, x...) = envConst(Snormal, mean, std, x...);
-Normal(mean :: Union{AbstractInterval,AbstractPbox}, std :: Union{AbstractInterval,AbstractPbox}, x...) = normal(mean, std, x...);
+N = normal = gaussian(mean, std, x...) = envConstruct(Snormal, mean, std, x...);
+#Normal(mean :: Union{AbstractInterval,AbstractPbox}, std :: Union{AbstractInterval,AbstractPbox}, x...) = normal(mean, std, x...);
 
 #Normal(mean, std) = normal(mean, std)
 #Normal(mean, std, x...) = normal(mean, std, x...);
@@ -131,7 +132,22 @@ Normal(mean :: Union{AbstractInterval,AbstractPbox}, std :: Union{AbstractInterv
 ###
 #   Uniform Distribtion
 ###
-function Suniform(min, max, case = 1, name="")
+
+
+###
+#   Env constructor specifically for the uniform distribtion. 
+###
+function envUnif( i, j, x...)
+
+    a = env(
+    map.(Suniform, left(i), left(j), 1, x...),
+    map.(Suniform, right(i), right(j),x...),
+    map.(Suniform, left(i), right(j), 1, x...),
+    map.(Suniform, right(i), left(j),x...));
+
+end
+
+function Suniform(min, max, case = 1; name="")
 
     if (case==1) && (max <= min); min = max; end
     if max <= min; max = min; end
@@ -145,35 +161,132 @@ function Suniform(min, max, case = 1, name="")
 
 end
 
-
-function envUnif(i , j,x...)
-
-    a = env(
-    map.(Suniform, left(i), left(j), 1, x...),
-    map.(Suniform, right(i), right(j),x...),
-    map.(Suniform, left(i), right(j), 1, x...),
-    map.(Suniform, right(i), left(j),x...));
-
-end
-
 U = uniform(min, max, x...) = envUnif(min,max, x...)
 
 
-
 ###
-#   Uniform Distribtion
+#   Other Parametric distribution constructors
 ###
 
-function Sbeta(α, β,name="")
+#=
+function Sbeta(α, β, name="")
 
     a = Beta(α, β);
     m = mean(a); v = var(a);
 
-    return pbox(quantile.(a,ii()), quantile.(a,jj()),shape="beta", name=name, ml=m, mh=m, vl=v, vh=v)
+    return pbox(quantile.(a,ii()), quantile.(a,jj()), shape="beta", name=name, ml=m, mh=m, vl=v, vh=v)
 
 end
 
-beta(α, β, x...) = envConst(Sbeta, α, β)
+beta(α, β, x...) = envConst(Sbeta, α, β, x...)
+=#
+
+
+###
+#   Constructs a pbox from a parametric distribution. Takes endpoints of given intervals.
+#   Will work for all parametric functions up to 2 parameter. And if pbox is envelope of endpoints
+#   of parameters
+###
+function envConstFunc(Dist, i, j, name, shape, Bounded)
+
+    a = env(
+    Sdist(Dist, left(i),  left(j),  name, shape, Bounded),
+    Sdist(Dist, right(i), right(j), name, shape, Bounded),
+    Sdist(Dist, left(i),  right(j), name, shape, Bounded),
+    Sdist(Dist, right(i), left(j),  name, shape, Bounded));
+    
+    a.dids = "PB $(uniquePbox())";
+    return a;
+
+end
+
+function envConstFunc1(Dist, i, name, shape, Bounded)
+
+    a = env(
+    Sdist1(Dist, left(i),  name, shape, Bounded),
+    Sdist1(Dist, right(i), name, shape, Bounded))
+    
+    a.dids = "PB $(uniquePbox())";
+    return a;
+
+end
+
+function envConstFunc3(Dist, i, j, k,  name, shape, Bounded)
+
+    a = env(
+    Sdist(Dist, left(i),  left(j),  name, shape, Bounded),
+    Sdist(Dist, right(i), right(j), name, shape, Bounded),
+    Sdist(Dist, left(i),  right(j), name, shape, Bounded),
+    Sdist(Dist, right(i), left(j),  name, shape, Bounded));
+    
+    a.dids = "PB $(uniquePbox())";
+    return a;
+
+end
+
+###
+#   The dname function for parametric distributions
+###
+function Sdist(DistFunc, i, j, name, shape, Bounded)
+
+    is = iii(); js = jjj(); 
+    if Bounded[1]; is = ii(); end
+    if Bounded[2]; js = jj(); end
+
+    Dist = DistFunc(i,j)
+    m = mean(Dist); v = var(Dist);
+    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v)
+
+end
+
+function Sdist1(DistFunc, i, name, shape, Bounded)
+
+    is = iii(); js = jjj(); 
+    if Bounded[1]; is = ii(); end
+    if Bounded[2]; js = jj(); end
+
+    Dist = DistFunc(i)
+    m = mean(Dist); v = var(Dist);
+    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v)
+
+end
+
+
+function Sdist3(DistFunc, i, j, k, name, shape, Bounded)
+
+    is = iii(); js = jjj(); 
+    if Bounded[1]; is = ii(); end
+    if Bounded[2]; js = jj(); end
+
+    Dist = DistFunc(i, j, k)
+    m = mean(Dist); v = var(Dist);
+    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v)
+
+end
+
+
+###
+#   For informaton about what parameters are, see the Distributions.jl package
+###
+
+beta(       α=1,    β=1,    name = "")      = envConstFunc(     Beta,       α, β, name, "beta",         [true, true])
+betaPrime(  α=1,    β=1,    name = "")      = envConstFunc(     BetaPrime,  α, β, name, "betaPrime",    [true,false])   # http://en.wikipedia.org/wiki/Beta_prime_distribution
+biweight(   α,      β,      name = "")      = envConstFunc(     Biweight,   α, β, name, "biweight",     [true, true])
+cauchy(     α=0,    β=1,    name = "")      = envConstFunc(     Cauchy,     α, β, name, "cauchy",       [false, false]) # http://en.wikipedia.org/wiki/Cauchy_distribution
+chi(        k,              name = "")      = envConstFunc1(    Chi,        k,    name, "chi",          [true,false])   # http://en.wikipedia.org/wiki/Chi_distribution
+chisq(      k,              name = "")      = envConstFunc1(    Chisq,      k,    name, "chusq",        [true,false])   # http://en.wikipedia.org/wiki/Chi-squared_distribution
+cosine(     α,      β,      name = "")      = envConstFunc(     Cosine,     α, β, name, "cosine",       [true,true])    # http://en.wikipedia.org/wiki/Raised_cosine_distribution
+epanechnikov(α,     β,      name = "")      = envConstFunc(     Epanechnikov, α, β, name, "epanechnikov",[true,true])
+erlang(     α=1,    β=1,    name = "")      = envConstFunc(     Erlang,     α, β, name, "erlang",       [true,false])   # http://en.wikipedia.org/wiki/Erlang_distribution
+exponential(θ=1,            name = "")      = envConstFunc1(    Exponential, θ,   name, "exponential",  [true,false])   # http://en.wikipedia.org/wiki/Exponential_distribution         
+fDist(      ν1,     ν2,     name = "")      = envConstFunc(     FDist,     ν1,ν2, name, "fDist",        [true,false])   # http://en.wikipedia.org/wiki/F-distribution
+frechet(    α=1,    θ=1,    name = "")      = envConstFunc(     Frechet,    α, θ, name, "frechet",      [true,false])   # http://en.wikipedia.org/wiki/Fréchet_distribution
+gamma(      α=1,    θ=1,    name = "")      = envConstFunc(     Gamma,      α, θ, name, "gamma",        [true,false])   # http://en.wikipedia.org/wiki/Gamma_distribution
+ksdist(     n,              name = "")      = envConstFunc1(    KSDist,     n,    name, "ksdist",       [true,true])
+laplace(    μ=0,    θ=1,    name = "")      = envConstFunc(     Laplace,    μ, θ, name, "laplace",      [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
+levy(       μ=0,    θ=1,    name = "")      = envConstFunc(     Levy,       μ, θ, name, "levy",         [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
+lognormal(  μ=0,    θ=1,    name = "")      = envConstFunc(     lognormal,  μ, θ, name, "lognormal",    [true,false])   # http://en.wikipedia.org/wiki/Log-normal_distribution
+
 
 ###
 #   Distribution-free constructors for pboxes
