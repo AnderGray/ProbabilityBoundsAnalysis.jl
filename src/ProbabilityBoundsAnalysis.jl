@@ -101,6 +101,8 @@ export
     conv, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
     +, -, /, *,
 
+    negate, reciprocate, complement, shift,
+
     normal, gaussian, N, Normal,
     U,uniform,
     beta, betaPrime, biweight, cauchy, 
@@ -114,6 +116,7 @@ export
     Chebyshev, chebyshev, cheb,
 
     meanMin, MeanMin, meanmin, Markov, markov,
+    meanMax, MeanMax, meanmax,
 
     meanMinMax, MeanMinMax, meanminmax, Cantelli, cantelli,
 

@@ -375,11 +375,12 @@ end
 Markov(x...)    = meanMin(x...);    markov(x...)    = meanMin(x...);
 MeanMin(x...)   = meanMin(x...);    meanmin(x...)   = meanMin(x...);
 
+meanMax(mean = 0, max = 1, name = "") = pbox(negate(meanMin(- (mean), - (max))) , name = name)
+MeanMax(x...) = meanMax(x...);      meanmax(x...)= meanMax(x...);
 
 ###
 #   Cantelli inequality and mean - min - max pbox
 ###
-
 function cantelliIneq(mean, min, max, name)
 
     if mean < min; min = mean; end
@@ -410,6 +411,12 @@ end
 Cantelli(x...)      = meanMinMax(x...);     cantelli(x...)      = meanMinMax(x...);
 MeanMinMax(x...)    = meanMinMax(x...);     meanminmax(x...)    = meanMinMax(x...);
 
+
+###
+#   Ferson Pbox (mean - min - max - var)
+###
+
+#function Fersonal()
 function meanMinMaxVar(mean, min, max, var, name = "")
 end
 
