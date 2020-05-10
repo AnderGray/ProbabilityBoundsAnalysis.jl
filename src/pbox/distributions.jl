@@ -269,7 +269,13 @@ end
 #   For informaton about what parameters are, see the Distributions.jl package
 ###
 
-beta(       α=1,    β=1,    name = "")      = envConstFunc(     Beta,       α, β, name, "beta",         [true, true])
+function beta( α=1,    β=1,    name = "")
+    if α == 0 && β == 0; return pbox(0,1);end
+    if α == 0; return pbox(0); end
+    if β == 0; return pbox(1);end
+    return envConstFunc( Beta, α, β, name, "beta", [true, true])
+end
+
 betaPrime(  α=1,    β=1,    name = "")      = envConstFunc(     BetaPrime,  α, β, name, "betaPrime",    [true,false])   # http://en.wikipedia.org/wiki/Beta_prime_distribution
 biweight(   α,      β,      name = "")      = envConstFunc(     Biweight,   α, β, name, "biweight",     [true, true])
 cauchy(     α=0,    β=1,    name = "")      = envConstFunc(     Cauchy,     α, β, name, "cauchy",       [false, false]) # http://en.wikipedia.org/wiki/Cauchy_distribution
@@ -287,11 +293,70 @@ laplace(    μ=0,    θ=1,    name = "")      = envConstFunc(     Laplace,    μ
 levy(       μ=0,    θ=1,    name = "")      = envConstFunc(     Levy,       μ, θ, name, "levy",         [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
 lognormal(  μ=0,    θ=1,    name = "")      = envConstFunc(     lognormal,  μ, θ, name, "lognormal",    [true,false])   # http://en.wikipedia.org/wiki/Log-normal_distribution
 
+###
+#   Confidence boxes
+###
+
+function KN(k, n)
+    if left(k) < 0
+        throw(ArgumentError("k must be greater than 0, provided k = $k"))
+    end
+    if right(n) < right(k)
+        throw(ArgumentError("k < n must be true, provided: k = $k | n = $n"))
+    end
+    return env( beta( left(k), right(n)-left(k)+1 ),  beta( right(k)+1, max(0, left(n)-right(k)) ) ) 
+end
+
+kn(x...) = KN(x...)
 
 ###
 #   Distribution-free constructors for pboxes
 ###
 
+function chebIneq(mean = 0, var = 1, name = "")
+    p = iii();
+    u = mean .- sqrt(var) .* sqrt.(1 ./p .-1)
+    p = jjj();
+    d = mean .+ sqrt(var) .* sqrt.(p ./(1 .-p))
+    return pbox(u, d, shape = "chebyshev", name = name, ml = mean, mh = mean, vl = var, vh = var)
+end
+
+function meanVar(mean = 0, var = 1, name = "")
+
+    if !isa(mean, Interval) && !isa(var, Interval);
+        return chebIneq(mean, var,name)
+    end
+     Envelope = env(
+        chebIneq(left(mean), left(var)),
+        chebIneq(left(mean), right(var)),
+        chebIneq(right(mean), left(var)),
+        chebIneq(right(mean), right(var)),
+    )
+    Envelope.shape = "chebyshev"; Envelope.name = name;
+    return Envelope
+end
+
+Chebyshev(x...) = meanVar(x...);    chebyshev(x...) = meanVar(x...);
+cheb(x...)      = meanVar(x...);    MeanVar(x...)   = meanVar(x...);
+minvar(x...)    = meanVar(x...);
+
+meanStd(mean,std, name = "") = meanVar(mean, std^2, name)
+
+
+function meanMin(mean, min, name = "")
+end
+
+Markov(x...) = markov(x...) = MeanVar(x...) = meanVar(x...)
+
+function meanMinMax(mean, min, max, name = "")
+end
+
+Cantelli(x...) = cantelli(x...) = MeanMinMax(x...) = meanminmax(x...) = meanMinMax(x...)
+
+function meanMinMaxVar(mean, min, max, var, name = "")
+end
+
+Ferson(x...) = ferson(x...) = MeanMinMaxVar(x...) = meanminmaxvar(x...) = meanMinMaxVar(x...)
 
 
 # This cut could be quicker, and should also allow interval arguments

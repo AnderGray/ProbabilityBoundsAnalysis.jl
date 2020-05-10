@@ -108,6 +108,11 @@ export
     exponential, fDist, frechet, gamma, ksdist,
     laplace, levy, lognormal,
 
+    KN,
+
+    meanVar, MeanVar, minvar, meanVar, meanStd,
+    Chebyshev, chebyshev, cheb,
+
     isequal,
     rand,
     cut,
