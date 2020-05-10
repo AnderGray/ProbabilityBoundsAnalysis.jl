@@ -313,6 +313,11 @@ kn(x...) = KN(x...)
 #   Distribution-free constructors for pboxes
 ###
 
+
+###
+#   Chebyshev inequality and mean - var pbox
+###
+
 function chebIneq(mean = 0, var = 1, name = "")
     p = iii();
     u = mean .- sqrt(var) .* sqrt.(1 ./p .-1)
@@ -342,11 +347,34 @@ minvar(x...)    = meanVar(x...);
 
 meanStd(mean,std, name = "") = meanVar(mean, std^2, name)
 
+###
+#   Markov inequality and mean - min pbox
+###
+function markovIneq(mean = 1, min = 0, name = "")
 
-function meanMin(mean, min, name = "")
+    if mean < min; min = mean; end
+    p = jjj(); numS = length(p);
+    d = ( (mean - min) ./(1 .- p) ) .+ min;
+    return pbox(ones(numS)*min, d, shape = "markov", name = name, ml = mean, mh = mean, vl =0 , vh = Inf)
 end
 
-Markov(x...) = markov(x...) = MeanVar(x...) = meanVar(x...)
+function meanMin(mean=1, min=0, name = "")
+    if !isa(mean, Interval) && !isa(min, Interval);
+        return markovIneq(mean, min, name)
+    end
+
+    Envelope = env(
+        markovIneq(left(mean), left(min)),
+        markovIneq(left(mean), right(min)),
+        markovIneq(right(mean), left(min)),
+        markovIneq(right(mean), right(min)),
+    )
+    Envelope.shape = "markov"; Envelope.name = name;
+    return Envelope
+end
+
+Markov(x...)    = meanMin(x...);    markov(x...)    = meanMin(x...);
+MeanMin(x...)   = meanMin(x...);    meanmin(x...)   = meanMin(x...);
 
 function meanMinMax(mean, min, max, name = "")
 end

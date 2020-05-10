@@ -113,6 +113,8 @@ export
     meanVar, MeanVar, minvar, meanVar, meanStd,
     Chebyshev, chebyshev, cheb,
 
+    meanMin, MeanMin, meanmin, Markov, markov,
+
     isequal,
     rand,
     cut,
