@@ -29,10 +29,17 @@
 # Convolutions operations #
 ###########################
 
-function conv(x::Real, y::Real, op = +)
+function conv(x::Real, y::Real, op = +; corr =0) 
+    if corr == 0; return convIndep(x,y,op); end
+    if corr == 1; return convPerfect(x,y,op);end
+    if corr ==-1; return convOpposite(x,y,op);end
+    return convCorr(x, y, Gaussian(corr), op)
+end
 
-    if (op == -) return conv(x, negate(y), +);end
-    if (op == /) return conv(x, reciprocate(y), *);end
+function convIndep(x::Real, y::Real, op = +)
+
+    if (op == -) return convIndep(x, negate(y), +);end
+    if (op == /) return convIndep(x, reciprocate(y), *);end
 
 
     x = makepbox(x);
@@ -91,18 +98,12 @@ function conv(x::Real, y::Real, op = +)
 
 end
 
-#function conv(x::Real, y::Real, op = +; corr =0) 
-#    if corr == 0; return conv(x,y,op); end
-#    if corr == 1; return convPerfect(x,y,op);end
-#    if corr ==-1; return convOpposite(x,y,op);end
-#    return conv(x,y,Gaussian(corr), op)
-#end
 
-function conv(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the same as the conv function except the condensation is different
+function convCorr(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the same as the conv function except the condensation is different
 
 
-	if (op == -) return conv(x, negate(y), C, +);end
-    if (op == /) return conv(x, reciprocate(y), C, *);end
+	if (op == -) return convCorr(x, negate(y), C, +);end
+    if (op == /) return convCorr(x, reciprocate(y), C, *);end
 
     x = makepbox(x);
     y = makepbox(y);

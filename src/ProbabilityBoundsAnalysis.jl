@@ -44,14 +44,15 @@ import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
 
 import Base: show, -,
     +, *, /, //,
-    <, >, ⊆, ^,
+    <, >, ⊆, ^, intersect, issubset,
     rand
+
+import IntervalArithmetic: intersect, issubset
 
 import Statistics: mean, var, std
 
 
-
-#import Distributions: Normal, Beta, Uniform
+import Distributions: cdf #Normal, Beta, Uniform
 
 
 
@@ -128,13 +129,13 @@ export
     # Arithmetic, binary
     conv, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
     VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper,
-    +, -, /, *,
+    +, -, /, *, 
 
     # Arithmetic, uniary
-    negate, reciprocate, complement, shift,
+    negate, reciprocate, complement, shift, 
 
     # Set based operations  
-    env, imp, # Union, Intersection
+    env, imp,  intersect,# Union, Intersection
 
     # Plots
     plot,
@@ -147,6 +148,7 @@ export
     rand, cut, cdf,
 
     left, right, lefts, rights,
+    checkMomentsAndRanges,
 
     # Copulas
     AbstractCopula, copula

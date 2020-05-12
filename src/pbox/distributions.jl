@@ -364,9 +364,9 @@ end
 
 function meanMin(mean = 1, min = 0, name = "")
 
-    if !isa(mean, Interval) && !isa(min, Interval);
-        return markovIneq(mean, min, name)
-    end
+    if right(mean) < left(min); throw(ArgumentError("Inconsistent arguements: \n            $mean < $min"));end
+
+    if !isa(mean, Interval) return markovIneq(mean, left(min), name); end
 
     Envelope = env(
         markovIneq(left(mean), left(min)),
@@ -402,14 +402,16 @@ end
 
 function meanMinMax(mean = 0.5, min = 0, max = 1, name = "")
 
-    if !isa(mean, Interval) && !isa(min, Interval);
-        return cantelliIneq(mean, min,max, name)
-    end
+    min, max, mean1, var = checkMomentsAndRanges(min,max,mean);
+
+    if !isa(mean, Interval) return cantelliIneq(mean, left(min), right(max), name); end
+
     Envelope = env(
-        cantelliIneq(left(mean), left(min), right(max)),
-        cantelliIneq(right(mean), left(min), right(max))
+        cantelliIneq(left(mean1), left(min), right(max)),
+        cantelliIneq(right(mean1), left(min), right(max))
     )
-    Envelope.shape = "cantelli"; Envelope.name = name;
+    Envelope.shape = "cantelli"; Envelope.name = name; 
+    Envelope.vl = var.lo; Envelope.vh = var.hi;
     return Envelope
 end
 
@@ -421,26 +423,25 @@ MeanMinMax(x...)    = meanMinMax(x...);     meanminmax(x...)    = meanMinMax(x..
 #   Ferson Pbox (min - max - mean - var)
 ###
 function FersonEvalEasy(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
-
-    if mean < min; min = mean; end      # Not sure about this yet. If mean is outside bounds, expand bounds
-    if mean > max; max = mean; end
-
+    
     fer = pbox(imp(meanVar(mean,var), imp(meanmin(mean,min),meanmax(mean,max))),
     ml = left(mean), mh = right(mean), vl = left(var), vh =right(var))
     fer.shape = "ferson"; fer.name = name;
-    
+
     return fer
 end
 
 function minMaxMeanVar(min = 0, max = 1, mean = 0.5, var = 0.1, name = "")
 
-    if all(!isa([min, max, mean, var], Interval));
-        return FersonEvalEasy(min,max,mean,var,name);
+    min1,max1,mean1,var1 = checkMomentsAndRanges(min,max,mean,var);
+
+    if all(!isa([mean, var], Interval));
+        return FersonEvalEasy(left(min),right(max),mean,var,name);
     end
 
     Envelope = env(
-        FersonEvalEasy(left(min), right(max), left(mean), right(var)),            # pba.r has it like this (left(var) not used?)
-        FersonEvalEasy(left(min), right(max), right(mean), right(var)),
+        FersonEvalEasy(left(min1), right(max1), left(mean1), right(var1)),            # pba.r has it like this (left(var) not used?)
+        FersonEvalEasy(left(min1), right(max1), right(mean1), right(var1)),
     )
     Envelope.shape = "ferson"; Envelope.name = name;
     return Envelope
@@ -469,6 +470,56 @@ cut(x, p :: Interval; tight :: Bool = true) = interval(cut(x,left(p),tight=tight
 rand(a :: pbox, n :: Int64 = 1) = cut.(a,rand(n));
 
 
+###
+#   Checks consitency of provided moments and ranges, which may all be intervals. 
+#   Returns consitent intervals. If var not provided, returns best var. Could maybe make this a macro?
+###
+function checkMomentsAndRanges(Min, Max, Mean=interval(left(min),right(max)), Var = interval(0,Inf))
+
+    if right(Max) < left(Min); throw(ArgumentError("Inconsistent bounds max < min: $Max < $Min")); end
+
+    range = interval(left(Min), right(Max));
+    if Mean ∩ range == ∅;
+        throw(ArgumentError("Inconsistent arguements: mean ∩ [min, max] = ∅ \n            $Mean ∩ $range = ∅"))
+    end
+
+    # Fix min and max
+    MAXl = max(left(Max), left(Min), left(Mean))
+    MINh = min(right(Min), right(Max), right(Mean))
+
+    Max = interval(MAXl,  right(Max));
+    Min = interval(left(Min), MINh)
+
+    # Fix mean
+    mh = min(right(Mean), right(Max));
+    ml = max(left(Mean), left(Min));
+
+    Mean = interval(ml,mh);
+
+    # Find variance range
+    MIN = left(Min); MAX = right(Max);
+    v1 = (MAX-MIN)*(MAX-ml)-(MAX-ml)*(MAX-ml);
+    v2 = (MAX-MIN)*(MAX-mh)-(MAX-mh)*(MAX-mh);
+    v3 = 0; 
+
+    # Use mid point if it is in mean
+    mid = (MAX-MIN)/2;
+    if (mid ∈ Mean); v3 = (MAX-MIN)*(MAX-mid)-(MAX-mid)*(MAX-mid); end
+
+    vh = max(v1, v2, v3); vl = 0;    
+    maxVar = interval(vl,vh);
+
+    if (Var ∩ maxVar == ∅); throw(ArgumentError("Provided information not valid. Variance ∩ VarBounds = ∅.\n       $Var ∩ $maxVar = ∅")); end
+
+    if !(Var ⊆ maxVar)  # If it's already a subset no need to bother
+        vl = max(left(Var), left(maxVar));
+        vh = min(right(Var), right(maxVar));
+        Var = interval(vl, vh)
+    end
+
+    return Min, Max, Mean, Var
+
+end
 
 #=
 myvectormax <- function(..., na.rm = FALSE) {

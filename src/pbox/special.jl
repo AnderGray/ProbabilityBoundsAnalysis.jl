@@ -44,6 +44,24 @@ isvacuous(x::AbstractInterval) = return ((x.lo == -Inf) && (x.hi == Inf));
 straddles(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<=0) && (0<=right(x)));   # includes zero
 straddlingzero(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<0) && (0<right(x)));   # neglects zero as an endpoint
 
+function degenerate(x :: AbstractInterval)
+    if x.lo == x.hi; return x.lo; end
+    return x
+end
+
+issubset(x :: AbstractVector, y :: IntervalBox{N,T}) where {N,T} = ∈(x,y)
+issubset(x :: IntervalBox, y :: Interval) = issubset(x[1],y)
+issubset(x :: Interval, y :: IntervalBox) = issubset(x,y[1])
+
+function intersect(x:: Union{Float64,Int64}, y :: AbstractInterval)
+    if x ∈ y
+        return x
+    end
+    return ∅
+end
+intersect(x :: AbstractInterval, y ::Union{Float64,Int64}) = intersect(y,x)
+
+
 function noNesting(x::Array{<:AbstractInterval})
 
     N = length(x);
