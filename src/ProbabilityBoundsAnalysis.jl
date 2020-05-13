@@ -128,7 +128,7 @@ export
     mean, var, std, sideVariance, dwmean, dwVariance,
 
     # Arithmetic, binary
-    conv, convIndep, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
+    conv, convCorr, convIndep, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
     VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper,
     +, -, /, *, 
 
@@ -152,7 +152,7 @@ export
     checkMomentsAndRanges,
 
     # Copulas
-    AbstractCopula, copula
+    AbstractCopula, copula, GauCopula, π, M, W
 
 
 include("pbox/pbox.jl")

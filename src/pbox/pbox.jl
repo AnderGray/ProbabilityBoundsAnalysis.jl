@@ -126,10 +126,10 @@ function cdf(s :: pbox, x::Real)
     d = s.d; u = s.u; n = s.n;
     bounded = s.bounded;
 
-    if x < u[1]; 
+    if x <= u[1]; 
         return interval(0,1/n) * (1-bounded[1]); 
     end;
-    if x > d[end]; 
+    if x >= d[end]; 
         if bounded[2]; return 1; end
         return interval((n-1)/n, 1);
     end;

@@ -247,7 +247,7 @@ function Clayton(t = 0)                                  #   Clayton copula
     return copula(Cla(x,y,t), func = Cla, param = t);
 end
 
-function Gaussian(corr = 0)
+function GauCopula(corr = 0)
     x = y = range(0,stop = 1,length = n);
     cdf = Gau(x,y,corr);
     #cdf[:,end] = cdf[end,:] = x;    # This removes the NaNs from Liams mvNormCdf. We know the marginals must be uniform

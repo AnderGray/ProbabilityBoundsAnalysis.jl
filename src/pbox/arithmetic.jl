@@ -41,7 +41,7 @@ function conv(x::Real, y::Real, op = +; corr =0)
         return env(Lower, Upper)
     end
 
-    return convCorr(x, y, Gaussian(corr), op)
+    return convCorr(x, y, GauCopula(corr), op)
 end
 
 function convIndep(x::Real, y::Real, op = +)

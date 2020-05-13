@@ -150,6 +150,7 @@ N = gaussian = normal
 ###
 function envUnif( i, j, x...)
 
+    i, j, _, _ = checkMomentsAndRanges(i,j)
     a = env(
     map.(Suniform, left(i), left(j), 1, x...),
     map.(Suniform, right(i), right(j),x...),
@@ -158,21 +159,21 @@ function envUnif( i, j, x...)
     return a
 end
 
-function Suniform(min, max, case = 1; name="")
+function Suniform(Min, Max, case = 1; name="")
+    
+    if (case==1) && (Max <= Min); Min = Max; end
+    if Max <= Min; Max = Min; end
 
-    if (case==1) && (max <= min); min = max; end
-    if max <= min; max = min; end
+    m = (Min+Max)/2;
+    v = (Min-Max)^2/12;
+    if Max == Min; return pbox(Min,shape="uniform", name=name, ml=m, mh=m, vl=v, vh=v,bounded = [true, true]);end
 
-    m = (min+max)/2;
-    v = (min-max)^2/12;
-    if max == min; return pbox(min,shape="uniform", name=name, ml=m, mh=m, vl=v, vh=v);end
-
-    return (pbox(quantile.(Uniform(min,max),ii()), quantile.(Uniform(min,max),jj()),
+    return (pbox(quantile.(Uniform(Min,Max),ii()), quantile.(Uniform(Min,Max),jj()),
     shape="uniform", name=name, ml=m, mh=m, vl=v, vh=v, bounded = [true, true]));
 
 end
 
-U = uniform(min, max, x...) = envUnif(min,max, x...)
+U = uniform(Min, Max, x...) = envUnif(Min,Max, x...)
 
 
 ###
@@ -367,7 +368,7 @@ function markovIneq(mean = 1, min = 0, name = "")
     if mean < min; min = mean; end
     p = jjj(); numS = length(p);
     d = ( (mean - min) ./(1 .- p) ) .+ min;
-    return pbox(ones(numS)*min, d, shape = "markov", name = name, ml = mean, mh = mean, vl =0 , vh = Inf)
+    return pbox(ones(numS)*min, d, shape = "markov", name = name, ml = mean, mh = mean, vl =0 , vh = Inf, bounded = [true, false])
 end
 
 function meanMin(mean = 1, min = 0, name = "")
@@ -404,7 +405,8 @@ function cantelliIneq(mean = 0.5, min = 0, max = 1, name = "")
     p = jj();
     d = ifelse.(mid .<= p, max, (mean .- min .*p ) ./(1 .- p))
     
-    return pbox(u, d, shape = "cantelli", name = name, ml = mean, mh = mean, vl = 0, vh = (max-min)*(max-mean)-(max-mean)*(max-mean))
+    return pbox(u, d, shape = "cantelli", name = name, ml = mean, mh = mean, vl = 0, 
+    vh = (max-min)*(max-mean)-(max-mean)*(max-mean), bounded = [true, true])
 
 end
 
@@ -433,7 +435,7 @@ MeanMinMax(x...)    = meanMinMax(x...);     meanminmax(x...)    = meanMinMax(x..
 function FersonEvalEasy(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
     
     fer = pbox(imp(meanVar(mean,var), imp(meanmin(mean,min),meanmax(mean,max))),
-    ml = left(mean), mh = right(mean), vl = left(var), vh =right(var))
+    ml = left(mean), mh = right(mean), vl = left(var), vh =right(var), bounded = [true, true])
     fer.shape = "ferson"; fer.name = name;
 
     return fer
@@ -482,7 +484,7 @@ rand(a :: pbox, n :: Int64 = 1) = cut.(a,rand(n));
 #   Checks consitency of provided moments and ranges, which may all be intervals. 
 #   Returns consitent intervals. If var not provided, returns best var. Could maybe make this a macro?
 ###
-function checkMomentsAndRanges(Min, Max, Mean=interval(left(min),right(max)), Var = interval(0,Inf))
+function checkMomentsAndRanges(Min, Max, Mean=interval(left(Min),right(Max)), Var = interval(0,Inf))
 
     if right(Max) < left(Min); throw(ArgumentError("Inconsistent bounds max < min: $Max < $Min")); end
 
