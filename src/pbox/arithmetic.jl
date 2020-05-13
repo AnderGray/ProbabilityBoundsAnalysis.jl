@@ -33,6 +33,14 @@ function conv(x::Real, y::Real, op = +; corr =0)
     if corr == 0; return convIndep(x,y,op); end
     if corr == 1; return convPerfect(x,y,op);end
     if corr ==-1; return convOpposite(x,y,op);end
+    if corr ==interval(-1,1); return convFrechet(x,y,op); end
+    
+    if isinterval(corr)
+        Lower = convCorr(x, y, Gaussian(left(corr)), op);
+        Upper = convCorr(x, y, Gaussian(right(corr)), op);
+        return env(Lower, Upper)
+    end
+
     return convCorr(x, y, Gaussian(corr), op)
 end
 
@@ -93,7 +101,9 @@ function convIndep(x::Real, y::Real, op = +)
         vh = map(op,x.vh,y.vh);
     end
 
-    return pbox(Zu, Zd, ml = ml, mh = mh, vl=vl, vh=vh, dids="$(x.dids) $(y.dids)");
+    bounded = min(x.bounded,y.bounded);
+
+    return pbox(Zu, Zd, ml = ml, mh = mh, vl=vl, vh=vh, dids="$(x.dids) $(y.dids)",bounded = bounded);
     #return ([Zu, Zd, ml, mh, vl, vh, "$(x.dids) $(y.dids)"]);
 
 end
@@ -155,7 +165,9 @@ function convCorr(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the sa
 
 	# Moment propagation needs to be included here
 
-	return pbox(Zu, Zd, ml = ml, mh = mh, vl=vl, vh=vh, dids="$(x.dids) $(y.dids)");
+    bounded = min(x.bounded,y.bounded);
+
+	return pbox(Zu, Zd, ml = ml, mh = mh, vl=vl, vh=vh, dids="$(x.dids) $(y.dids)", bounded = bounded);
 
 end
 
@@ -213,9 +225,11 @@ function convPerfect(x::Real, y::Real, op = +)
 
     # Here we will also need the moment propagation
 
+    bounded = min(x.bounded,y.bounded);
+
     if (all(cu == scu) && all(cd == scd))
-        return pbox(scu, scd,  dids="$(x.dids) $(y.dids) ", bob=x.bob)
-    else return pbox(scu, scd,  dids="$(x.dids) $(y.dids) ")
+        return pbox(scu, scd,  dids="$(x.dids) $(y.dids) ", bob=x.bob, bounded = bounded)
+    else return pbox(scu, scd,  dids="$(x.dids) $(y.dids) ", bounded= bounded)
       end
 end
 
@@ -233,7 +247,9 @@ function convOpposite(x::Real, y::Real, op = +)
 
     # Here we will also need the moment propagation
 
-    return pbox(scu, scd, dids = "$(x.dids) $(y.dids)")
+    bounded = min(x.bounded,y.bounded);
+
+    return pbox(scu, scd, dids = "$(x.dids) $(y.dids)", bounded=bounded)
 end
 
 function convFrechet(x::Real, y::Real, op = +)
@@ -278,32 +294,37 @@ function convFrechet(x::Real, y::Real, op = +)
         # vl <- x@v+y@v + 2*sqrt(x@v*y@v)
     end
 
-    return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, dids = "$(x.dids) $(y.dids) ");
+    bounded = min(x.bounded,y.bounded);
+    return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, dids = "$(x.dids) $(y.dids) ", bounded=bounded);
 end
 
 function shift(x :: pbox, ss :: Real)
      if (x.shape) ∈ (["uniform","normal","cauchy","triangular","skew-normal"]) s = x.shape; else s = ""; end
-    return pbox(ss .+ x.u, ss .+ x.d, shape=s, name="", ml = x.ml+ss, mh=x.mh+ss, vl=x.vl, vh=x.vh, dids=x.dids, bob=perfectdep(x))
+    return pbox(ss .+ x.u, ss .+ x.d, shape=s, name="", ml = x.ml+ss, mh=x.mh+ss, 
+    vl=x.vl, vh=x.vh, dids=x.dids, bob=perfectdep(x),bounded = x.bounded)
 end
 
 function mult(x::pbox, m :: Real)
     if (x.shape) ∈ (["uniform","normal","cauchy","triangular","skew-normal"]) s = x.shape; else s = ""; end
     if ((x.shape) ∈ (["exponential","lognormal"]) && 0 <= x.u[1]) s = x.shape; else s = ""; end
     if (m < 0) return negate(mult(x,abs(m))) end
-    return pbox(m*x.u, m*x.d, shape=s, name="", ml=m*x.ml, mh=m*x.mh, vl=(m^2)*x.vl, vh=(m^2)*x.vh, dids=x.dids, bob=perfectopposite(m,x))   ################## mean if m<0
+    return pbox(m*x.u, m*x.d, shape=s, name="", ml=m*x.ml, mh=m*x.mh, vl=(m^2)*x.vl, 
+    vh=(m^2)*x.vh, dids=x.dids, bob=perfectopposite(m,x), bounded = x.bounded)   ################## mean if m<0
 end
 
 function negate(x)
     if (ispbox(x))
         if ((x.shape)∈(["uniform", "normal", "cauchy", "triangular"])) s = x.shape; else s = ""; end
-        return pbox(-x.d[end:-1:1],-x.u[end:-1:1],shape=s,name = "", ml=-x.mh, mh=-x.ml, vl=x.vl, vh=x.vh, dids=x.dids, bob=oppositedep(x));
+        return pbox(-x.d[end:-1:1],-x.u[end:-1:1],shape=s,name = "", ml=-x.mh, mh=-x.ml, 
+        vl=x.vl, vh=x.vh, dids=x.dids, bob=oppositedep(x), bounded = reverse(x.bounded));
     end
     return -x;
 end
 
 function complement(x::pbox)
     if ((x.shape)∈(["uniform", "normal", "cauchy", "triangular", "skew-normal"])) s = x.shape; else s = ""; end
-    return pbox(1 .-x.d[end:-1:1],1 .-x.u[end:-1:1],shape=s,name = "", ml=1-x.mh, mh=1-x.ml, vl=x.vl, vh=x.vh, dids=x.dids, bob=oppositedep(x));
+    return pbox(1 .-x.d[end:-1:1],1 .-x.u[end:-1:1],shape=s,name = "", ml=1-x.mh, 
+    mh=1-x.ml, vl=x.vl, vh=x.vh, dids=x.dids, bob=oppositedep(x), bounded = x.bounded);
 end
 
 function reciprocate(x)
@@ -329,36 +350,38 @@ function reciprocate(x)
         myMean = interval(x.ml, x.mh);
         myVar = interval(x.vl, x.vh);
 
-        return pbox(1 ./reverse(x.d[:]), 1 ./ reverse(x.u[:]), shape = sh, name="", ml=left(myMean), mh=right(myMean), vl=left(myVar), vh=right(myVar), dids=x.dids, bob=oppositedep(x));
+        return pbox(1 ./reverse(x.d[:]), 1 ./ reverse(x.u[:]), shape = sh, name="", ml=left(myMean), 
+        mh=right(myMean), vl=left(myVar), vh=right(myVar), dids=x.dids, bob=oppositedep(x), bounded = [true, true]);
     end
     return 1/x;
 end
 
 
+defaultCorr = 0;
 
 -(x::pbox) = negate(x);
 /(x::pbox) = reciprocate(x);
 
-+(x::AbstractPbox, y::AbstractPbox) = conv(x,y,+); # if(x==y) return 2*x; ????
--(x::AbstractPbox, y::AbstractPbox) = conv(x,y,-); # if(x==y) return 0;   ????
-*(x::AbstractPbox, y::AbstractPbox) = conv(x,y,*); # if(x==y) return x^2; ????
-/(x::AbstractPbox, y::AbstractPbox) = conv(x,y,/); # if(x==y) return 0;   ????
++(x::AbstractPbox, y::AbstractPbox) = conv(x,y,+, corr = defaultCorr); # if(x==y) return 2*x; ????
+-(x::AbstractPbox, y::AbstractPbox) = conv(x,y,-, corr = defaultCorr); # if(x==y) return 0;   ????
+*(x::AbstractPbox, y::AbstractPbox) = conv(x,y,*, corr = defaultCorr); # if(x==y) return x^2; ????
+/(x::AbstractPbox, y::AbstractPbox) = conv(x,y,/, corr = defaultCorr); # if(x==y) return 0;   ????
 
 ###
 #   Conv of pboxes and intervals
 ###
 
 # Probably will only need shift for + and - with reals
-+(x :: AbstractPbox, y :: AbstractInterval) = conv(x,y,+);
++(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, +, corr = defaultCorr);
 +(x :: AbstractInterval, y :: AbstractPbox) = y + x;
 
--(x :: AbstractPbox, y :: AbstractInterval) = conv(x,y,-);
+-(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, -, corr = defaultCorr);
 -(x :: AbstractInterval, y :: AbstractPbox) = -y + x;
 
-*(x :: AbstractPbox, y :: AbstractInterval) = conv(x,y,*);
+*(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, *, corr = defaultCorr);
 *(x :: AbstractInterval, y :: AbstractPbox) = y * x;
 
-/(x :: AbstractPbox, y :: AbstractInterval) = conv(x,y,/);
+/(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, /, corr = defaultCorr);
 /(x :: AbstractInterval, y :: AbstractPbox) = reciprocate(y) * x;
 
 ###

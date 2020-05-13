@@ -1,7 +1,7 @@
 ######
 # This file is part of the pba.jl package.
 #
-# Definition of plotting recipes
+#   Definition of plotting recipes
 #
 #           University of Liverpool
 #                                           Author: Ander Gray

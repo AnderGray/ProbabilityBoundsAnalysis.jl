@@ -51,9 +51,10 @@ import IntervalArithmetic: intersect, issubset
 
 import Statistics: mean, var, std
 
-
 import Distributions: cdf #Normal, Beta, Uniform
 
+
+abstract type AbstractPbox <: Real end
 
 
 ## Global Variables (we may want to avoid these)
@@ -127,7 +128,7 @@ export
     mean, var, std, sideVariance, dwmean, dwVariance,
 
     # Arithmetic, binary
-    conv, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
+    conv, convIndep, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
     VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper,
     +, -, /, *, 
 

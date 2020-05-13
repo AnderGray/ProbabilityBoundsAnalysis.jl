@@ -34,6 +34,7 @@ function env(x...; naRm = false )
     dids = elts[1].dids;
     na = elts[1].name;
     sh = elts[1].shape;
+    bounded =elts[1].bounded;
 
     for i =2:length(elts)
         u = min.(u,elts[i].u);
@@ -42,11 +43,14 @@ function env(x...; naRm = false )
         mh = max(mh,elts[i].ml);
         vl = min(vl,elts[i].vl);
         vh = max(vh,elts[i].vh);
+        bounded[1] = min(bounded[1], elts[i].bounded[1]);
+        bounded[2] = min(bounded[2], elts[i].bounded[2]);
         dids = "$dids $(elts[i].dids)"
+
         if (elts[i].name != na) na = "";end
         if (elts[i].shape != sh) sh = "";end
     end
-    return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, dids=dids, name=na, shape=sh)
+    return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, dids=dids, name=na, shape=sh, bounded = bounded)
 
 end
 
@@ -65,6 +69,7 @@ function imp(x...; naRm = false )
     dids = elts[1].dids;
     na = elts[1].name;
     sh = elts[1].shape;
+    bounded =elts[1].bounded;
 
     for i =2:length(elts)
         u = max.(u,elts[i].u);
@@ -73,12 +78,14 @@ function imp(x...; naRm = false )
         mh = min(mh,elts[i].mh);
         vl = max(vl,elts[i].vl);
         vh = min(vh,elts[i].vh);
+        bounded[1] = max(bounded[1], elts[i].bounded[1]);
+        bounded[2] = max(bounded[2], elts[i].bounded[2]);
         dids = "$dids $(elts[i].dids)"
     end
 
     if (any(d[:] < u[:])) throw(ArgumentError("Imprint does not exist"));
     else
-        return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, dids=dids)
+        return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, dids=dids, bounded = bounded)
     end
 
 end
@@ -148,7 +155,7 @@ function envUnif( i, j, x...)
     map.(Suniform, right(i), right(j),x...),
     map.(Suniform, left(i), right(j), 1, x...),
     map.(Suniform, right(i), left(j),x...));
-
+    return a
 end
 
 function Suniform(min, max, case = 1; name="")
@@ -161,7 +168,7 @@ function Suniform(min, max, case = 1; name="")
     if max == min; return pbox(min,shape="uniform", name=name, ml=m, mh=m, vl=v, vh=v);end
 
     return (pbox(quantile.(Uniform(min,max),ii()), quantile.(Uniform(min,max),jj()),
-    shape="uniform", name=name, ml=m, mh=m, vl=v, vh=v));
+    shape="uniform", name=name, ml=m, mh=m, vl=v, vh=v, bounded = [true, true]));
 
 end
 
@@ -200,6 +207,7 @@ function envConstFunc(Dist, i, j, name, shape, Bounded)
     Sdist(Dist, right(i), left(j),  name, shape, Bounded));
     
     a.dids = "PB $(uniquePbox())";
+    a.bounded = Bounded; 
     return a;
 
 end
@@ -239,7 +247,7 @@ function Sdist(DistFunc, i, j, name, shape, Bounded)
 
     Dist = DistFunc(i,j)
     m = mean(Dist); v = var(Dist);
-    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v)
+    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v, bounded = Bounded)
 
 end
 
@@ -251,7 +259,7 @@ function Sdist1(DistFunc, i, name, shape, Bounded)
 
     Dist = DistFunc(i)
     m = mean(Dist); v = var(Dist);
-    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v)
+    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v, bounded = bounded)
 
 end
 
@@ -264,7 +272,7 @@ function Sdist3(DistFunc, i, j, k, name, shape, Bounded)
 
     Dist = DistFunc(i, j, k)
     m = mean(Dist); v = var(Dist);
-    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v)
+    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v, bounded = bounded)
 
 end
 

@@ -24,6 +24,9 @@
 #   ->  Multiplication of pboxes with intervals not working as expected.
 #   ->  id and dids don't work. When a pbox is made, 4 is added to the id counter
 #
+#   ->  Check bounded. What is the reciprocal of bounded? What is it's complement?
+#       -> Does my arithmetic with bounded make sense?       
+#
 #   Severe:
 #       ->  makepbox() won't work when both a pbox and an interval type are introduced as arguments
 ###
@@ -34,8 +37,6 @@
 #   ->  When passing a pbox to the pbox constructor, mean and variance not saved and recalculated from bounds
 #
 ###
-
-abstract type AbstractPbox <: Real end
 
 mutable struct pbox <: AbstractPbox
     id :: String                        # Id of the pbox ie: "PB 1"
@@ -50,11 +51,11 @@ mutable struct pbox <: AbstractPbox
     name :: String                      # name
     dids :: String                      # dependancy id, defines which pbox ids it's depedent to
     bob :: Int64                        # for dependancy tracking
-
+    bounded :: Array{Bool,1}            # Is it bounded?
 
     function pbox(u::Union{Missing, Array{<:Real}, Real} = missing, d=u; shape = "", name = "", ml= missing, mh = missing,
         vl = missing, vh = missing, interpolation = "linear",
-        bob = missing, perfect = missing, opposite = missing, depends = missing, dids=missing)
+        bob = missing, perfect = missing, opposite = missing, depends = missing, dids=missing, bounded = [false, false])
 
         steps = ProbabilityBoundsAnalysis.steps;                  # Reading global varaibles costly, creating local for multiple use
 
@@ -70,6 +71,7 @@ mutable struct pbox <: AbstractPbox
             vl = p.vl;
             vh = p.vh;
             shape = p.shape;
+            bounded = p.bounded;
         else
 
             if (!(typeof(u)<:Union{Array{<:Real},Real}) || !(typeof(d)<:Union{Array{<:Real},Real}))
@@ -87,7 +89,7 @@ mutable struct pbox <: AbstractPbox
             unique = uniquePbox();      # Here an error because will create multiple pboxes when distribution constructor is called
             id = "PB $unique";
 
-            p = new(id,u,d,steps,"",-∞,∞,0,∞,"","",unique);
+            p = new(id,u,d,steps,"",-∞,∞,0,∞,"","",unique, bounded);
         end
 
         p = computeMoments(p);
@@ -122,9 +124,15 @@ end
 ###
 function cdf(s :: pbox, x::Real)   
     d = s.d; u = s.u; n = s.n;
+    bounded = s.bounded;
 
-    if x <u[1]; return 0;end;
-    if x >d[end]; return 1;end;
+    if x < u[1]; 
+        return interval(0,1/n) * (1-bounded[1]); 
+    end;
+    if x > d[end]; 
+        if bounded[2]; return 1; end
+        return interval((n-1)/n, 1);
+    end;
 
     indUb = findfirst(x .<= u);
     indLb = findlast(x .>= d);
