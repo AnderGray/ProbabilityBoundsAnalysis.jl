@@ -97,11 +97,28 @@ and may be plotted as follows:
 ```julia
 julia> plot(f)
 ```
-![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/pboxExample1.png "a probability box")
+![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/PbaPlot1.png "a probability box")
 
 In `ProbabilityBoundsAnalysis.jl` all plots of uncertain numbers are of their cdfs.
 
-**Currently only the normal distribution shaped p-boxes may be constructed like this. More to follow.**
+Supported parametric distributions:
+
+|           |         |        |              |         |             |
+|:---------:|:-------:|:------:|:------------:|:-------:|:-----------:|
+|   normal  | uniform |  beta  |   betaPrime  | biweght |    Cauchy   |
+|    chi    |  chisq  | cosine | epanechnikov |  erlang | exponential |
+|   fDist   | frechet |  gamma |    ksdist    | laplace |     levy    |
+| lognormal |         |        |              |         |             |
+
+Supported distribution free p-boxes:
+
+|           |         |        |              |         |
+|:---------:|:-------:|:------:|:------------:|:-------:|
+|   meanVar  | meanMin |  meanMax  |   meanMinMax  | minMaxMeanVar|
+
+KN c-boxes also supported.
+
+All constructors support interval arguments.
 
 ### Arithmetic
 
@@ -145,10 +162,28 @@ julia> convOpposite(a,b,+)
 Pbox: 	  ~  ( range=[0.48559,1.51440], mean=[0.96909,1.03090], var=[0.0,0.00840])
 ```
 
+Binary operations with a specified correlation coefficient may also be performed:
 
+```julia
+julia> a = normal(0,1);
+julia> b = normal(1,1);
+julia> conv(a,b, +, corr = 0.5)
+Pbox: 	  ~  ( range=[-5.18046,7.18046], mean=1.0, var=[2.57835,3.96457])
+```
+This assumes that a and b follow a Gaussian Copula. You may however perform the operation with any copula by using the function
+```julia
+julia> convCorr(a,b,C,+)
+```
+where C is a copula (see section on dependence modelling).
 
+Note that:
 
-
+```julia
+conv(a,b, op, corr = 0)               == convIndep(a,b,op)
+conv(a,b, op, corr = 1)               == convPerfect(a,b,op)
+conv(a,b, op, corr = -1)              == convOpposite(a,b,op)
+conv(a,b, op, corr = interval(-1,1))  == convFrechet(a,b,op)
+```
 
 Interval statistics 
 ---
