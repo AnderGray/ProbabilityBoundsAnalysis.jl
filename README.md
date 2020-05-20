@@ -18,11 +18,10 @@ Supported dependent arithmetic between uncertain numbers:
 
 |                           |     independent    | dependency known   | dependency unknown | perfect/opposite     | partial information  |
 |---------------------------|:------------------:|--------------------|--------------------|----------------------|----------------------|
-| intervals                 | not known to exist |         tbc        |         yes        |  solutions exist |  solutions exist |
-| probability distributions |         yes        |         tbc        |         yes        |          yes         |          solutions exist         |
-| probability boxes         |         yes        |         tbc        |         yes        |          yes         |          solutions exist         |
+| intervals                 | not known to exist |         solutions exist        |         yes        |  solutions exist |  solutions exist |
+| probability distributions |         yes        |         yes        |         yes        |          yes         |          solutions exist         |
+| probability boxes         |         yes        |         yes        |         yes        |          yes         |          solutions exist         |
 
-**tbc: to be continued. General solutions exist and will be implemented.**
 
 
 Installation
@@ -30,16 +29,26 @@ Installation
 Two ways to install and use:
 
 **1. From the julia package manager**
+
+You may download the lastest release by:
+```julia
+julia> ]
+(v1.0) pkg> add ProbabilityBoundsAnalysis
+julia> using ProbabilityBoundsAnalysis
+```
+
+or the lastest version of this repository by:
 ```julia
 julia> ]
 (v1.0) pkg> add https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl.git
 julia> using ProbabilityBoundsAnalysis
 ```
-(will be `add ProbabilityBoundsAnalysis` when full package is released)
 
 **2. Downloading the source code**
 ```julia
-julia> include("directory/of/source/src/ProbabilityBoundsAnalysis.jl")
+git clone https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl.git
+
+julia> include("ProbabilityBoundsAnalysis.jl/src/ProbabilityBoundsAnalysis.jl")
 julia> using Main.ProbabilityBoundsAnalysis
 ```
 
