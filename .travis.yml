@@ -1,7 +1,11 @@
-coveralls: true
+codecov: true
 
 language: julia
 os:
 	- linux
 julia:
+	- nightly
 	- 1.4
+
+after_success:
+	- julia -e 'cd(Pkg.dir("ProbabilityBoundsAnalysis.jl")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
