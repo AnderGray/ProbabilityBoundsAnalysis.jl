@@ -1,4 +1,5 @@
 # ProbabilityBoundsAnalysis.jl
+[![Build Status]https://travis-ci.com/AnderGray/ProbabilityBoundsAnalysis.jl.svg?branch=master](https://travis-ci.com/github/AnderGray/ProbabilityBoundsAnalysis.jl)
 [Probability bounds analysis](https://en.wikipedia.org/wiki/Probability_bounds_analysis) in Julia, a package for performing arithmetic between uncertain numbers. `ProbabilityBoundsAnalysis.jl` computes guaranteed bounds on functions of random variables, given only partial information about their marginals and dependence. Considered to be a form of rigorous computing with random variables.
 
 The mayority of this code is a port from [pba.r](https://github.com/ScottFerson/pba.r) by Scott Ferson and Jason O'Rawe, Applied Biomathematics (2006)
