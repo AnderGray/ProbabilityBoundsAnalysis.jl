@@ -18,11 +18,10 @@ Supported dependent arithmetic between uncertain numbers:
 
 |                           |     independent    | dependency known   | dependency unknown | perfect/opposite     | partial information  |
 |---------------------------|:------------------:|--------------------|--------------------|----------------------|----------------------|
-| intervals                 | not known to exist |         tbc        |         yes        |  solutions exist |  solutions exist |
-| probability distributions |         yes        |         tbc        |         yes        |          yes         |          solutions exist         |
-| probability boxes         |         yes        |         tbc        |         yes        |          yes         |          solutions exist         |
+| intervals                 | not known to exist |         solutions exist        |         yes        |  solutions exist |  solutions exist |
+| probability distributions |         yes        |         yes        |         yes        |          yes         |          solutions exist         |
+| probability boxes         |         yes        |         yes        |         yes        |          yes         |          solutions exist         |
 
-**tbc: to be continued. General solutions exist and will be implemented.**
 
 
 Installation
@@ -30,16 +29,26 @@ Installation
 Two ways to install and use:
 
 **1. From the julia package manager**
+
+You may download the lastest release by:
+```julia
+julia> ]
+(v1.0) pkg> add ProbabilityBoundsAnalysis
+julia> using ProbabilityBoundsAnalysis
+```
+
+or the lastest version of this repository by:
 ```julia
 julia> ]
 (v1.0) pkg> add https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl.git
 julia> using ProbabilityBoundsAnalysis
 ```
-(will be `add ProbabilityBoundsAnalysis` when full package is released)
 
 **2. Downloading the source code**
 ```julia
-julia> include("directory/of/source/src/ProbabilityBoundsAnalysis.jl")
+git clone https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl.git
+
+julia> include("ProbabilityBoundsAnalysis.jl/src/ProbabilityBoundsAnalysis.jl")
 julia> using Main.ProbabilityBoundsAnalysis
 ```
 
@@ -88,11 +97,28 @@ and may be plotted as follows:
 ```julia
 julia> plot(f)
 ```
-![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/pboxExample1.png "a probability box")
+![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/PbaPlot1.png "a probability box")
 
 In `ProbabilityBoundsAnalysis.jl` all plots of uncertain numbers are of their cdfs.
 
-**Currently only the normal distribution shaped p-boxes may be constructed like this. More to follow.**
+Supported parametric distributions:
+
+|           |         |        |              |         |             |
+|:---------:|:-------:|:------:|:------------:|:-------:|:-----------:|
+|   normal  | uniform |  beta  |   betaPrime  | biweght |    Cauchy   |
+|    chi    |  chisq  | cosine | epanechnikov |  erlang | exponential |
+|   fDist   | frechet |  gamma |    ksdist    | laplace |     levy    |
+| lognormal |         |        |              |         |             |
+
+Supported distribution free p-boxes:
+
+|           |         |        |              |         |
+|:---------:|:-------:|:------:|:------------:|:-------:|
+|   meanVar  | meanMin |  meanMax  |   meanMinMax  | minMaxMeanVar|
+
+KN c-boxes also supported.
+
+All constructors support interval arguments.
 
 ### Arithmetic
 
@@ -136,10 +162,28 @@ julia> convOpposite(a,b,+)
 Pbox: 	  ~  ( range=[0.48559,1.51440], mean=[0.96909,1.03090], var=[0.0,0.00840])
 ```
 
+Binary operations with a specified correlation coefficient may also be performed:
 
+```julia
+julia> a = normal(0,1);
+julia> b = normal(1,1);
+julia> conv(a,b, +, corr = 0.5)
+Pbox: 	  ~  ( range=[-5.18046,7.18046], mean=1.0, var=[2.57835,3.96457])
+```
+This assumes that a and b follow a Gaussian Copula. You may however perform the operation with any copula by using the function
+```julia
+julia> convCorr(a,b,C,+)
+```
+where C is a copula (see section on dependence modelling).
 
+Note that:
 
-
+```julia
+conv(a,b, op, corr = 0)               == convIndep(a,b,op)
+conv(a,b, op, corr = 1)               == convPerfect(a,b,op)
+conv(a,b, op, corr = -1)              == convOpposite(a,b,op)
+conv(a,b, op, corr = interval(-1,1))  == convFrechet(a,b,op)
+```
 
 Interval statistics 
 ---
