@@ -304,7 +304,15 @@ gamma(      α=1,    θ=1,    name = "")      = envConstFunc(     Gamma,      α
 ksdist(     n,              name = "")      = envConstFunc1(    KSDist,     n,    name, "ksdist",       [true,true])
 laplace(    μ=0,    θ=1,    name = "")      = envConstFunc(     Laplace,    μ, θ, name, "laplace",      [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
 levy(       μ=0,    θ=1,    name = "")      = envConstFunc(     Levy,       μ, θ, name, "levy",         [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
-lognormal(  μ=0,    θ=1,    name = "")      = envConstFunc(     lognormal,  μ, θ, name, "lognormal",    [true,false])   # http://en.wikipedia.org/wiki/Log-normal_distribution
+
+function pbaLogNormal(m, std)
+    γ = 1+std^2/m^2
+    μ = log(m/sqrt(γ))
+    σ = sqrt(log(γ))
+    return LogNormal(μ,σ)
+end
+
+lognormal(  μ=1,    θ=1,    name = "")      = envConstFunc(     pbaLogNormal,  μ, θ, name, "lognormal",    [true,false])   # http://en.wikipedia.org/wiki/Log-normal_distribution
 
 ###############################
 #   Confidence boxes
