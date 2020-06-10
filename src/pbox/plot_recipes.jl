@@ -11,7 +11,7 @@
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
-function plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2)
+function plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 12)
     if (isvacuous(s)); throw(ArgumentError("Pbox is vacuous"));end
     if (ismissing(name)) name = s.id; end
 
@@ -32,7 +32,8 @@ function plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2)
         ax.fill_between(Xs, Ylb, Yub, alpha=alpha, color =fillcol)
     end
 
-    xlabel("Distribution range"); ylabel("CDF");
+    xticks(fontsize = fontsize); yticks(fontsize = fontsize)
+    xlabel("Distribution range",fontsize = fontsize); ylabel("CDF",fontsize=fontsize);
 
 end
 

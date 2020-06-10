@@ -12,8 +12,7 @@
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
-
-#####
+######
 #   Known Bugs:
 #
 #   ->  After using a pbox in a computation, the shape is no longer saved. For example normal(0,1) + 1, should still be a normal
@@ -29,14 +28,14 @@
 #
 #   Severe:
 #       ->  makepbox() won't work when both a pbox and an interval type are introduced as arguments
-###
+#####
 
 #####
 #   Fixed Bugs wrt. pba.r:
 #
 #   ->  When passing a pbox to the pbox constructor, mean and variance not saved and recalculated from bounds
 #
-###
+#####
 
 mutable struct pbox <: AbstractPbox
     id :: String                        # Id of the pbox ie: "PB 1"
