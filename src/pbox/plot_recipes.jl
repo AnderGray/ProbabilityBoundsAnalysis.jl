@@ -56,8 +56,10 @@ function prepFillBounds(x)
     Ylb = zeros(nums,1); Yub = zeros(nums,1);
 
     for i = 1:2:nums
-        indLb = findfirst(Xs[i] .<= d)
+        #indUb = findfirst(Xs[i] .<= d)
+        #indLb = findlast(Xs[i]  .>= u)
         indUb = findlast(Xs[i]  .>= u)
+        indLb = findfirst(Xs[i] .<= d)
 
         if ~isempty(indLb)
             Ylb[i] = ui[indLb]
@@ -73,10 +75,10 @@ function prepFillBounds(x)
 
         if ~isempty(indUb)
             Yub[i+1] = di[indUb]
-            if Xs[i] ∈ d
-                Yub[i] = di[indUb]
-            else
+            if Xs[i] ∈ u
                 Yub[i] = ui[indUb]
+            else
+                Yub[i] = di[indUb]
             end
         else
             Yub[i] = 0
