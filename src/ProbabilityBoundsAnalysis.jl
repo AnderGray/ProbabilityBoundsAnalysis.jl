@@ -129,7 +129,7 @@ export
 
     # Arithmetic, binary
     conv, convCorr, convIndep, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
-    VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper,
+    VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper, tauRho,
     +, -, /, *, 
 
     # Arithmetic, uniary
@@ -152,7 +152,7 @@ export
     checkMomentsAndRanges,
 
     # Copulas
-    AbstractCopula, copula, GauCopula, π, M, W
+    AbstractCopula, copula, GauCopula, πCop, M, W
 
 
 include("pbox/pbox.jl")

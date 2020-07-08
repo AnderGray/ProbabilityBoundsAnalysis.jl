@@ -298,6 +298,55 @@ function convFrechet(x::Real, y::Real, op = +)
     return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, dids = "$(x.dids) $(y.dids) ", bounded=bounded);
 end
 
+
+function tauRho(x::Real, y::Real, C:: AbstractCopula, op = +)
+
+    if (op == -) return (tauRho(x,negate(y), C, +));end
+    if (op == /) return (tauRho(x,reciprocate(y), C, *));end
+    if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (throw(ArgumentError("Not sure if straddles"))); end; end
+    ## Unsure about the above line. It looks like if it straddles 0, we need to do the naive frechet and the balch prod (?) and impose one on the other
+
+    x = makepbox(x);
+    y = makepbox(y);
+
+    Ns = ProbabilityBoundsAnalysis.steps
+
+    zd = zeros(Ns);
+    zu = zeros(Ns);
+
+    zds = [map(op, dx, dy) for dx in x.d, dy in x.d]
+    zus = [map(op, ux, uy) for ux in x.u, uy in x.u]
+
+    is = range(0, stop = 1, length = Ns); js = range(0, stop = 1, length = Ns)
+
+    cop = C.cdf;
+    dual = [is[i] + js[j] - cop[i,j] for i in 1:Ns, j in 1:Ns]
+    
+    downs = findall(cop .== 1); ups = findall(dual .== 0);
+
+    zd[end] = minimum(zds[downs]); zu[1] = maximum(zus[ups])
+
+    for i = 2:Ns
+
+        downs = findall( is[i-1] .<= cop .<= is[i]);
+        ups = findall(js[i-1] .<= dual .<= js[i]);
+        
+        zd[i-1] = minimum(zds[downs]);
+        zu[i] = maximum(zus[ups]);
+
+    end
+    
+    bounded = min(x.bounded,y.bounded);
+
+    return pbox(zu, zd, bounded=bounded);
+
+end
+
+
+###
+#   Scalars and some univariate functions
+###
+
 function shift(x :: pbox, ss :: Real)
      if (x.shape) ∈ (["uniform","normal","cauchy","triangular","skew-normal"]) s = x.shape; else s = ""; end
     return pbox(ss .+ x.u, ss .+ x.d, shape=s, name="", ml = x.ml+ss, mh=x.mh+ss, 

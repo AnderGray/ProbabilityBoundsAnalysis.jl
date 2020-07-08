@@ -12,6 +12,7 @@
 ######
 
 function plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 12)
+
     if (isvacuous(s)); throw(ArgumentError("Pbox is vacuous"));end
     if (ismissing(name)) name = s.id; end
 
@@ -37,6 +38,7 @@ function plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2,
 
 end
 
+#plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 12) = plot(makepbox(s), fill, name=name, col=col, alpha=alpha, fontsize=fontsize)
 
 ###
 #   Prepares bounds for use with fill between
