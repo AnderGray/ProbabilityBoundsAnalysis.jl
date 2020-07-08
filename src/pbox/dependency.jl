@@ -48,7 +48,7 @@ using Interpolations
 #using3D()
 include("NormalDistribution.jl")
 
-global  n  = 200;        # Number of descretizations
+#global  n  = 200;        # Number of descretizations
 global  pn = 200;        # Number of descretization for plotting
 #global bOt = 0.001;              # smallest quamtile to use if left tail is unbounded
 #global tOp = 0.999;              # largest quamtile to use if right tail is unbounded
@@ -79,6 +79,8 @@ function (obj::copula)(X,Y, useInterp = false)             # Evaluating the copu
 
     #if (!issorted(X) || !issorted(Y)) throw(ArgumentError("cdf evaluation request must be given in assending order"));end
 
+    n = ProbabilityBoundsAnalysis.steps
+
     if !useInterp
         if !ismissing(obj.func)
             if !ismissing(obj.param)
@@ -100,6 +102,8 @@ function (obj::copula)(X :: Sampleable{Univariate},Y :: Sampleable{Univariate}) 
 end
 
 function sample(C :: AbstractCopula, N = 1; plot = false)
+
+    n = ProbabilityBoundsAnalysis.steps
 
     if plot return samplePlot(C,N);end
     if (C.func == Gau) return CholeskyGaussian(N, C.param) ;end     # Use Cholesky decompostition of the Cov matrix for gaussian copula sampling
@@ -148,6 +152,8 @@ end
 
 function conditional(C :: AbstractCopula, xVal :: Real; plot = false)   # May also work for joint? xVal will be take from invCdf(M1, u1)
 
+    n = ProbabilityBoundsAnalysis.steps
+
     e = 1/n;        ygrid = range(0,1,length = n);
     if !ismissing(C.func) e = (sqrt(eps())); end
 
@@ -167,6 +173,8 @@ function calcCdf(density :: Array{<:Real,2})
 end
 
 function calcDensity(C :: AbstractCopula)
+
+    n = ProbabilityBoundsAnalysis.steps
 
     if ismissing(C.func) return calcDensity(C.cdf); end
     #density = zeros(n,n);
@@ -188,6 +196,8 @@ end
 function calcDensity(cdf :: Array{<:Real,2}, xRange = range(0,1,length = n), yRange = range(0,1,length = n))
 
     xStep = Float64(xRange.step); yStep = Float64(yRange.step);
+
+    n = ProbabilityBoundsAnalysis.steps
 
     density = zeros(size(cdf));
     for i = 1:n-1
@@ -215,11 +225,16 @@ function calcDensity(cdf :: Array{<:Real,2}, xRange = range(0,1,length = n), yRa
 end
 
 function M()
+    n = ProbabilityBoundsAnalysis.steps
+
     x = y = range(0,1,length = n);
     return copula(perf(x,y), density = Matrix{Float64}(I, n, n), func = perf);
 end
 
 function W()
+
+    n = ProbabilityBoundsAnalysis.steps
+
     x = y = range(0,1,length = n);
 
     den = zeros(n,n)
@@ -232,22 +247,28 @@ function W()
 end
 
 function πCop()
+    
+    n = ProbabilityBoundsAnalysis.steps
+
     x = y = range(0,1,length = n);
     return copula(indep(x,y), func = indep);
 end
 Pi() = πCop()
 
 function Frank(s = 1)                                     #   Frank copula
+    n = ProbabilityBoundsAnalysis.steps
     x = y = range(0,stop = 1,length = n);                          #   s>0; 0 for perfect, 1 for indep, inf for oposite
     return copula(F(x,y,s), func = F, param = s);
 end
 
 function Clayton(t = 0)                                  #   Clayton copula
+    n = ProbabilityBoundsAnalysis.steps
     x = y = range(0,stop=1,length = n);                          #   t>-1; -1 for opposite, 0 for indep and inf for perfect
     return copula(Cla(x,y,t), func = Cla, param = t);
 end
 
 function GauCopula(corr = 0)
+    n = ProbabilityBoundsAnalysis.steps
     x = y = range(0,stop = 1,length = n);
     cdf = Gau(x,y,corr);
     #cdf[:,end] = cdf[end,:] = x;    # This removes the NaNs from Liams mvNormCdf. We know the marginals must be uniform
@@ -268,6 +289,8 @@ mvNormCdf(X,Y,cor) = [bivariate_cdf(x,y,cor) for x in X, y in Y];
 wait_for_key() = (print(stdout, "press enter to continue"); read(stdin, 1); nothing);
 
 function samplePlot(C :: AbstractCopula, N = 1)
+
+    n = ProbabilityBoundsAnalysis.steps
 
     x = rand(N);    y = rand(N);
     ux = x;         uy = zeros(N);
@@ -492,6 +515,8 @@ mutable struct joint <: AbstractJoint
         #if (ismissing(cdf) && ismissing(density)) throw(ArgumentError("Cdf and/or density must be provided")) end
         #if (ismissing(cdf)); cdf = calcCdf(density); end
         #if (ismissing(density)); density = calcDensity(cdf);end
+
+        n = ProbabilityBoundsAnalysis.steps
 
         xRange = range(invCdf(marginal1,bOt), invCdf(marginal1,tOp), length = n)
         yRange = range(invCdf(marginal2,bOt), invCdf(marginal2,tOp), length = n)

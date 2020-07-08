@@ -301,7 +301,7 @@ end
 
 function tauRho(x::Real, y::Real, C:: AbstractCopula, op = +)
 
-    if (op == -) return (tauRho(x,negate(y), C, +));end
+    if (op == -) return (tauRho(x,negate(y), C, +));end             # Odd behaviour, negating has no effect if we don't do something to copula
     if (op == /) return (tauRho(x,reciprocate(y), C, *));end
     if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (throw(ArgumentError("Not sure if straddles"))); end; end
     ## Unsure about the above line. It looks like if it straddles 0, we need to do the naive frechet and the balch prod (?) and impose one on the other
@@ -314,7 +314,7 @@ function tauRho(x::Real, y::Real, C:: AbstractCopula, op = +)
     zd = zeros(Ns);
     zu = zeros(Ns);
 
-    zds = [map(op, dx, dy) for dx in x.d, dy in x.d]
+    zds = [map(op, dx, dy) for dx in x.d, dy in x.d]        # Carteesian products
     zus = [map(op, ux, uy) for ux in x.u, uy in x.u]
 
     is = range(0, stop = 1, length = Ns); js = range(0, stop = 1, length = Ns)
