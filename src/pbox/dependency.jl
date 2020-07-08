@@ -50,8 +50,8 @@ include("NormalDistribution.jl")
 
 global  n  = 200;        # Number of descretizations
 global  pn = 200;        # Number of descretization for plotting
-global bOt = 0.001;              # smallest quamtile to use if left tail is unbounded
-global tOp = 0.999;              # largest quamtile to use if right tail is unbounded
+#global bOt = 0.001;              # smallest quamtile to use if left tail is unbounded
+#global tOp = 0.999;              # largest quamtile to use if right tail is unbounded
 
 abstract type AbstractCopula <: Real end
 abstract type AbstractJoint <: Real end
@@ -231,11 +231,11 @@ function W()
     return copula(opp(x,y), density = den , func = opp);
 end
 
-function π()
+function πCop()
     x = y = range(0,1,length = n);
     return copula(indep(x,y), func = indep);
 end
-Pi() = π()
+Pi() = πCop()
 
 function Frank(s = 1)                                     #   Frank copula
     x = y = range(0,stop = 1,length = n);                          #   s>0; 0 for perfect, 1 for indep, inf for oposite
