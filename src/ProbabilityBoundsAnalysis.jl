@@ -152,11 +152,14 @@ export
     checkMomentsAndRanges,
 
     # Copulas
-    AbstractCopula, copula, GauCopula, πCop, M, W
+    AbstractCopula, copula, GauCopula, πCop, M, W, Frank, Clayton, Frechet,
+    cdfU, cdfD, mass
 
 
 include("pbox/pbox.jl")
-include("pbox/dependency.jl")
+#include("pbox/dependency.jl")
+include("pbox/NormalDistribution.jl")
+include("pbox/copulas.jl")
 include("pbox/arithmetic.jl")
 include("pbox/MomentTransformations.jl")
 include("pbox/distributions.jl")

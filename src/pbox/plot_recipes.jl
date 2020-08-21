@@ -38,6 +38,8 @@ function plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2,
 
 end
 
+plot(s :: Union{<:Real, Interval{<:Real}}, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 12) = plot(makepbox(s), fill, name = name, col = col, alpha = alpha, fontsize = fontsize)
+
 #plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 12) = plot(makepbox(s), fill, name=name, col=col, alpha=alpha, fontsize=fontsize)
 
 ###
