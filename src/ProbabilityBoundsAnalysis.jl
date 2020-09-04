@@ -153,7 +153,7 @@ export
 
     # Copulas
     AbstractCopula, copula, GauCopula, πCop, M, W, Frank, Clayton, Frechet,
-    cdfU, cdfD, mass
+    cdfU, cdfD, mass, conditionalX, conditionalY, bivpbox, plotStep
 
 
 include("pbox/pbox.jl")

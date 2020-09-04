@@ -36,8 +36,8 @@ function conv(x::Real, y::Real, op = +; corr =0)
     if corr ==interval(-1,1); return convFrechet(x,y,op); end
     
     if isinterval(corr)
-        Lower = convCorr(x, y, Gaussian(left(corr)), op);
-        Upper = convCorr(x, y, Gaussian(right(corr)), op);
+        Lower = convCorr(x, y, GauCop(left(corr)), op);
+        Upper = convCorr(x, y, GauCop(right(corr)), op);
         return env(Lower, Upper)
     end
 
@@ -108,7 +108,44 @@ function convIndep(x::Real, y::Real, op = +)
 
 end
 
+function sigma(x::Real, y ::Real, C::AbstractCopula, op = +)
 
+    if (op == -) return convCorr(x, negate(y), C, +);end
+    if (op == /) return convCorr(x, reciprocate(y), C, *);end
+
+    x = makepbox(x);
+    y = makepbox(y);
+
+    Ns = ProbabilityBoundsAnalysis.steps
+
+    zd = zeros(Ns);
+    zu = zeros(Ns);
+
+    zds = [map(op, dx, dy) for dx in x.d, dy in y.d]        # Carteesian products
+    zus = [map(op, ux, uy) for ux in x.u, uy in y.u]
+
+    uMasses = C.cdfU[2:end,2:end] + C.cdfU[1:end-1,1:end-1] - C.cdfU[1:end-1,2:end] - C.cdfU[2:end,1:end-1]
+    dMasses = C.cdfD[2:end,2:end] + C.cdfD[1:end-1,1:end-1] - C.cdfD[1:end-1,2:end] - C.cdfD[2:end,1:end-1]
+
+    is = range(0, stop = 1, length = Ns); js = range(0, stop = 1, length = Ns)
+
+    zd[1] = minimum(zds); zd[end] = maximum(zds);
+    zu[1] = minimum(zus); zu[end] = maximum(zus);
+
+    for i = 2:Ns
+
+        downs = findall(is[i-1] .<= cop  .<= is[i]);
+        ups   = findall(js[i-1] .<= dual .<= js[i]);
+        
+        zd[i-1] = minimum(zds[downs]);
+        zu[i]   = maximum(zus[ups]);
+
+    end
+
+end
+
+
+#=
 function convCorr(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the same as the conv function except the condensation is different
 
 
@@ -170,7 +207,7 @@ function convCorr(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the sa
 	return pbox(Zu, Zd, ml = ml, mh = mh, vl=vl, vh=vh, dids="$(x.dids) $(y.dids)", bounded = bounded);
 
 end
-
+=#
 
 function condense_d(x :: Array{<:Real,1}, probs :: Array{<:Real,1})
 
