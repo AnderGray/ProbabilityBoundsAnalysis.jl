@@ -125,22 +125,25 @@ function cdf(s :: pbox, x::Real)
     d = s.d; u = s.u; n = s.n;
     bounded = s.bounded;
 
-    if x <= u[1]; 
+    if x < u[1]; 
         return interval(0,1/n) * (1-bounded[1]); 
     end;
-    if x >= d[end]; 
+    if x > d[end]; 
         if bounded[2]; return 1; end
         return interval((n-1)/n, 1);
     end;
 
-    indUb = findfirst(x .<= u);
-    indLb = findlast(x .>= d);
+    indUb = 1 - sum(x .< u)/n;
+    indLb = 1 - sum(x .<= d)/n;
 
     pub = 1; plb = 0;
-    if x < u[end];  pub = indUb/n; end
-    if x > d[1];    plb = indLb/n; end
 
-    return interval(plb, pub)
+    #if x < u[end];  pub = indUb; end
+    #if x > d[1];    plb = indLb; end
+
+    #return interval(plb, pub)
+
+    return interval(indLb, indUb)
 end
 
 function cdf(s :: pbox, x::Interval)
@@ -148,6 +151,20 @@ function cdf(s :: pbox, x::Interval)
     ub = right(cdf(s,right(x)));
     return interval(lb, ub)
 end
+
+function mass(s :: pbox, lo :: Real, hi :: Real)
+
+    cdfHi = cdf(s, hi)
+    cdfLo = cdf(s, lo)
+
+    ub = min(1, cdfHi.hi - cdfLo.lo)
+    lb = max(0, cdfHi.lo - cdfLo.hi)
+
+    return interval(lb, ub)
+
+end
+
+mass(s :: pbox, x:: Interval) = mass(s, x.lo, x.hi)
 
 uniquePbox() = ( ProbabilityBoundsAnalysis.setPboxes(ProbabilityBoundsAnalysis.pboxes+1); return ProbabilityBoundsAnalysis.pboxes );
 
@@ -166,6 +183,44 @@ function makepbox(x...)
         end
     end
     return elts;
+end
+
+
+function pbox( x :: Array{Interval{T}, 1}) where T <: Real
+
+    us = left.(x);  ds = right.(x)
+    us = sort(us);  ds = sort(ds)
+
+    numel = length(us)
+
+    n = ProbabilityBoundsAnalysis.steps;
+
+    uNew = zeros(n);    dNew = zeros(n);
+
+    i = range(0,stop = 1, length = numel +1);
+    j = i[1:end-1];   i = i[2:end];
+
+    j = reverse(j)
+
+    iis = ProbabilityBoundsAnalysis.ii();
+    jjs = ProbabilityBoundsAnalysis.jj();
+
+    #jjs = reverse(jjs)
+
+    for k = 1:n
+
+        iThis = findfirst(iis[k] .<= i)
+        jThis = findfirst(jjs[k] .>= j)
+
+        uNew[k] = us[iThis]
+        dNew[k] = ds[jThis]
+
+    end
+
+    dNew = reverse(dNew)
+    
+    return pbox(uNew, dNew, bounded = [true, true])
+
 end
 
 #pbox(x :: pbox) = pbox(x);
