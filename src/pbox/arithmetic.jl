@@ -251,7 +251,7 @@ function condense_u(x :: Array{<:Real,1}, probs :: Array{<:Real,1})
 end
 
 function convPerfect(x::Real, y::Real, op = +)
-    #=
+    
     if (op)∈([-,/])
         cu = map(op, x.u[:],y.d[:]);
         cd = map(op, x.d[:],y.u[:]);
@@ -259,9 +259,9 @@ function convPerfect(x::Real, y::Real, op = +)
         cu = map(op, x.u[:], y.u[:]);
         cd = map(op, x.d[:], y.d[:]);
     end
-    =#
-    cu = map(op, x.u[:],y.u[:]);
-    cd = map(op, x.d[:],y.d[:]);
+    
+    #cu = map(op, x.u[:],y.u[:]);
+    #cd = map(op, x.d[:],y.d[:]);
     scu = sort(cu);
     scd = sort(cd);
 
@@ -277,7 +277,7 @@ end
 
 function convOpposite(x::Real, y::Real, op = +)
 
-    #=
+    
     if (op)∈([-,/])
         cu = map(op, x.u[:],y.d[end:-1:1]);
         cd = map(op, x.d[:],y.u[end:-1:1]);
@@ -285,9 +285,9 @@ function convOpposite(x::Real, y::Real, op = +)
         cu = map(op, x.u[:], y.u[end:-1:1]);
         cd = map(op, x.d[:], y.d[end:-1:1]);
     end
-    =#
-    cu = map(op, x.u[:], y.u[end:-1:1]);
-    cd = map(op, x.d[:], y.d[end:-1:1]);
+    
+    #cu = map(op, x.u[:], y.u[end:-1:1]);
+    #cd = map(op, x.d[:], y.d[end:-1:1]);
     scu = sort(cu);
     scd = sort(cd);
 
