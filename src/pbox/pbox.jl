@@ -186,7 +186,7 @@ function makepbox(x...)
 end
 
 
-function pbox( x :: Array{Interval{T}, 1}) where T <: Real
+function pbox( x :: Array{Interval{T}, 1}, bounded = [true, true]) where T <: Real
 
     us = left.(x);  ds = right.(x)
     us = sort(us);  ds = sort(ds)
@@ -219,7 +219,52 @@ function pbox( x :: Array{Interval{T}, 1}) where T <: Real
 
     dNew = reverse(dNew)
     
-    return pbox(uNew, dNew, bounded = [true, true])
+    return pbox(uNew, dNew, bounded = bounded)
+
+end
+
+
+##
+#   Making a pbox from an matrix of 2nd order samples [Nouter x Ninner]
+##
+function pbox( x :: Array{T, 2}, bounded = [true, true]) where T <: Real
+
+    x = sort(x, dims = 2);
+
+    Nouter, Ninner = size(x);
+    us = minimum(x, dims = 1);
+    ds = maximum(x, dims = 1);
+
+    us = sort(us', dims=1)
+    ds = sort(ds', dims=1)
+    
+    n = ProbabilityBoundsAnalysis.steps;
+
+    uNew = zeros(n);    dNew = zeros(n);
+
+    i = range(0,stop = 1, length = Ninner + 1);
+    j = i[1:end-1];   i = i[2:end];
+
+    j = reverse(j)
+
+    iis = ProbabilityBoundsAnalysis.ii();
+    jjs = ProbabilityBoundsAnalysis.jj();
+
+    #jjs = reverse(jjs)
+
+    for k = 1:n
+
+        iThis = findfirst(iis[k] .<= i)
+        jThis = findfirst(jjs[k] .>= j)
+
+        uNew[k] = us[iThis]
+        dNew[k] = ds[jThis]
+
+    end
+
+    dNew = reverse(dNew)
+    
+    return pbox(uNew, dNew, bounded = bounded)
 
 end
 
