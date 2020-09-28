@@ -36,8 +36,8 @@ function conv(x::Real, y::Real, op = +; corr =0)
     if corr ==interval(-1,1); return convFrechet(x,y,op); end
     
     if isinterval(corr)
-        Lower = convCorr(x, y, GauCop(left(corr)), op);
-        Upper = convCorr(x, y, GauCop(right(corr)), op);
+        Lower = convCorr(x, y, GauCopula(left(corr)), op);
+        Upper = convCorr(x, y, GauCopula(right(corr)), op);
         return env(Lower, Upper)
     end
 
@@ -108,6 +108,7 @@ function convIndep(x::Real, y::Real, op = +)
 
 end
 
+#=
 function sigma(x::Real, y ::Real, C::AbstractCopula, op = +)
 
     if (op == -) return convCorr(x, negate(y), C, +);end
@@ -143,9 +144,9 @@ function sigma(x::Real, y ::Real, C::AbstractCopula, op = +)
     end
 
 end
+=#
 
 
-#=
 function convCorr(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the same as the conv function except the condensation is different
 
 
@@ -207,7 +208,7 @@ function convCorr(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the sa
 	return pbox(Zu, Zd, ml = ml, mh = mh, vl=vl, vh=vh, dids="$(x.dids) $(y.dids)", bounded = bounded);
 
 end
-=#
+
 
 function condense_d(x :: Array{<:Real,1}, probs :: Array{<:Real,1})
 
@@ -250,6 +251,7 @@ function condense_u(x :: Array{<:Real,1}, probs :: Array{<:Real,1})
 end
 
 function convPerfect(x::Real, y::Real, op = +)
+    #=
     if (op)∈([-,/])
         cu = map(op, x.u[:],y.d[:]);
         cd = map(op, x.d[:],y.u[:]);
@@ -257,6 +259,9 @@ function convPerfect(x::Real, y::Real, op = +)
         cu = map(op, x.u[:], y.u[:]);
         cd = map(op, x.d[:], y.d[:]);
     end
+    =#
+    cu = map(op, x.u[:],y.u[:]);
+    cd = map(op, x.d[:],y.d[:]);
     scu = sort(cu);
     scd = sort(cd);
 
@@ -272,6 +277,7 @@ end
 
 function convOpposite(x::Real, y::Real, op = +)
 
+    #=
     if (op)∈([-,/])
         cu = map(op, x.u[:],y.d[end:-1:1]);
         cd = map(op, x.d[:],y.u[end:-1:1]);
@@ -279,6 +285,9 @@ function convOpposite(x::Real, y::Real, op = +)
         cu = map(op, x.u[:], y.u[end:-1:1]);
         cd = map(op, x.d[:], y.d[end:-1:1]);
     end
+    =#
+    cu = map(op, x.u[:], y.u[end:-1:1]);
+    cd = map(op, x.d[:], y.d[end:-1:1]);
     scu = sort(cu);
     scd = sort(cd);
 
