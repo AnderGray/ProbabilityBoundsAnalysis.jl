@@ -128,8 +128,8 @@ export
     mean, var, std, sideVariance, dwmean, dwVariance,
 
     # Arithmetic, binary
-    conv, convCorr, convIndep, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
-    VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper, tauRho,
+    conv, convIndep, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
+    VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper, tauRho, sigma, convCorr,
     +, -, /, *, 
 
     # Arithmetic, uniary
@@ -158,8 +158,8 @@ export
 
 include("pbox/pbox.jl")
 #include("pbox/dependency.jl")
-include("pbox/NormalDistribution.jl")
 include("pbox/copulas.jl")
+include("pbox/NormalDistribution.jl")
 include("pbox/arithmetic.jl")
 include("pbox/MomentTransformations.jl")
 include("pbox/distributions.jl")

@@ -29,22 +29,22 @@
 # Convolutions operations #
 ###########################
 
-function conv(x::Real, y::Real, op = +; corr =0) 
-    if corr == 0; return convIndep(x,y,op); end
-    if corr == 1; return convPerfect(x,y,op);end
-    if corr ==-1; return convOpposite(x,y,op);end
-    if corr ==interval(-1,1); return convFrechet(x,y,op); end
+function conv(x::Real, y::Real; op = +, corr =0) 
+    if corr == 0; return convIndep(x,y,op = op); end
+    if corr == 1; return convPerfect(x,y, op = op);end
+    if corr ==-1; return convOpposite(x,y,op = op);end
+    if corr ==interval(-1,1); return convFrechet(x,y, op = op); end
     
     if isinterval(corr)
-        Lower = convCorr(x, y, GauCopula(left(corr)), op);
-        Upper = convCorr(x, y, GauCopula(right(corr)), op);
+        Lower = sigma(x, y, C = GauCopula(left(corr)), op=op);
+        Upper = sigma(x, y, C = GauCopula(right(corr)), op=op);
         return env(Lower, Upper)
     end
 
-    return convCorr(x, y, GauCopula(corr), op)
+    return sigma(x, y, C = GauCopula(corr), op=op)
 end
 
-function convIndep(x::Real, y::Real, op = +)
+function convIndep(x::Real, y::Real; op = +)
 
     if (op == -) return convIndep(x, negate(y), +);end
     if (op == /) return convIndep(x, reciprocate(y), *);end
@@ -108,149 +108,8 @@ function convIndep(x::Real, y::Real, op = +)
 
 end
 
-#=
-function sigma(x::Real, y ::Real, C::AbstractCopula, op = +)
 
-    if (op == -) return convCorr(x, negate(y), C, +);end
-    if (op == /) return convCorr(x, reciprocate(y), C, *);end
-
-    x = makepbox(x);
-    y = makepbox(y);
-
-    Ns = ProbabilityBoundsAnalysis.steps
-
-    zd = zeros(Ns);
-    zu = zeros(Ns);
-
-    zds = [map(op, dx, dy) for dx in x.d, dy in y.d]        # Carteesian products
-    zus = [map(op, ux, uy) for ux in x.u, uy in y.u]
-
-    uMasses = C.cdfU[2:end,2:end] + C.cdfU[1:end-1,1:end-1] - C.cdfU[1:end-1,2:end] - C.cdfU[2:end,1:end-1]
-    dMasses = C.cdfD[2:end,2:end] + C.cdfD[1:end-1,1:end-1] - C.cdfD[1:end-1,2:end] - C.cdfD[2:end,1:end-1]
-
-    is = range(0, stop = 1, length = Ns); js = range(0, stop = 1, length = Ns)
-
-    zd[1] = minimum(zds); zd[end] = maximum(zds);
-    zu[1] = minimum(zus); zu[end] = maximum(zus);
-
-    for i = 2:Ns
-
-        downs = findall(is[i-1] .<= cop  .<= is[i]);
-        ups   = findall(js[i-1] .<= dual .<= js[i]);
-        
-        zd[i-1] = minimum(zds[downs]);
-        zu[i]   = maximum(zus[ups]);
-
-    end
-
-end
-=#
-
-
-function convCorr(x::Real, y::Real, C:: AbstractCopula, op = +) # This is the same as the conv function except the condensation is different
-
-
-	if (op == -) return convCorr(x, negate(y), C, +);end
-    if (op == /) return convCorr(x, reciprocate(y), C, *);end
-
-    x = makepbox(x);
-    y = makepbox(y);
-
-    m = x.n;
-    p = y.n;
-    n = min(ProbabilityBoundsAnalysis.steps, m*p);
-    L = m * p / n;
-    c = zeros(m*p);
-    Zu = ones(n);
-    Zd = ones(n);
-
-	#Probs from copula
-    pdf = reshape(C.density,:,1);	# Should be vector of length n*n
-	pdf = pdf[:] ./(n*n)					# Gets rid of 2nd array dimension from reshape
-	pdfsave = deepcopy(pdf);
-
-    k = 1:n;
-
-    Y = repeat(y.d[:], inner = m);
-    for i=1:p
-        c[m*(i-1)+1:m*i] = map(op, x.d[:], Y[m*(i-1)+1:m*i]);
-    end
-
-	doublequick(c,pdf);
-	Zd = condense_d(c, pdf);
-
-	Y = repeat(y.u[:], inner = m);
-	c = zeros(length(Y));
-	for i=1:p
-		c[m*(i-1)+1:m*i] = map(op, x.u[:], Y[m*(i-1)+1:m*i]);
-	end
-
-	doublequick(c,pdfsave);
-	Zu = condense_u(c, pdfsave);
-
-	# Mean tranforms the same as independence
-	ml = -Inf;
-    mh = Inf;
-
-    if (op)∈([+,-,*])
-        ml = map(op,x.ml,y.ml);
-        mh = map(op,x.mh,y.mh);
-    end
-
-    # Variance does not
-    vl = 0;
-    vh = Inf
-
-	# Moment propagation needs to be included here
-
-    bounded = min(x.bounded,y.bounded);
-
-	return pbox(Zu, Zd, ml = ml, mh = mh, vl=vl, vh=vh, dids="$(x.dids) $(y.dids)", bounded = bounded);
-
-end
-
-
-function condense_d(x :: Array{<:Real,1}, probs :: Array{<:Real,1})
-
-	n = ProbabilityBoundsAnalysis.steps;	d = zeros(n);
-	cumulprob = 1.0;	z = n*n;
-	laststep = x[z];
-
-	for i = n:-1:1
-		pstep = i/n;
-		if z > 0
-			while ((pstep <= cumulprob) && (z > 0))
-				cumulprob = cumulprob - probs[z];			# Can we directly use the cdf?
-				z -= 1;
-			end
-		end
-		d[i] = laststep;
-		laststep = x[z+1];
-	end
-	return d
-end
-
-function condense_u(x :: Array{<:Real,1}, probs :: Array{<:Real,1})
-
-	n = ProbabilityBoundsAnalysis.steps;	u = zeros(n);
-	cumulprob = 0.0; z = 1;
-  	laststep = x[z];
-
-	for i = 1:n
-		pstep = i/n
-		if z <= n*n
-			while (pstep >= cumulprob && z<=n*n)
-				cumulprob = cumulprob + probs[z];
-				z += 1;
-			end
-		end
-		u[i] = laststep;
-		laststep = x[z-1];
-	end
-	return u
-end
-
-function convPerfect(x::Real, y::Real, op = +)
+function convPerfect(x::Real, y::Real; op = +)
     
     if (op)∈([-,/])
         cu = map(op, x.u[:],y.d[:]);
@@ -275,7 +134,7 @@ function convPerfect(x::Real, y::Real, op = +)
       end
 end
 
-function convOpposite(x::Real, y::Real, op = +)
+function convOpposite(x::Real, y::Real; op = +)
 
     
     if (op)∈([-,/])
@@ -298,7 +157,7 @@ function convOpposite(x::Real, y::Real, op = +)
     return pbox(scu, scd, dids = "$(x.dids) $(y.dids)", bounded=bounded)
 end
 
-function convFrechet(x::Real, y::Real, op = +)
+function convFrechet(x::Real, y::Real; op = +)
 
     if (op == -) return (convFrechet(x,negate(y),+));end
     if (op == /) return (convFrechet(x,reciprocate(y),*));end
@@ -345,7 +204,98 @@ function convFrechet(x::Real, y::Real, op = +)
 end
 
 
-function tauRho(x::Real, y::Real, C:: AbstractCopula, op = +)
+
+
+function sigma(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
+
+    if (op == -) return sigma(x, negate(y), op=+, C = C); end
+    if (op == /) return sigma(x, reciprocate(y), op = *, C = C);end
+
+    x = makepbox(x);
+    y = makepbox(y);
+
+    Ns = ProbabilityBoundsAnalysis.steps
+
+    zus = [map(op, ux, uy) for ux in x.u[1:end-1], uy in y.u[1:end-1]]        # Carteesian products
+    zds = [map(op, dx, dy) for dx in x.d[2:end], dy in y.d[2:end]]
+
+    zd = zeros(Ns);
+    zu = zeros(Ns);
+
+    zd[1] = minimum(zds); zd[end] = maximum(zds);
+    zu[1] = minimum(zus); zu[end] = maximum(zus);
+
+    zus = zus[:];
+    zds = zds[:];
+
+    uMasses = C.cdfU[2:end, 2:end] + C.cdfU[1:end-1, 1:end-1] - C.cdfU[1:end-1, 2:end] - C.cdfU[2:end, 1:end-1]
+    dMasses = C.cdfD[2:end, 2:end] + C.cdfD[1:end-1, 1:end-1] - C.cdfD[1:end-1, 2:end] - C.cdfD[2:end, 1:end-1]
+
+    pU = sortperm(zus)
+    pD = sortperm(zds)
+
+    zus = zus[pU]
+    zds = zds[pD]
+    
+    uMasses = uMasses[:][pU]
+    dMasses = dMasses[:][pD]
+
+    #uCdf = zeros(length(uMasses)+1); dCdf = ones(length(dMasses)+1);
+
+    #push!(zus, zu[end])
+    #pushfirst!(zds, zd[1])
+    
+    #uCdf[2:end] = cumsum(uMasses);
+    #dCdf[1:end-1] = cumsum(dMasses);
+
+    uCdf = cumsum(uMasses);
+    dCdf = reverse(1 .- cumsum(reverse(dMasses)));
+
+    #is = range(0, stop = 1, length = Ns); #js = range(0, stop = 1, length = Ns)
+
+    bounded = min(x.bounded,y.bounded);
+
+    is = ProbabilityBoundsAnalysis.iii();
+    js = ProbabilityBoundsAnalysis.jjj();
+    if bounded[1]; is = ProbabilityBoundsAnalysis.ii(); end
+    if bounded[2]; js = ProbabilityBoundsAnalysis.jj(); end
+
+    for i = 2:Ns
+
+        ups   = findall(is[i-1] .<= uCdf .<= is[i]);
+        downs = findall(js[i-1] .<= dCdf .<= js[i]);
+
+        if !isempty(ups);   zu[i]   = minimum(zus[ups]);   else zu[i]   = zu[i-1]; end
+        if !isempty(downs); zd[i-1] = maximum(zds[downs]); else zd[i-1] = zd[i-2]; end
+
+    end
+    
+    # Mean tranforms the same as independence
+	ml = -Inf;
+    mh = Inf;
+
+    if (op)∈([+, -, *])
+        ml = map(op, x.ml, y.ml);
+        mh = map(op, x.mh, y.mh);
+    end
+
+    # Variance does not
+    vl = 0;
+    vh = Inf;
+
+    if !(C.cdfU == C.cdfD);
+        z1 = deepcopy(zu);  z2 = deepcopy(zd); 
+        zu[2:end]   = min.(z1[2:end], z2[1:end-1]); 
+        zd[1:end-1] = max.(z1[2:end], z2[1:end-1]);
+    end
+
+    return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, bounded = bounded);
+
+end
+convCorr(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula) = sigma(x, y, op = op, C = C)
+
+
+function tauRho(x::Real, y::Real, C:: AbstractCopula; op = +)
 
     #if (op == -) return (tauRho(x,negate(y), C, +));end             # Odd behaviour, negating has no effect if we don't do something to copula
     #if (op == /) return (tauRho(x,reciprocate(y), C, *));end
@@ -457,26 +407,26 @@ defaultCorr = 0;
 -(x::pbox) = negate(x);
 /(x::pbox) = reciprocate(x);
 
-+(x::AbstractPbox, y::AbstractPbox) = conv(x,y,+, corr = defaultCorr); # if(x==y) return 2*x; ????
--(x::AbstractPbox, y::AbstractPbox) = conv(x,y,-, corr = defaultCorr); # if(x==y) return 0;   ????
-*(x::AbstractPbox, y::AbstractPbox) = conv(x,y,*, corr = defaultCorr); # if(x==y) return x^2; ????
-/(x::AbstractPbox, y::AbstractPbox) = conv(x,y,/, corr = defaultCorr); # if(x==y) return 0;   ????
++(x::AbstractPbox, y::AbstractPbox) = conv(x,y, op = +, corr = defaultCorr); # if(x==y) return 2*x; ????
+-(x::AbstractPbox, y::AbstractPbox) = conv(x,y, op = -, corr = defaultCorr); # if(x==y) return 0;   ????
+*(x::AbstractPbox, y::AbstractPbox) = conv(x,y, op = *, corr = defaultCorr); # if(x==y) return x^2; ????
+/(x::AbstractPbox, y::AbstractPbox) = conv(x,y, op =/, corr = defaultCorr); # if(x==y) return 0;   ????
 
 ###
 #   Conv of pboxes and intervals
 ###
 
 # Probably will only need shift for + and - with reals
-+(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, +, corr = defaultCorr);
++(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, op = +, corr = defaultCorr);
 +(x :: AbstractInterval, y :: AbstractPbox) = y + x;
 
--(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, -, corr = defaultCorr);
+-(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, op =  -, corr = defaultCorr);
 -(x :: AbstractInterval, y :: AbstractPbox) = -y + x;
 
-*(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, *, corr = defaultCorr);
+*(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, op =  *, corr = defaultCorr);
 *(x :: AbstractInterval, y :: AbstractPbox) = y * x;
 
-/(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, /, corr = defaultCorr);
+/(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, op = /, corr = defaultCorr);
 /(x :: AbstractInterval, y :: AbstractPbox) = reciprocate(y) * x;
 
 ###
@@ -514,11 +464,11 @@ perfectopposite(m, x::pbox) = if (m<0) return oppositedep(x); else return perfec
 ##################################################################################
 
 
-function convFrechetNaive(x::Real, y::Real, op = *)
+function convFrechetNaive(x::Real, y::Real; op = *)
 
-    if (op == +) return (convFrechet(x, y,+));end
-    if (op == -) return (convFrechet(x,negate(y),+));end
-    if (op == /) return (convFrechetNaive(x,reciprocate(y),*));end
+    if (op == +) return (convFrechet(x, y, op = +));end
+    if (op == -) return (convFrechet(x,negate(y), op = +));end
+    if (op == /) return (convFrechetNaive(x,reciprocate(y), op = *));end
 
     x = makepbox(x);
     y = makepbox(y);
@@ -563,25 +513,25 @@ function balchProd(x::pbox, y::pbox)
         y0 = left(y);
         xx0 = x - x0;
         yy0 = y - y0;
-        a = convFrechet(xx0, yy0, *);
-        b = convFrechet(y0 * xx0, x0 * yy0, +);
-        return convFrechet(a,b,+) + x0 * y0;
+        a = convFrechet(xx0, yy0,op= *);
+        b = convFrechet(y0 * xx0, x0 * yy0, op = +);
+        return convFrechet(a,b, op = +) + x0 * y0;
     end
 
     if straddles(x)
         x0 = left(x);
         xx0 = x - x0;
-        a = convFrechet(xx0, y, *);
+        a = convFrechet(xx0, y, op = *);
         b = x0 * y;
-        return convFrechet(a,b,+);
+        return convFrechet(a, b, op = +);
     end
 
     if straddles(y)
         y0 = left(y)
         yy0 = y - y0
-        a = convFrechet(x, yy0, *)
+        a = convFrechet(x, yy0, op = *)
         b = x * y0
-        return convFrechet(a,b,+)
+        return convFrechet(a, b, op = +)
     end
-    return convFrechet(x,y,*);
+    return convFrechet(x, y, op = *);
 end

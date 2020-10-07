@@ -18,11 +18,11 @@
 
     Nsamples = 100; Ncdf = 100;
 
-    @testset "Indepdenent" begin
+    @testset "Independent" begin
 
         c = a + b;
-        d = conv(a,b,+,corr = 0);
-        e = convIndep(a,b,+)
+        d = conv(a,b,op = +,corr = 0);
+        e = convIndep(a,b, op = +)
 
         sigma = sig(sigma1,sigma2,0)
         correct = Normal(meanOut, sigma)
@@ -50,8 +50,8 @@
 
     @testset "Perfect" begin
 
-        d = conv(a,b,+,corr = 1);
-        e = convPerfect(a,b,+)
+        d = conv(a,b,op = +,corr = 1);
+        e = convPerfect(a,b, op = +)
 
         sigma = sig(sigma1,sigma2,1)
         correct = Normal(meanOut, sigma)
@@ -85,8 +85,8 @@
 
     @testset "Opposite" begin
 
-        d = conv(a,b,+,corr = -1);
-        e = convOpposite(a,b,+)
+        d = conv(a,b, op = +, corr = -1);
+        e = convOpposite(a,b, op = +)
 
         sigma = sig(sigma1,sigma2,-1)
         correct = Normal(meanOut, sigma)
@@ -121,11 +121,11 @@
     @testset "correlated" begin
 
         R = 0.5
-        d = conv(a,b,+,corr = R);
-        e = convCorr(a,b, GauCopula(R), +)
+        d = conv(a,b, op = +,corr = R);
+        e = sigma(a,b, C = GauCopula(R), op= +)
 
-        sigma = sig(sigma1,sigma2,R)
-        correct = Normal(meanOut, sigma)
+        sigCor = sig(sigma1,sigma2,R)
+        correct = Normal(meanOut, sigCor)
 
         #@test e.shape == d.shape == "normal"
 
@@ -156,8 +156,8 @@
 
     @testset "Frechet" begin
 
-        d = conv(a,b,+,corr = interval(-1,1));
-        e = convFrechet(a,b,+)
+        d = conv(a,b, op = +, corr = interval(-1,1));
+        e = convFrechet(a,b, op = +)
 
         #@test e.shape == d.shape == "normal"
 
