@@ -37,6 +37,22 @@
 #
 #####
 
+
+"""
+    mutable struct pbox <: AbstractPbox
+
+Basic type used in Probability Bounds Analysis. A set of probability distributions defined by an upper (u) and lower (d/down) cdf, interval bounds on mean and variance and distibution shape (eg. Normal).
+
+If partial information is given (eg, no bounds on moments), the other properties are determined from provided information.
+
+# Constructors
+* `pbox()                     => Vacous case`
+* `pbox(u :: Real)            => Scalar case`
+* `pbox(u :: Real, d :: Real) => Interval case`
+* `pbox(u :: Array{<:Real}, d :: Array{<:Real}, shape :: String, ml :: Real, mh :: Real, vl :: Real, vh :: Real)`
+
+See also: [`mean`](@ref), [`var`](@ref), [`uniform`](@ref), [`normal`](@ref), [`conv`](@ref), [`copula`](@ref)
+"""
 mutable struct pbox <: AbstractPbox
     id :: String                        # Id of the pbox ie: "PB 1"
     u :: Union{Array{<:Real},Real}      # vector of the left bounds
@@ -121,6 +137,13 @@ end
 ###
 # Returns bounds on cdf. Upper bound may not be best possible
 ###
+"""
+	cdf(s :: pbox, x :: Real)
+
+Returns cdf value (interval) at x
+
+See also: [`cut`](@ref), [`mass`](@ref), [`rand`](@ref)
+"""
 function cdf(s :: pbox, x::Real)   
     d = s.d; u = s.u; n = s.n;
     bounded = s.bounded;
@@ -146,12 +169,28 @@ function cdf(s :: pbox, x::Real)
     return interval(indLb, indUb)
 end
 
+
+"""
+	cdf(s :: pbox, x :: Interval)
+
+Returns interval bounds on cdf value in interval x
+
+See also: [`cut`](@ref), [`mass`](@ref), [`rand`](@ref)
+"""
 function cdf(s :: pbox, x::Interval)
     lb = left(cdf(s,left(x)));
     ub = right(cdf(s,right(x)));
     return interval(lb, ub)
 end
 
+
+"""
+	mass(s :: pbox, lo :: Real, hi :: Real)
+
+Returns bounds on probability mass in interval [lo, hi]
+
+See also: [`cut`](@ref), [`cdf`](@ref), [`rand`](@ref)
+"""
 function mass(s :: pbox, lo :: Real, hi :: Real)
 
     cdfHi = cdf(s, hi)
@@ -164,10 +203,36 @@ function mass(s :: pbox, lo :: Real, hi :: Real)
 
 end
 
+"""
+	mass(s :: pbox, x:: Interval)
+
+Returns bounds on probability mass in interval x
+
+See also: [`cut`](@ref), [`cdf`](@ref), [`rand`](@ref)
+"""
 mass(s :: pbox, x:: Interval) = mass(s, x.lo, x.hi)
 
 uniquePbox() = ( ProbabilityBoundsAnalysis.setPboxes(ProbabilityBoundsAnalysis.pboxes+1); return ProbabilityBoundsAnalysis.pboxes );
 
+
+"""
+    makepbox(x...)
+
+Returns an array of pboxes from an array of inputs (eg an array of intervals or reals).
+
+# Examples
+```jldoctest
+julia> s = makepbox(interval(0,1))
+ Pbox: 	  ~  ( range=[0.0,1.0], mean=[0.0,1.0], var=[0.0,0.25])
+
+julia> ar = [interval(0, 1), interval(0, 2), 3];
+julia> s = makepbox.(ar)
+3-element Array{pbox,1}:
+ Pbox: 	  ~  ( range=[0.0,1.0], mean=[0.0,1.0], var=[0.0,0.25])
+ Pbox: 	  ~  ( range=[0.0,2.0], mean=[0.0,2.0], var=[0.0,1.0])
+ Pbox: 	  ~  ( range=[-1.0,0.0], mean=[-1.0,0.0], var=[0.0,0.25])
+```
+"""
 function makepbox(x...)
 
 
@@ -186,6 +251,11 @@ function makepbox(x...)
 end
 
 
+"""
+    pbox( x :: Array{Interval{T}, 1} ) where T <: Real
+
+Constructs a pbox from an array of intervals with equal mass. Left and right bounds are sorted to construct cdf bounds.
+"""
 function pbox( x :: Array{Interval{T}, 1}, bounded = [true, true]) where T <: Real
 
     us = left.(x);  ds = right.(x)
@@ -225,8 +295,13 @@ end
 
 
 ##
-#   Making a pbox from an matrix of 2nd order samples [Nouter x Ninner]
+#   Making a pbox from a matrix of 2nd order samples [Nouter x Ninner]
 ##
+"""
+    pbox( x :: Array{T, 2} ) where T <: Real
+
+Constructs a pbox from a matrix of 2nd order samples [Nouter x Ninner]
+"""
 function pbox( x :: Array{T, 2}, bounded = [true, true]) where T <: Real
 
     x = sort(x, dims = 2);
@@ -278,8 +353,28 @@ end
 # Pbox moments                     #
 ####################################
 
+"""
+    mean( x :: pbox)
+
+Get interval mean of a pbox
+See also: [`var`](@ref), [`std`](@ref)
+"""
 mean(x::pbox) = Interval(x.ml,x.mh);
+
+"""
+    var( x :: pbox)
+
+Get interval variance of a pbox
+See also: [`std`](@ref), [`mean`](@ref)
+"""
 var(x::pbox) = Interval(x.vl,x.vh);
+
+"""
+    std( x :: pbox)
+
+Get interval std of a pbox
+See also: [`var`](@ref), [`mean`](@ref)
+"""
 std(x::pbox) = √(var(x));
 
 dwmean( x :: pbox) = Interval(mean(x.u),mean(x.d));

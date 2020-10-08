@@ -29,7 +29,7 @@
 # Convolutions operations #
 ###########################
 
-function conv(x::Real, y::Real; op = +, corr =0) 
+function conv(x::pbox, y::pbox; op = +, corr =0) 
     if corr == 0; return convIndep(x,y,op = op); end
     if corr == 1; return convPerfect(x,y, op = op);end
     if corr ==-1; return convOpposite(x,y,op = op);end
@@ -44,7 +44,7 @@ function conv(x::Real, y::Real; op = +, corr =0)
     return sigma(x, y, C = GauCopula(corr), op=op)
 end
 
-function convIndep(x::Real, y::Real; op = +)
+function convIndep(x::pbox, y::pbox; op = +)
 
     if (op == -) return convIndep(x, negate(y), +);end
     if (op == /) return convIndep(x, reciprocate(y), *);end
@@ -109,7 +109,7 @@ function convIndep(x::Real, y::Real; op = +)
 end
 
 
-function convPerfect(x::Real, y::Real; op = +)
+function convPerfect(x::pbox, y::pbox; op = +)
     
     if (op)∈([-,/])
         cu = map(op, x.u[:],y.d[:]);
@@ -134,7 +134,7 @@ function convPerfect(x::Real, y::Real; op = +)
       end
 end
 
-function convOpposite(x::Real, y::Real; op = +)
+function convOpposite(x::pbox, y::pbox; op = +)
 
     
     if (op)∈([-,/])
@@ -157,7 +157,7 @@ function convOpposite(x::Real, y::Real; op = +)
     return pbox(scu, scd, dids = "$(x.dids) $(y.dids)", bounded=bounded)
 end
 
-function convFrechet(x::Real, y::Real; op = +)
+function convFrechet(x::pbox, y::pbox; op = +)
 
     if (op == -) return (convFrechet(x,negate(y),+));end
     if (op == /) return (convFrechet(x,reciprocate(y),*));end
@@ -295,7 +295,7 @@ end
 convCorr(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula) = sigma(x, y, op = op, C = C)
 
 
-function tauRho(x::Real, y::Real, C:: AbstractCopula; op = +)
+function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
 
     #if (op == -) return (tauRho(x,negate(y), C, +));end             # Odd behaviour, negating has no effect if we don't do something to copula
     #if (op == /) return (tauRho(x,reciprocate(y), C, *));end
@@ -315,7 +315,7 @@ function tauRho(x::Real, y::Real, C:: AbstractCopula; op = +)
 
     is = range(0, stop = 1, length = Ns); js = range(0, stop = 1, length = Ns)
 
-    cop = C.cdf;
+    cop = C.cdfD;
     dual = [is[i] + js[j] - cop[i,j] for i in 1:Ns, j in 1:Ns]
     
     downs = findall(cop .== 1); ups = findall(dual .== 0);

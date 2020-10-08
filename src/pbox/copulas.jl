@@ -921,8 +921,8 @@ function plot(x :: copula; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
 
     ax.view_init(45-27, 180+ 26)
 
-    xlabel("y",fontsize = fontsize)
-    ylabel("x",fontsize = fontsize)
+    xlabel("x",fontsize = fontsize)
+    ylabel("y",fontsize = fontsize)
     ax.zaxis.set_rotate_label(false);
     zlabel("C(x,y)", rotation = 0, fontsize = fontsize)
     #xticks(fontsize = fontsize); yticks(fontsize = fontsize);
@@ -962,8 +962,8 @@ function plot(x :: bivpbox; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
 
     ax.view_init(45-27, 180+ 26)
 
-    xlabel("y",fontsize = fontsize)
-    ylabel("x",fontsize = fontsize)
+    xlabel("x",fontsize = fontsize)
+    ylabel("y",fontsize = fontsize)
     ax.zaxis.set_rotate_label(false);
     zlabel("H(x,y)", rotation = 0, fontsize = fontsize)
     #xticks(fontsize = fontsize); yticks(fontsize = fontsize);

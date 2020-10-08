@@ -12,7 +12,7 @@
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
-interval(a::AbstractInterval, b :: AbstractInterval) = interval(a.lo, b.hi);
+interval(a::AbstractInterval, b :: AbstractInterval) = hull(a, b)
 
 left(x::Real) = x;
 right(x::Real) = x;
