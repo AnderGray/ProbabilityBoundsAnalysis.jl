@@ -31,7 +31,6 @@ function env(x...; naRm = false )
     mh = elts[1].mh;
     vl = elts[1].vl;
     vh = elts[1].vh;
-    dids = elts[1].dids;
     na = elts[1].name;
     sh = elts[1].shape;
     bounded =elts[1].bounded;
@@ -45,12 +44,11 @@ function env(x...; naRm = false )
         vh = max(vh,elts[i].vh);
         bounded[1] = min(bounded[1], elts[i].bounded[1]);
         bounded[2] = min(bounded[2], elts[i].bounded[2]);
-        dids = "$dids $(elts[i].dids)"
 
         if (elts[i].name != na) na = "";end
         if (elts[i].shape != sh) sh = "";end
     end
-    return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, dids=dids, name=na, shape=sh, bounded = bounded)
+    return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, name=na, shape=sh, bounded = bounded)
 
 end
 
@@ -80,12 +78,11 @@ function imp(x...; naRm = false )
         vh = min(vh,elts[i].vh);
         bounded[1] = max(bounded[1], elts[i].bounded[1]);
         bounded[2] = max(bounded[2], elts[i].bounded[2]);
-        dids = "$dids $(elts[i].dids)"
     end
 
     if (any(d[:] < u[:])) throw(ArgumentError("Imprint does not exist"));
     else
-        return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, dids=dids, bounded = bounded)
+        return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, bounded = bounded)
     end
 
 end
@@ -103,8 +100,7 @@ function envConstruct(dname, i , j, x...)
     map.(dname, right(i), right(j), x...),
     map.(dname, left(i), right(j), x...),
     map.(dname, right(i), left(j), x...));
-    
-    a.dids = "PB $(uniquePbox())";
+
     return a;
 
 end
@@ -207,7 +203,6 @@ function envConstFunc(Dist, i, j, name, shape, Bounded)
     Sdist(Dist, left(i),  right(j), name, shape, Bounded),
     Sdist(Dist, right(i), left(j),  name, shape, Bounded));
     
-    a.dids = "PB $(uniquePbox())";
     a.bounded = Bounded; 
     return a;
 
@@ -219,7 +214,6 @@ function envConstFunc1(Dist, i, name, shape, Bounded)
     Sdist1(Dist, left(i),  name, shape, Bounded),
     Sdist1(Dist, right(i), name, shape, Bounded))
     
-    a.dids = "PB $(uniquePbox())";
     return a;
 
 end
@@ -232,7 +226,6 @@ function envConstFunc3(Dist, i, j, k,  name, shape, Bounded)
     Sdist(Dist, left(i),  right(j), name, shape, Bounded),
     Sdist(Dist, right(i), left(j),  name, shape, Bounded));
     
-    a.dids = "PB $(uniquePbox())";
     return a;
 
 end

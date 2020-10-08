@@ -103,7 +103,7 @@ function convIndep(x::pbox, y::pbox; op = +)
 
     bounded = min(x.bounded,y.bounded);
 
-    return pbox(Zu, Zd, ml = ml, mh = mh, vl=vl, vh=vh, dids="$(x.dids) $(y.dids)",bounded = bounded);
+    return pbox(Zu, Zd, ml = ml, mh = mh, vl=vl, vh=vh, bounded = bounded);
     #return ([Zu, Zd, ml, mh, vl, vh, "$(x.dids) $(y.dids)"]);
 
 end
@@ -129,8 +129,8 @@ function convPerfect(x::pbox, y::pbox; op = +)
     bounded = min(x.bounded,y.bounded);
 
     if (all(cu == scu) && all(cd == scd))
-        return pbox(scu, scd,  dids="$(x.dids) $(y.dids) ", bob=x.bob, bounded = bounded)
-    else return pbox(scu, scd,  dids="$(x.dids) $(y.dids) ", bounded= bounded)
+        return pbox(scu, scd, bounded = bounded)
+    else return pbox(scu, scd, bounded= bounded)
       end
 end
 
@@ -154,7 +154,7 @@ function convOpposite(x::pbox, y::pbox; op = +)
 
     bounded = min(x.bounded,y.bounded);
 
-    return pbox(scu, scd, dids = "$(x.dids) $(y.dids)", bounded=bounded)
+    return pbox(scu, scd, bounded=bounded)
 end
 
 function convFrechet(x::pbox, y::pbox; op = +)
@@ -200,7 +200,7 @@ function convFrechet(x::pbox, y::pbox; op = +)
     end
 
     bounded = min(x.bounded,y.bounded);
-    return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, dids = "$(x.dids) $(y.dids) ", bounded=bounded);
+    return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, bounded=bounded);
 end
 
 
@@ -346,7 +346,7 @@ end
 function shift(x :: pbox, ss :: Real)
      if (x.shape) ∈ (["uniform","normal","cauchy","triangular","skew-normal"]) s = x.shape; else s = ""; end
     return pbox(ss .+ x.u, ss .+ x.d, shape=s, name="", ml = x.ml+ss, mh=x.mh+ss, 
-    vl=x.vl, vh=x.vh, dids=x.dids, bob=perfectdep(x),bounded = x.bounded)
+    vl=x.vl, vh=x.vh, bounded = x.bounded)
 end
 
 function mult(x::pbox, m :: Real)
@@ -354,14 +354,14 @@ function mult(x::pbox, m :: Real)
     if ((x.shape) ∈ (["exponential","lognormal"]) && 0 <= x.u[1]) s = x.shape; else s = ""; end
     if (m < 0) return negate(mult(x,abs(m))) end
     return pbox(m*x.u, m*x.d, shape=s, name="", ml=m*x.ml, mh=m*x.mh, vl=(m^2)*x.vl, 
-    vh=(m^2)*x.vh, dids=x.dids, bob=perfectopposite(m,x), bounded = x.bounded)   ################## mean if m<0
+    vh=(m^2)*x.vh, bounded = x.bounded)   ################## mean if m<0
 end
 
 function negate(x)
     if (ispbox(x))
         if ((x.shape)∈(["uniform", "normal", "cauchy", "triangular"])) s = x.shape; else s = ""; end
         return pbox(-x.d[end:-1:1],-x.u[end:-1:1],shape=s,name = "", ml=-x.mh, mh=-x.ml, 
-        vl=x.vl, vh=x.vh, dids=x.dids, bob=oppositedep(x), bounded = reverse(x.bounded));
+        vl=x.vl, vh=x.vh, bounded = reverse(x.bounded));
     end
     return -x;
 end
@@ -369,7 +369,7 @@ end
 function complement(x::pbox)
     if ((x.shape)∈(["uniform", "normal", "cauchy", "triangular", "skew-normal"])) s = x.shape; else s = ""; end
     return pbox(1 .-x.d[end:-1:1],1 .-x.u[end:-1:1],shape=s,name = "", ml=1-x.mh, 
-    mh=1-x.ml, vl=x.vl, vh=x.vh, dids=x.dids, bob=oppositedep(x), bounded = x.bounded);
+    mh=1-x.ml, vl=x.vl, vh=x.vh, bounded = x.bounded);
 end
 
 function reciprocate(x)
@@ -396,7 +396,7 @@ function reciprocate(x)
         myVar = interval(x.vl, x.vh);
 
         return pbox(1 ./reverse(x.d[:]), 1 ./ reverse(x.u[:]), shape = sh, name="", ml=left(myMean), 
-        mh=right(myMean), vl=left(myVar), vh=right(myVar), dids=x.dids, bob=oppositedep(x), bounded = [true, true]);
+        mh=right(myMean), vl=left(myVar), vh=right(myVar), bounded = [true, true]);
     end
     return 1/x;
 end
@@ -447,10 +447,6 @@ defaultCorr = 0;
 /(x :: Real, y :: AbstractPbox) = reciprocate(y) * x;
 
 
-oppositedep(x::pbox) = -x.bob;
-perfectdep(x::pbox) = x.bob;
-perfectopposite(m, x::pbox) = if (m<0) return oppositedep(x); else return perfectdep(x);end
-
 
 ##################################################################################
 #
@@ -497,7 +493,7 @@ function convFrechetNaive(x::Real, y::Real; op = *)
     vl = 0;
     vh = Inf;
 
-    return pbox(Zu, Zd,  ml = left(m), mh = right(m), vl=vl, vh=vh, dids="$(x.dids) $(y.dids)");
+    return pbox(Zu, Zd,  ml = left(m), mh = right(m), vl=vl, vh=vh);
 
 end
 
