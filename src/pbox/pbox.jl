@@ -54,7 +54,6 @@ If partial information is given (eg, no bounds on moments), the other properties
 See also: [`mean`](@ref), [`var`](@ref), [`uniform`](@ref), [`normal`](@ref), [`conv`](@ref), [`copula`](@ref)
 """
 mutable struct pbox <: AbstractPbox
-    id :: String                        # Id of the pbox ie: "PB 1"
     u :: Union{Array{<:Real},Real}      # vector of the left bounds
     d :: Union{Array{<:Real},Real}      # vector of the right bounds
     n :: Int64                          # descretization size
@@ -64,13 +63,10 @@ mutable struct pbox <: AbstractPbox
     vl :: Real                          # lower bound on variance
     vh :: Real                          # upper bound of variance
     name :: String                      # name
-    dids :: String                      # dependancy id, defines which pbox ids it's depedent to
-    bob :: Int64                        # for dependancy tracking
     bounded :: Array{Bool,1}            # Is it bounded?
 
     function pbox(u::Union{Missing, Array{<:Real}, Real} = missing, d=u; shape = "", name = "", ml= missing, mh = missing,
-        vl = missing, vh = missing, interpolation = "linear",
-        bob = missing, perfect = missing, opposite = missing, depends = missing, dids=missing, bounded = [false, false])
+        vl = missing, vh = missing, interpolation = "linear", bounded = [false, false])
 
         steps = ProbabilityBoundsAnalysis.steps;                  # Reading global varaibles costly, creating local for multiple use
 
@@ -101,10 +97,7 @@ mutable struct pbox <: AbstractPbox
             if (length(u) != steps) u = Interpolate(u,interpolation,true);end
             if (length(d) != steps) d = Interpolate(d,interpolation,false);end
 
-            unique = uniquePbox();      # Here an error because will create multiple pboxes when distribution constructor is called
-            id = "PB $unique";
-
-            p = new(id,u,d,steps,"",-∞,∞,0,∞,"","",unique, bounded);
+            p = new(u,d,steps,"",-∞,∞,0,∞,"", bounded);
         end
 
         p = computeMoments(p);
@@ -114,10 +107,6 @@ mutable struct pbox <: AbstractPbox
         if (!ismissing(mh))         p.mh = min(mh,p.mh);end
         if (!ismissing(vl))         p.vl = max(vl,p.vl);end
         if (!ismissing(vh))         p.vh = min(vh,p.vh);end
-        if (!ismissing(dids))       p.dids = "$(p.id) $dids";end
-        if (!ismissing(opposite))   p.bob = -opposite.bob;end
-        if (!ismissing(perfect))    p.bob = perfect.bob;end
-        if (!(ismissing(depends)))  p.dids = "$(p.id) $(depends.dids)";end
         if (!ismissing(name))       p.name = name;end
 
         p = checkMoments(p);
@@ -211,8 +200,6 @@ Returns bounds on probability mass in interval x
 See also: [`cut`](@ref), [`cdf`](@ref), [`rand`](@ref)
 """
 mass(s :: pbox, x:: Interval) = mass(s, x.lo, x.hi)
-
-uniquePbox() = ( ProbabilityBoundsAnalysis.setPboxes(ProbabilityBoundsAnalysis.pboxes+1); return ProbabilityBoundsAnalysis.pboxes );
 
 
 """
