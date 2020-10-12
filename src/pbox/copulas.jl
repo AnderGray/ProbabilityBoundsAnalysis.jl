@@ -45,7 +45,7 @@ include("NormalDistribution.jl")
 
 pyimport_conda("mpl_toolkits.mplot3d", "mpl_toolkits")
 art3d = PyObject(PyPlot.art3D)
-@pyimport matplotlib as mpl
+mpl = pyimport("matplotlib")
 using3D()
 
 abstract type AbstractCopula <: Real end
