@@ -9,7 +9,7 @@ using Distributions
 
 @testset "Distributions" begin
 
-    Nsamples = 100;
+    Nsamples = 5000; Ncdf = 5000;
 
     @testset "Normal" begin
 
@@ -30,7 +30,7 @@ using Distributions
         
         @test all( distSamps .∈ pbaSamples )
 
-        testVals = range(left(x), stop = right(x),length = 100)
+        testVals = range(left(x), stop = right(x),length = Ncdf)
         cdfPba = cdf.(x, testVals);
         cdfDis = cdf.(a, testVals);
 
@@ -56,7 +56,7 @@ using Distributions
     
     @test all( distSamps .∈ pbaSamples )
 
-    testVals = range(left(x), stop = right(x),length = 100)
+    testVals = range(left(x), stop = right(x),length = Ncdf)
     cdfPba = cdf.(x, testVals);
     cdfDis = cdf.(a, testVals);
 
@@ -80,7 +80,7 @@ using Distributions
     
     @test all( distSamps .∈ pbaSamples )
 
-    testVals = range(left(x), stop = right(x),length = 100)
+    testVals = range(left(x), stop = right(x),length = Ncdf)
     cdfPba = cdf.(x, testVals);
     cdfDis = cdf.(a, testVals);
 

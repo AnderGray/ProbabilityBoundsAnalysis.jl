@@ -266,7 +266,7 @@ function sigma(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
         downs = findall(js[i-1] .<= dCdf .<= js[i]);
 
         if !isempty(ups);   zu[i]   = minimum(zus[ups]);   else zu[i]   = zu[i-1]; end
-        if !isempty(downs); zd[i] = maximum(zds[downs]); else zd[i] = zd[i-1]; end
+        if !isempty(downs); zd[i-1] = maximum(zds[downs]); else zd[i-1] = zd[i-2]; end
 
     end
     

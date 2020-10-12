@@ -16,7 +16,7 @@
     sig(sig1, sig2, cor) = sqrt(sig1^2 + sig2^2 + 2*cor*sig1*sig2)
     meanOut = mean1 + mean2;    
 
-    Nsamples = 100; Ncdf = 100;
+    Nsamples = 5000; Ncdf = 5000;
 
     @testset "Independent" begin
 

@@ -467,7 +467,12 @@ MinMaxMeanVar(x...) = minMaxMeanVar(x...);  minmaxmeanvar(x...) = minMaxMeanVar(
 function cut(x, p :: Real; tight :: Bool = true)
 
     x = makepbox(x);
+
     if (p<0 || p>1) throw(ArgumentError("Second argument must be a probability between zero and one")); end
+
+    if (p < ProbabilityBoundsAnalysis.bOt && !x.bounded[1]); return interval(-∞, x.d[1]);end
+    if (p > ProbabilityBoundsAnalysis.tOp && !x.bounded[2]); return interval(x.u[end], ∞);end
+
     long = x.n;
     if (tight) return (interval(x.u[Int(min.(long,(mod(p*long, 1)==0)+ceil(p*x.n)))], x.d[ Int(max.(1,ceil(p*x.n)))])) end
     if (p == 1) lower = long; elseif (mod(p,(1/long)) == 0) lower = round(p*long); else lower = ceil(p*long); end
