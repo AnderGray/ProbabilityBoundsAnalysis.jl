@@ -45,6 +45,7 @@ include("NormalDistribution.jl")
 
 pyimport_conda("mpl_toolkits.mplot3d", "mpl_toolkits")
 art3d = PyObject(PyPlot.art3D)
+@pyimport matplotlib as mpl
 using3D()
 
 abstract type AbstractCopula <: Real end
@@ -380,13 +381,15 @@ Pi() = πCop()
 
 function Frank(s = 1)                       #   s is real; inf for perfect, 0 for indep, -inf for opposite
 
+    if !(s ∈ interval(-Inf,Inf)); throw(ArgumentError("coefficient must be ∈ [-Inf, Inf]\n $s ∉ [-Inf, Inf]"));end
+
     if s == -Inf         # Limit should be set earlier
         C = W()
         return copula(C.cdfU, family = "Frank", param = -Inf)
     end
     if s == 0
         C = πCop()
-        return copula(C.cdfU,  family = "Frank", param =  1)
+        return copula(C.cdfU,  family = "Frank", param =  0)
     end
     if s == Inf
         C = M()
@@ -402,7 +405,7 @@ end
 
 function Frank(s :: Interval)
 
-    if !(s ⊆ interval(-Inf,Inf)); throw(ArgumentError("coefficient must be ⊆ [-Inf, Inf]\n $r ⊄ [-Inf, Inf]"));end
+    if !(s ⊆ interval(-Inf,Inf)); throw(ArgumentError("coefficient must be ⊆ [-Inf, Inf]\n $s ⊄ [-Inf, Inf]"));end
 
     lb = Frank(s.lo);
     ub = Frank(s.hi);
@@ -414,6 +417,8 @@ end
 
 
 function Clayton(t = 0)                     #   t>-1; -1 for opposite, 0 for indep and inf for perfect
+
+    if !(t ∈ interval(-1,Inf)); throw(ArgumentError("coefficient must be ∈ [-1, Inf]\n $t ∉ [-1, Inf]"));end
 
     if t == 0
         C = πCop()
@@ -437,7 +442,7 @@ end
 
 function Clayton(t :: Interval)
 
-    if !(t ⊆ interval(-1,Inf)); throw(ArgumentError("coefficient must be ⊆ [-1, Inf]\n $r ⊄ [-1, Inf]"));end
+    if !(t ⊆ interval(-1,Inf)); throw(ArgumentError("coefficient must be ⊆ [-1, Inf]\n $t ⊄ [-1, Inf]"));end
 
     lb = Clayton(t.lo);
     ub = Clayton(t.hi);
@@ -449,6 +454,8 @@ end
 
 
 function GauCopula(r = 0)     #   -1 <= r <=1 ; -1 for opposite, 1 for indep and 1 for perfect
+
+    if !(r ∈ interval(-1,1)); throw(ArgumentError("correlation coefficient must be ∈ [-1, 1]\n $r ∉ [-1, 1]"));end
 
     if r == 0; C = πCop(); return copula(C.cdfU, family = "Gaussian", param = 0); end
     if r == -1; C = W(); return copula(C.cdfU, family = "Gaussian", param =  -1); end
@@ -499,6 +506,46 @@ function env(x::copula, y::copula)
     if x.family == y.family; newFam = x.family; else newFam = missing; end
     return copula(newU, newD, family = newFam)
 end
+
+###
+#   Copula sampling
+###
+function sample(C :: AbstractCopula, N = 1)
+
+    if !(C.cdfU == C.cdfU); throw(ArgumentError("Can only sample from precise copula")); end
+
+    useInterp = false;      # Set true to use interpolator
+    if ismissing(C.family); family = 0; useInterp = true else family = C.family end
+
+    if (family == "Gaussian") return CholeskyGaussian(N, Float64(C.param)) ;end  # Use Cholesky decompostition of the Cov matrix for gaussian copula sampling
+
+    n = size(C.cdfD)[1]
+
+    x = rand(N);    y = rand(N);
+    ux = x;         uy = zeros(N);
+    m = n;
+
+    if family == "M"; return hcat(ux,ux); end
+    if family == "W"; return hcat(ux,1 .- ux); end
+    if family == "π"; return hcat(ux,y); end
+
+    uy = mid.([cut(conditionalY(C, x[i]), y[i]) for i =1:N])
+
+    return hcat(ux,uy);
+end
+
+function CholeskyGaussian(N = 1, correlation = 0)
+
+    Cov = ones(2,2); Cov[1,2] = Cov[2,1] = correlation;
+    a = cholesky(Cov).L;
+    z = transpose(rand(Normal(),N,2))
+    x = a * z;
+    u = transpose(cdf.(Normal(),x))
+
+    return hcat(u[:,1],u[:,2])
+end
+
+
 
 ###
 #   Bivaraite pbox
@@ -596,6 +643,20 @@ function conditionalY(J :: bivpbox, yVal :: Real)
 
     return pbox(zU, zD)
 
+end
+
+###
+#   Sampling biv pbox
+###
+function sample(J :: bivpbox, N = 1)
+
+    C = J.C; x = J.marg1; y = J.marg2
+    copSamples = sample(C,N)
+
+    ux = cut.(x, copSamples[:,1])
+    uy = cut.(y, copSamples[:,2])
+
+    return hcat(ux,uy);
 end
 
 
@@ -972,7 +1033,100 @@ function plot(x :: bivpbox; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
 end
 
 
+slice(x,y) = pycall(pybuiltin("slice"), PyObject, x, y)         # For performing python array slicing for
 
+function scatter(a :: Array{Float64,2}; title = "samples")
+
+    x = a[:,1];
+    y = a[:,2];
+
+    fig = plt.figure(title, figsize=(10, 10))
+    grid = plt.GridSpec(4, 4, hspace=0.2, wspace=0.2)
+    main_ax = fig.add_subplot(get(grid, (slice(1,4),slice(0,3))))
+    y_hist  = fig.add_subplot(get(grid, (slice(1,4),3)), xticklabels=[], sharey=main_ax)
+    x_hist  = fig.add_subplot(get(grid, (0,slice(0,3))), yticklabels=[], sharex=main_ax)
+
+    # scatter points on the main axes
+    main_ax.plot(x, y, "o", markersize=3, alpha=0.2)
+
+    # histogram on the attached axes
+    x_hist.hist(x, 40, histtype="stepfilled", orientation="vertical", color="gray")
+    #x_hist.invert_yaxis()
+
+    y_hist.hist(y, 40, histtype="stepfilled", orientation="horizontal", color="gray")
+    #y_hist.invert_xaxis()
+
+end
+
+function plotBoxes(xs :: Array{Interval{T},1}, ys  :: Array{Interval{T},1},  subpl = missing; linewidth = 1, alpha=0.2, fillcol= "grey") where T <: Real
+
+    if ismissing(subpl); 
+        fig = plt.figure("boxes", figsize=(10, 10));
+        subpl = fig.add_subplot()
+    end
+    Asize = length(xs)
+    for i = 1:Asize
+
+        #println(" $(a[i]) |  $(a[i+1])")
+        xlo = xs[i].lo; xhi = xs[i].hi
+        ylo = ys[i].lo; yhi = ys[i].hi
+
+        subpl.plot([xlo; xhi], [ ylo; ylo], color = "red", linewidth = linewidth)
+        subpl.plot([xhi; xhi], [ylo; yhi], color = "red", linewidth = linewidth)
+        subpl.plot([xhi; xlo], [yhi; yhi], color = "red", linewidth = linewidth)
+        subpl.plot([xlo; xlo], [yhi; ylo], color = "red", linewidth = linewidth)
+
+        subpl.fill_between([xlo, xhi], [ylo, ylo], [yhi, yhi], alpha=alpha, color =fillcol)
+    end
+
+end
+
+function scatter(a :: Array{Interval{T},2}; title = "samples", fontsize = 18) where T <: Real
+
+    x = a[:,1];
+    y = a[:,2];
+
+    fig = plt.figure(title, figsize=(10, 10))
+    grid = plt.GridSpec(4, 4, hspace=0.2, wspace=0.2)
+    main_ax = fig.add_subplot(get(grid, (slice(1,4),slice(0,3))))
+
+    # scatter points on the main axes
+    #main_ax.plot(xMids, yMids, "o", markersize=3, alpha=0.2)
+    plotBoxes(x, y, main_ax,linewidth = 0.5, alpha=0.1, fillcol= "grey")
+    
+    xticks(fontsize = fontsize); yticks(fontsize = fontsize)
+    xlabel("x",fontsize = fontsize); ylabel("y",fontsize=fontsize);
+
+    y_hist  = fig.add_subplot(get(grid, (slice(1,4),3)), xticklabels=[], sharey=main_ax)
+    x_hist  = fig.add_subplot(get(grid, (0,slice(0,3))), yticklabels=[], sharex=main_ax)
+
+    xPbox = pbox(x);
+    yPbox = pbox(y);    
+
+    alpha = 0.2;
+
+    col1 = "red"; col2 = "black"; fillcol = "grey"
+
+    j = (0:(xPbox.n-1))/xPbox.n;
+    x_hist.step([xPbox.u[:];xPbox.u[xPbox.n];xPbox.d[xPbox.n]], [j;1;1], color = col1, where = "pre");
+
+    i = (1:(xPbox.n))/xPbox.n;
+    x_hist.step([xPbox.u[1];xPbox.d[1];xPbox.d[:]], [0;0;i], color = col2,     where = "post");
+
+    Xs, Ylb, Yub = prepFillBounds(xPbox);
+    x_hist.fill_between(Xs, Ylb, Yub, alpha=alpha, color =fillcol)
+
+    j = (0:(yPbox.n-1))/yPbox.n;
+    y_hist.step([j;1;1], [yPbox.u[:];yPbox.u[yPbox.n];yPbox.d[yPbox.n]], color = col1, where = "post");
+
+    i = (1:(yPbox.n))/yPbox.n;
+    y_hist.step([0;0;i],[yPbox.u[1];yPbox.d[1];yPbox.d[:]], color = col2,     where = "pre");
+
+    #Xs, Ylb, Yub = prepFillBounds(yPbox);
+    #y_hist.fill_between(Ylb,Xs,Yub, alpha=alpha, color =fillcol)
+    #y_hist.invert_yaxis()
+
+end
 
 #=
 function piLoop() 

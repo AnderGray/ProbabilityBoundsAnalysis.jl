@@ -38,7 +38,7 @@ __precompile__(true)
 
 module ProbabilityBoundsAnalysis
 
-using IntervalArithmetic, Distributions, Interpolations, Statistics, PyPlot, PyCall
+using IntervalArithmetic, Distributions, Interpolations, Statistics, PyPlot, PyCall, LinearAlgebra
 
 import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
 
@@ -144,7 +144,8 @@ export
 
     # Copulas
     AbstractCopula, copula, GauCopula, πCop, M, W, Frank, Clayton, Frechet,
-    cdfU, cdfD, mass, conditionalX, conditionalY, bivpbox, plotStep
+    cdfU, cdfD, mass, conditionalX, conditionalY, bivpbox, plotStep, sample, scatter,
+    plotBoxes
 
 
 include("pbox/pbox.jl")
