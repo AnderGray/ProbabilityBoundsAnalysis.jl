@@ -208,8 +208,8 @@ end
 
 function sigma(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
 
-    if (op == -) return sigma(x, negate(y), op=+, C = C); end
-    if (op == /) return sigma(x, reciprocate(y), op = *, C = C);end
+    #if (op == -) return sigma(x, negate(y), op=+, C = C); end
+    #if (op == /) return sigma(x, reciprocate(y), op = *, C = C);end
 
     x = makepbox(x);
     y = makepbox(y);
@@ -266,7 +266,7 @@ function sigma(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
         downs = findall(js[i-1] .<= dCdf .<= js[i]);
 
         if !isempty(ups);   zu[i]   = minimum(zus[ups]);   else zu[i]   = zu[i-1]; end
-        if !isempty(downs); zd[i-1] = maximum(zds[downs]); else zd[i-1] = zd[i-2]; end
+        if !isempty(downs); zd[i] = maximum(zds[downs]); else zd[i] = zd[i-1]; end
 
     end
     
@@ -530,4 +530,94 @@ function balchProd(x::pbox, y::pbox)
         return convFrechet(a, b, op = +)
     end
     return convFrechet(x, y, op = *);
+end
+
+
+function copulaConv( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
+
+    Fz = sigma(x, y, op = +, C = C);
+
+    Ns = size(C.cdfD)[1];
+
+    zus = [map(op, ux, uy) for ux in x.u[1:end-1], uy in y.u[1:end-1]]        # Carteesian products
+    zds = [map(op, dx, dy) for dx in x.d[2:end], dy in y.d[2:end]]
+
+    cdfU = zeros(Ns, Ns);
+    cdfD = zeros(Ns, Ns);
+
+    uMasses = C.cdfU[2:end, 2:end] + C.cdfU[1:end-1, 1:end-1] - C.cdfU[1:end-1, 2:end] - C.cdfU[2:end, 1:end-1]
+    dMasses = C.cdfD[2:end, 2:end] + C.cdfD[1:end-1, 1:end-1] - C.cdfD[1:end-1, 2:end] - C.cdfD[2:end, 1:end-1]
+
+    for i = 2:Ns             # Cycle through u's
+        for j = 2:Ns         # Cycle through v's
+            indexs = findall((Fz.u[i-1] .<= zus .< Fz.u[i]));
+            indexs2 = findall(x.u[j-1] .<= x.u .< x.u[j]);
+
+            YesNo = [indexs[k][1] .== indexs2 for k = 1:length(indexs)];     # Confusing, but checks which elements share the same indexs
+            sums = sum.(YesNo);          # The zeros will be removed from the integration
+    
+            newIndx = indexs[sums .> 0];
+    
+            us = sum(uMasses[newIndx])
+    
+            cdfU[i,j] = us + cdfU[i,j-1] + cdfU[i-1,j] - cdfU[i-1,j-1];
+
+            indexs = findall((Fz.d[i-1] .<= zds .< Fz.d[i]));
+            indexs2 = findall(x.d[j-1] .<= x.d .< x.d[j]);
+
+            YesNo = [indexs[k][1] .== indexs2 for k = 1:length(indexs)];     # Confusing, but checks which elements share the same indexs
+            sums = sum.(YesNo);          # The zeros will be removed from the integration
+    
+            newIndx = indexs[sums .> 0];
+    
+            ds = sum(dMasses[newIndx])
+    
+            cdfD[i,j] = ds + cdfD[i,j-1] + cdfD[i-1,j] - cdfD[i-1,j-1];
+
+        end
+        if mod(i,Ns/100 * 20) == 0.0 println("Completed $(i/Ns * 100)%") end
+    end
+
+    return copula(cdfU, cdfD)
+
+end
+
+
+function copulaConvHard( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
+
+    Fz = sigma(x, y, op = +, C = C);
+
+    Ns = size(C.cdfD)[1];
+
+    zus = [map(op, ux, uy) for ux in x.u[1:end-1], uy in y.u[1:end-1]]        # Carteesian products
+    zds = [map(op, dx, dy) for dx in x.d[2:end], dy in y.d[2:end]]
+
+    cdfU = zeros(Ns, Ns);
+    cdfD = zeros(Ns, Ns);
+
+    #zus = zus[:];
+    #zds = zds[:];
+
+    uMasses = C.cdfU[2:end, 2:end] + C.cdfU[1:end-1, 1:end-1] - C.cdfU[1:end-1, 2:end] - C.cdfU[2:end, 1:end-1]
+    dMasses = C.cdfD[2:end, 2:end] + C.cdfD[1:end-1, 1:end-1] - C.cdfD[1:end-1, 2:end] - C.cdfD[2:end, 1:end-1]
+
+    for i = 1:Ns             # Cycle through u's
+        for j = 1:Ns         # Cycle through v's
+            indexs = findall((zus .<= Fz.u[i]));
+            indexs2 = findall(x.u .<= x.u[j]);
+
+            YesNo = [indexs[k][1] .== indexs2 for k = 1:length(indexs)];     # Confusing, but checks which elements share the same indexs
+            sums = sum.(YesNo);          # The zeros will be removed from the integration
+    
+            newIndx = indexs[sums .> 0];
+
+            us = sum(uMasses[newIndx])
+
+            cdfU[i,j] = us
+
+        end
+        if mod(i,Ns/100 * 20) == 0.0 println("Completed $(i/Ns * 100)%") end
+    end
+
+    return copula(cdfU)
 end
