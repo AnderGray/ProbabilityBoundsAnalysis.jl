@@ -14,12 +14,14 @@
 function plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 12)
 
     if (isvacuous(s)); throw(ArgumentError("Pbox is vacuous"));end
-    if (ismissing(name)) name = s.id; end
+    #if (ismissing(name)) name = s.id; end
 
     col1 = "red"; col2 = "black"; fillcol = "grey"
     if !(ismissing(col)); col1 = col2 = fillcol = col;end
 
-    fig = figure(name,figsize=(10,10))
+    #
+    if (ismissing(name)); fig = figure(figsize=(10,10)); else fig = figure(name,figsize=(10,10));end
+
     ax = fig.add_subplot()
     j = (0:(s.n-1))/s.n;
 
