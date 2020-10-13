@@ -35,6 +35,16 @@ using Distributions
         cdfDis = cdf.(a, testVals);
 
         @test all( cdfDis .∈ cdfPba)
+
+        EndPoints = rand(Nsamples,2) .* (right(x) .- left(x)) .+ left(x);
+        EndPoints = sort(EndPoints, dims = 2);
+
+        massInts = interval.(EndPoints[:,1], EndPoints[:,2])
+        massPba = mass.(x,massInts)
+        massDis = cdf.(a,EndPoints[:,2]) .- cdf.(a, EndPoints[:,1])
+
+        @test all( massDis .∈ massPba)
+
     end
 
     @testset "Uniform" begin
@@ -62,6 +72,15 @@ using Distributions
 
     @test all( cdfDis .∈ cdfPba)
 
+    EndPoints = rand(Nsamples,2) .* (right(x) .- left(x)) .+ left(x);
+    EndPoints = sort(EndPoints, dims = 2);
+
+    massInts = interval.(EndPoints[:,1], EndPoints[:,2])
+    massPba = mass.(x,massInts)
+    massDis = cdf.(a,EndPoints[:,2]) .- cdf.(a, EndPoints[:,1])
+
+    @test all( massDis .∈ massPba)
+
     end
 
     @testset "Beta" begin
@@ -85,6 +104,16 @@ using Distributions
     cdfDis = cdf.(a, testVals);
 
     @test all( cdfDis .∈ cdfPba)
+
+    EndPoints = rand(Nsamples,2) .* (right(x) .- left(x)) .+ left(x);
+    EndPoints = sort(EndPoints, dims = 2);
+
+    massInts = interval.(EndPoints[:,1], EndPoints[:,2])
+    massPba = mass.(x,massInts)
+    massDis = cdf.(a,EndPoints[:,2]) .- cdf.(a, EndPoints[:,1])
+
+    @test all( massDis .∈ massPba)
+
     end
 
     # Distribution Free constructors need alot of test
