@@ -117,9 +117,15 @@ end
 
 function Base.show(io::IO, z::pbox)
 
-    if (z.u[1] != z.d[end]) statement1 = "[$(z.u[1]),$(z.d[end])]"; else statement1 = "$(z.u[1])";end
-    if (z.ml != z.mh) statement2 = "[$(z.ml),$(z.mh)]"; else statement2 = "$(z.ml)";end
-    if (z.vl != z.vh) statement3 = "[$(z.vl),$(z.vh)]"; else statement3 = "$(z.vl)";end
+    digits = 5
+
+    ranglb = round(z.u[1], sigdigits = digits);    rangub = round(z.d[end], sigdigits = digits);
+    ml = round(z.ml, sigdigits = digits);   mh = round(z.mh, sigdigits = digits)
+    vl = round(z.vl, sigdigits = digits);   vh = round(z.vh, sigdigits = digits)
+
+    if (z.u[1] != z.d[end]) statement1 = "[$ranglb, $rangub]"; else statement1 = "$ranglb";end
+    if (z.ml != z.mh) statement2 = "[$ml, $mh]"; else statement2 = "$ml";end
+    if (z.vl != z.vh) statement3 = "[$vl, $vh]"; else statement3 = "$vl";end
     print(io, "Pbox: \t $(z.name) ~ $(z.shape) ( range=$statement1, mean=$statement2, var=$statement3)");
 
 end

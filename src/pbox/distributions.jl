@@ -21,8 +21,24 @@ jj()    = [           collect((1:(ProbabilityBoundsAnalysis.steps-1)) / Probabil
 jjj()   = [           collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps); ProbabilityBoundsAnalysis.tOp ];
 
 ##
-# Should be able to env an array of p-boxes. Feature to be added 
+# Should be able to env an array of p-boxes.
 ##
+"""
+    env(x :: pbox, y :: pbox, ...)
+
+Envelope. Returns the union of pboxes. Any number of pboxes may be input
+
+# Examples
+```jldoctest
+julia> a = U(0,1)
+
+julia> b = U(1,2)
+
+julia> c = env(a, b)
+Pbox: 	  ~ uniform ( range=[0.0,2.0], mean=[0.5,1.5], var=0.08333333333333333)
+```
+See also: [`imp`](@ref), [`makepbox`](@ref)
+"""
 function env(x...; naRm = false )
     elts = makepbox(x...);
     u = elts[1].u;
@@ -56,6 +72,22 @@ end
 ###
 #   Computes the imprint (imposition)
 ###
+"""
+    imp(x :: pbox, y :: pbox)
+
+Imprint. Returns the intersection of pboxes. Any number of pboxes may be input
+
+# Examples
+```jldoctest
+julia> a = U(interval(0, 1), 2)
+
+julia> b = U(1, 2)
+
+julia> c = imp(a, b)
+Pbox: 	  ~  ( range=[1.0,2.0], mean=1.5, var=0.08333333333333333)
+```
+See also: [`env`](@ref), [`makepbox`](@ref)
+"""
 function imp(x...; naRm = false )
     elts = makepbox(x...);
     u = elts[1].u;
@@ -64,7 +96,6 @@ function imp(x...; naRm = false )
     mh = elts[1].mh;
     vl = elts[1].vl;
     vh = elts[1].vh;
-    dids = elts[1].dids;
     na = elts[1].name;
     sh = elts[1].shape;
     bounded =elts[1].bounded;
@@ -128,6 +159,23 @@ function Snormal(mean = missing, std=missing; median=missing, mode=missing,
     end
 end
 
+"""
+    normal(mean :: Interval, std :: Interval)
+
+Normal shaped pbox. Parameters can be Real or Intervals.
+
+# Constructors
+* `normal`
+* `N`
+* `gaussian`
+
+# Examples
+```jldoctest
+julia> a = normal(interval(0, 1), interval(1,2))
+Pbox: 	  ~ normal ( range=[-6.1805, 7.1805], mean=[0.0, 1.0], var=[1.0, 4.0])
+```
+See also: [`uniform`](@ref), [`lognormal`](@ref), [`meanMinMax`](@ref), [`plot`](@ref)
+"""
 normal(mean = 0, std = 1, x...) = envConstruct(Snormal, mean, std, x...);
 N = gaussian = normal
 
@@ -169,6 +217,22 @@ function Suniform(Min, Max, case = 1; name="")
 
 end
 
+"""
+    uniform(min :: Interval, max :: Interval)
+
+Uniform shaped pbox. Parameters can be Real or Intervals.
+
+# Constructors
+* `uniform`
+* `U`
+
+# Examples
+```jldoctest
+julia> a = normal(interval(0, 1), interval(1,2))
+Pbox: 	  ~ uniform ( range=[0.0, 2.0], mean=[1.0, 1.5], var=[0.083333, 0.33333])
+```
+See also: [`normal`](@ref), [`beta`](@ref), [`meanMinMax`](@ref), [`plot`](@ref)
+"""
 U = uniform(Min, Max, x...) = envUnif(Min,Max, x...)
 
 
@@ -275,6 +339,18 @@ end
 #   For informaton about what parameters are, see the Distributions.jl package
 ###
 
+"""
+    beta(α :: Interval, β :: Interval)
+
+Beta shaped pbox. Parameters can be Real or Intervals.
+
+# Examples
+```jldoctest
+julia> a = beta(2,interval(3,4))
+Pbox: 	  ~ beta ( range=[0.0, 1.0], mean=[0.33333, 0.4], var=[0.031746, 0.04])
+```
+See also: [`KN`](@ref), [`meanMinMax`](@ref), [`plot`](@ref)
+"""
 function beta( α=1,    β=1,    name = "")
     if α == 0 && β == 0; return pbox(0,1);end
     if α == 0; return pbox(0); end
@@ -305,12 +381,31 @@ function pbaLogNormal(m, std)
     return LogNormal(μ,σ)
 end
 
+"""
+    lognormal(μ :: Interval, std :: Interval)
+
+Lognormal shaped pbox. Parameters can be Real or Intervals.
+
+See also: [`KN`](@ref), [`meanMinMax`](@ref)
+"""
 lognormal(  μ=1,    θ=1,    name = "")      = envConstFunc(     pbaLogNormal,  μ, θ, name, "lognormal",    [true,false])   # http://en.wikipedia.org/wiki/Log-normal_distribution
 
 ###############################
 #   Confidence boxes
 ###############################
 
+"""
+    KN(k :: Interval, n :: Interval)
+
+k out of N confidence box (c-box), a pbox shaped confidence structure. Quantifies inferential uncertainty in binomial counts, 
+where k successes were observed out of n trails. One sided or two sided confidence intervals may be drawn
+
+# Constructors
+* `KN`
+* `kn`
+
+See also: [`meanMinMax`](@ref), [`plot`](@ref)
+"""
 function KN(k, n)
     if left(k) < 0
         throw(ArgumentError("k must be greater than 0, provided k = $k"))
@@ -320,7 +415,6 @@ function KN(k, n)
     end
     return env( beta( left(k), right(n)-left(k)+1 ),  beta( right(k)+1, max(0, left(n)-right(k)) ) ) 
 end
-
 kn(x...) = KN(x...)
 
 ###############################
@@ -464,6 +558,17 @@ MinMaxMeanVar(x...) = minMaxMeanVar(x...);  minmaxmeanvar(x...) = minMaxMeanVar(
 
 
 # This cut could be quicker, and should also allow interval arguments
+"""
+    cut(x :: pbox, p :: Real)
+
+returns a vertical cut of a pbox at cdf value p, for p ∈ [0, 1]
+
+# Constructors
+* `cut(x :: pbox, p :: Real)`
+* `cut(x :: pbox, p :: Interval)`
+
+See also: [`rand`](@ref), [`cdf`](@ref), [`mass`](@ref)
+"""
 function cut(x, p :: Real; tight :: Bool = true)
 
     x = makepbox(x);
@@ -483,6 +588,25 @@ end
 
 cut(x, p :: Interval; tight :: Bool = true) = interval(cut(x,left(p),tight=tight), cut(x,right(p),tight=tight))
 
+"""
+    rand(x :: pbox, n :: Int64)
+
+returns n number of random intervals from pbox x
+
+# Examples
+```jldoctest
+julia> a = N(0,1);
+
+julia> rand(a,5)
+5-element Array{Interval{Float64},1}:
+  [0.59776, 0.612813]
+  [0.453762, 0.467699]
+ [-0.426149, -0.412463]
+ [-0.358459, -0.345125]
+ [-0.612813, -0.59776]
+```
+See also: [`cut`](@ref), [`cdf`](@ref), [`mass`](@ref)
+"""
 rand(a :: pbox, n :: Int64 = 1) = cut.(a,rand(n));
 
 

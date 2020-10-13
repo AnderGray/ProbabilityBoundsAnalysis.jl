@@ -325,7 +325,7 @@ function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
     for i = 2:Ns
 
         downs = findall( is[i-1] .<= cop .<= is[i]);
-        ups   = findall(js[i-1] .<= dual .<= js[i]);
+        ups   = findall( js[i-1] .<= dual .<= js[i]);
         
         zd[i-1] = minimum(zds[downs]);
         zu[i]   = maximum(zus[ups]);
@@ -334,7 +334,7 @@ function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
     
     bounded = min(x.bounded,y.bounded);
 
-    return pbox(zu, zd, bounded=bounded);
+    return pbox(zu, zd, bounded = bounded);
 
 end
 
@@ -551,7 +551,7 @@ function copulaConv( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
     for i = 2:Ns             # Cycle through u's
         for j = 2:Ns         # Cycle through v's
             indexs = findall((Fz.u[i-1] .<= zus .< Fz.u[i]));
-            indexs2 = findall(x.u[j-1] .<= x.u .< x.u[j]);
+            indexs2 = findall(x.u[j -1] .<= x.u .< x.u[j]);
 
             YesNo = [indexs[k][1] .== indexs2 for k = 1:length(indexs)];     # Confusing, but checks which elements share the same indexs
             sums = sum.(YesNo);          # The zeros will be removed from the integration
@@ -578,7 +578,7 @@ function copulaConv( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
         if mod(i,Ns/100 * 20) == 0.0 println("Completed $(i/Ns * 100)%") end
     end
 
-    return copula(cdfU, cdfD)
+    return copula(cdfU, cdfD), Fz
 
 end
 

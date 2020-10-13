@@ -92,8 +92,8 @@ export
     Interval, interval, AbstractInterval, AbstractPbox, pbox, makepbox, 
 
     # Parametric
-    normal, gaussian, N, Normal,
-    U,uniform,
+    normal, gaussian, N,
+    U, uniform,
     beta, betaPrime, biweight, cauchy, 
     chi, chisq, cosine,epanechnikov, erlang,
     exponential, fDist, frechet, gamma, ksdist,
