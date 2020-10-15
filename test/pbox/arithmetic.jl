@@ -9,7 +9,7 @@
 @testset "Arithmetic" begin
     
     mean1 = 2;  mean2 = 2;
-    sigma1 =4;  sigma2 = 4;
+    sigma1 = 4;  sigma2 = 4;
 
     a = N(mean1, sigma1); b = N(mean2, sigma2);
 

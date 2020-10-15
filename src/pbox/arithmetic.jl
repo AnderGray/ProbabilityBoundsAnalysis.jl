@@ -159,9 +159,9 @@ end
 
 function convFrechet(x::pbox, y::pbox; op = +)
 
-    if (op == -) return (convFrechet(x,negate(y),+));end
-    if (op == /) return (convFrechet(x,reciprocate(y),*));end
-    if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (imp(balchProd(x,y), convFrechetNaive(x, y, *))); end; end
+    if (op == -) return (convFrechet(x,negate(y),op = +));end
+    if (op == /) return (convFrechet(x,reciprocate(y), op = *));end
+    if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (imp(balchProd(x,y), convFrechetNaive(x, y, op = *))); end; end
     ## Unsure about the above line. It looks like if it straddles 0, we need to do the naive frechet and the balch prod (?) and impose one on the other
 
     x = makepbox(x);
@@ -266,7 +266,7 @@ function sigma(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
         downs = findall(js[i-1] .<= dCdf .<= js[i]);
 
         if !isempty(ups);   zu[i]   = minimum(zus[ups]);   else zu[i]   = zu[i-1]; end
-        if !isempty(downs); zd[i-1] = maximum(zds[downs]); else zd[i-1] = zd[i-2]; end
+        if !isempty(downs); zd[i-1] = maximum(zds[downs]); elseif i!=2; zd[i-1] = zd[i-2]; end
 
     end
     
@@ -337,6 +337,51 @@ function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
     return pbox(zu, zd, bounded = bounded);
 
 end
+
+
+function tauRho2(x::Real, y::Real, C:: AbstractCopula, op = +)
+
+    #if (op == -) return (tauRho(x,negate(y), C, +));end             # Odd behaviour, negating has no effect if we don't do something to copula
+    #if (op == /) return (tauRho(x,reciprocate(y), C, *));end
+    #if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (throw(ArgumentError("Not sure if straddles"))); end; end
+    ## Unsure about the above line. It looks like if it straddles 0, we need to do the naive frechet and the balch prod (?) and impose one on the other
+
+    x = makepbox(x);
+    y = makepbox(y);
+
+    Ns = ProbabilityBoundsAnalysis.steps
+
+    zd = zeros(Ns);
+    zu = zeros(Ns);
+
+    zds = [map(op, dx, dy) for dx in x.d, dy in reverse(y.d)]        # Carteesian products
+    zus = [map(op, ux, uy) for ux in x.u, uy in reverse(y.u)]
+
+    is = range(0, stop = 1, length = Ns); js = range(0, stop = 1, length = Ns)
+
+    cop = C.cdf;
+    dual = [is[i] + js[j] - cop[i,j] for i in 1:Ns, j in 1:Ns]
+    
+    downs = findall(cop .== 1); ups = findall(dual .== 0);
+
+    zd[end] = minimum(zds[downs]); zu[1] = maximum(zus[ups])
+
+    for i = 2:Ns
+
+        downs = findall( is[i-1] .<= cop .<= is[i]);
+        ups   = findall(js[i-1] .<= dual .<= js[i]);
+        
+        zd[i-1] = minimum(zds[downs]);
+        zu[i]   = maximum(zus[ups]);
+
+    end
+    
+    bounded = min(x.bounded,y.bounded);
+
+    return pbox(zu, zd, bounded=bounded);
+
+end
+
 
 
 ###
@@ -533,7 +578,7 @@ function balchProd(x::pbox, y::pbox)
 end
 
 
-function copulaConv( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
+function copulaSigma( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
 
     Fz = sigma(x, y, op = +, C = C);
 
@@ -551,7 +596,7 @@ function copulaConv( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
     for i = 2:Ns             # Cycle through u's
         for j = 2:Ns         # Cycle through v's
             indexs = findall((Fz.u[i-1] .<= zus .< Fz.u[i]));
-            indexs2 = findall(x.u[j -1] .<= x.u .< x.u[j]);
+            indexs2 = findall(x.u[j-1] .<= x.u .< x.u[j]);
 
             YesNo = [indexs[k][1] .== indexs2 for k = 1:length(indexs)];     # Confusing, but checks which elements share the same indexs
             sums = sum.(YesNo);          # The zeros will be removed from the integration
@@ -583,7 +628,7 @@ function copulaConv( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
 end
 
 
-function copulaConvHard( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
+function copulaSigmaHard( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
 
     Fz = sigma(x, y, op = +, C = C);
 

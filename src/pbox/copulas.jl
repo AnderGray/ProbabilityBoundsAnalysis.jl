@@ -546,12 +546,46 @@ function CholeskyGaussian(N = 1, correlation = 0)
 end
 
 
+###
+#   Copula rotations. Rotates the mass by 90° (makes M -> W), 180° or 270°
+###
+
+# C⁹⁰(u1, u2) = u1 - C(1-u2, u1)
+function rotate90(x :: copula)
+    cdfU = x.cdfU; cdfD = x.cdfD
+
+    n1,n2 = size(cdfU);
+
+    u1 = range(0, 1, length = n1); 
+    u2 = range(0, 1, length = n2);
+
+    cdfU = u1 .- right.(cdfU(x, 1 .- u2, u1))
+
+end
+
+# C180(u1,u2) = u1 + u2 + C(1 - u1, 1 - u2) -1
+function rotate180(x :: copula)
+    cdfU = x.cdfU; cdfD = x.cdfD
+
+    n1,n2 = size(cdfU);
+
+    u1 = range(0, 1, length = n1); 
+
+end
+
+# C270(u1,u2) = u2 - C(u2, 1 - u1)
+function rotate180(x :: copula)
+    cdfU = x.cdfU; cdfD = x.cdfD
+
+    n1,n2 = size(cdfU);
+
+    u1 = range(0, 1, length = n1); 
+
+end
 
 ###
 #   Bivaraite pbox
 ###
-
-
 mutable struct bivpbox <: AbstractJoint
 
     marg1 :: pbox

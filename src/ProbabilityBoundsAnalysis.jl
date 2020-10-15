@@ -143,7 +143,7 @@ export
     checkMomentsAndRanges,
 
     # Copulas
-    AbstractCopula, copula, GauCopula, πCop, M, W, Frank, Clayton, Frechet, copulaConv,
+    AbstractCopula, copula, GauCopula, πCop, M, W, Frank, Clayton, Frechet, copulaSigma,
     cdfU, cdfD, mass, conditionalX, conditionalY, bivpbox, plotStep, sample, scatter,
     plotBoxes
 
