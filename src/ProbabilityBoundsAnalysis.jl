@@ -45,7 +45,7 @@ import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
 import Base: show, -,
     +, *, /, //,
     <, >, ⊆, ^, intersect, issubset,
-    rand
+    rand, sin, cos, tan, sinh, cosh, tanh, asin, acos, atan
 
 import IntervalArithmetic: intersect, issubset
 
@@ -126,6 +126,9 @@ export
     # Arithmetic, uniary
     negate, reciprocate, complement, shift, 
 
+    # Univariate functiosn
+    sin, cos, tan, sinh, cosh, tanh, asin, acos, atan,
+
     # Set based operations  
     env, imp,  intersect,# Union, Intersection
 
@@ -144,7 +147,7 @@ export
 
     # Copulas
     AbstractCopula, copula, GauCopula, πCop, M, W, Frank, Clayton, Frechet, copulaSigma,
-    cdfU, cdfD, mass, conditionalX, conditionalY, bivpbox, plotStep, sample, scatter,
+    copulaTau, copulaUnary, cdfU, cdfD, mass, conditionalX, conditionalY, bivpbox, plotStep, sample, scatter,
     plotBoxes
 
 

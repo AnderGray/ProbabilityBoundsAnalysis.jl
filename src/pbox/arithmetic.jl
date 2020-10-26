@@ -46,8 +46,8 @@ end
 
 function convIndep(x::pbox, y::pbox; op = +)
 
-    if (op == -) return convIndep(x, negate(y), +);end
-    if (op == /) return convIndep(x, reciprocate(y), *);end
+    if (op == -) return convIndep(x, negate(y), op=+);end
+    if (op == /) return convIndep(x, reciprocate(y), op=*);end
 
 
     x = makepbox(x);
@@ -446,6 +446,20 @@ function reciprocate(x)
     return 1/x;
 end
 
+function intUnivariate(x :: pbox, op)
+    Ints = interval.(x.u,x.d)
+    yInts = op.(Ints)
+
+    yu = sort(left.(yInts))
+    yd = sort(right.(yInts))
+
+    return pbox(yu, yd)
+end
+
+for op in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan)
+    @eval ($op)(x :: pbox) = intUnivariate(x, $op)
+end
+
 
 defaultCorr = 0;
 
@@ -665,4 +679,27 @@ function copulaSigmaHard( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCo
     end
 
     return copula(cdfU)
+end
+
+
+
+function copulaUnary(x :: pbox, op)
+
+    Fz = op(x)
+
+    xInts = interval.(x.u, x.d)
+    zInts = op.(xInts)
+
+    CopU = zeros(x.n, Fz.n)
+    CopD = zeros(x.n, Fz.n)
+
+    for i = 1:x.n
+        for j = 1:Fz.n
+            indexU =  left.(zInts[1:i]) .<= Fz.u[j]
+            indexD =  right.(zInts[1:i]) .<= Fz.d[j]
+            CopU[i, j] = sum(indexU)/Fz.n
+            CopD[i, j] = sum(indexD)/Fz.n
+        end
+    end
+    return copula(CopU,CopD)
 end

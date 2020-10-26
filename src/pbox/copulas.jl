@@ -549,7 +549,7 @@ end
 ###
 #   Copula rotations. Rotates the mass by 90° (makes M -> W), 180° or 270°
 ###
-
+#=
 # C⁹⁰(u1, u2) = u1 - C(1-u2, u1)
 function rotate90(x :: copula)
     cdfU = x.cdfU; cdfD = x.cdfD
@@ -574,7 +574,7 @@ function rotate180(x :: copula)
 end
 
 # C270(u1,u2) = u2 - C(u2, 1 - u1)
-function rotate180(x :: copula)
+function rotate270(x :: copula)
     cdfU = x.cdfU; cdfD = x.cdfD
 
     n1,n2 = size(cdfU);
@@ -582,7 +582,7 @@ function rotate180(x :: copula)
     u1 = range(0, 1, length = n1); 
 
 end
-
+=#
 ###
 #   Bivaraite pbox
 ###
