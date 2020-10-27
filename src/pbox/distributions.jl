@@ -586,7 +586,10 @@ function cut(x, p :: Real; tight :: Bool = true)
 
 end
 
-cut(x, p :: Interval; tight :: Bool = true) = interval(cut(x,left(p),tight=tight), cut(x,right(p),tight=tight))
+cut(x, p :: Interval; tight :: Bool = true) = interval(cut(x,left(p)), cut(x,right(p)))
+
+
+
 
 """
     rand(x :: pbox, n :: Int64)
