@@ -4,6 +4,7 @@ authors = ["Ander Gray <ander.gray@liverpool.ac.uk>"]
 version = "0.1.1"
 
 [deps]
+Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
 IntervalArithmetic = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
