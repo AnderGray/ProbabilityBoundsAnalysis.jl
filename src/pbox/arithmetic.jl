@@ -205,7 +205,9 @@ end
 
 
 
-
+##
+#   Can be parred
+##
 function sigma(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
 
     #if (op == -) return sigma(x, negate(y), op=+, C = C); end
@@ -594,6 +596,62 @@ end
 
 function copulaSigma( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
 
+    # Another option is to par the i,j search and return the vector of indicies
+
+    Fz = sigma(x, y, op = +, C = C);
+
+    ux = x.u; uy = y.u; cdf1 = C.cdfU;
+    uz = Fz.u;
+    
+    dx = x.d; dy = y.d; cdf2 =C.cdfD;
+    dz = Fz.d
+
+    proc1 = @spawn calcCbound(ux, ux, uz, cdf1, op, true)
+    proc2 = @spawn calcCbound(dx, dy, dz, cdf2, op, false)
+    
+    cdfU = fetch(proc1)
+    cdfU = fetch(proc2)
+
+    return copula(cdf1, cdf1), Fz
+
+end
+
+##
+# Note in this version of the algorithm everything is a julia base type, ie x == x.u or x.d
+##
+function calcCbound(x, y, z, C, op, left)
+
+    xs = x[2:end]; ys = y[2:end]
+    if left; xs = x[1:end-1]; ys = y[1:end-1];end
+
+    zus = [map(op, ux, uy) for ux in xs, uy in ys]        # Carteesian products
+
+    Ns = size(C)[1]
+    cdfC = zeros(Ns, Ns);
+
+    masses = C[2:end, 2:end] + C[1:end-1, 1:end-1] - C[1:end-1, 2:end] - C[2:end, 1:end-1]
+
+    for i = 2:Ns             # Cycle through u's
+        for j = 2:Ns         # Cycle through v's
+            indexs = findall((z[i-1] .<= zus .< z[i]));           # This findall may be parallelised
+            indexs2 = findall(x[j-1] .<= x .< x[j]);
+
+            YesNo = [indexs[k][1] .== indexs2 for k = 1:length(indexs)];     # Confusing, but checks which elements share the same indexs
+            sums = sum.(YesNo);          # The zeros will be removed from the integration
+    
+            newIndx = indexs[sums .> 0];
+    
+            us = sum(masses[newIndx])
+    
+            cdfC[i,j] = us + cdfC[i,j-1] + cdfC[i-1,j] - cdfC[i-1,j-1];
+        end
+    end
+    return cdfC
+end
+
+
+function copulaSigmaSlow( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
+
     Fz = sigma(x, y, op = +, C = C);
 
     Ns = size(C.cdfD)[1];
@@ -609,8 +667,8 @@ function copulaSigma( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula
 
     for i = 2:Ns             # Cycle through u's
         for j = 2:Ns         # Cycle through v's
-            indexs = findall((Fz.u[i-1] .<= zus .< Fz.u[i]));
-            indexs2 = findall(x.u[j-1] .<= x.u .< x.u[j]);
+            indexs = findall((Fz.u[i-1] .<= zus .< Fz.u[i]));           # This findall may be parallelised, split domain of integration over threads
+            indexs2 = findall(x.u[j-1] .<= x.u .< x.u[j]);              # This is stupid
 
             YesNo = [indexs[k][1] .== indexs2 for k = 1:length(indexs)];     # Confusing, but checks which elements share the same indexs
             sums = sum.(YesNo);          # The zeros will be removed from the integration
