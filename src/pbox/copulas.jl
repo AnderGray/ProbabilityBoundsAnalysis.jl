@@ -510,7 +510,7 @@ end
 ###
 #   Copula sampling
 ###
-function sample(C :: AbstractCopula, N = 1)
+function sampleCond(C :: AbstractCopula, N = 1)
 
     if !(C.cdfU == C.cdfU); throw(ArgumentError("Can only sample from precise copula")); end
 
@@ -533,6 +533,52 @@ function sample(C :: AbstractCopula, N = 1)
 
     return hcat(ux,uy);
 end
+
+function sample(C :: AbstractCopula, N = 1)
+
+    if !(C.cdfU == C.cdfU); throw(ArgumentError("Can only sample from precise copula")); end
+
+    useInterp = false;      # Set true to use interpolator
+    if ismissing(C.family); family = 0; useInterp = true else family = C.family end
+
+    if (family == "Gaussian") return CholeskyGaussian(N, Float64(C.param)) ;end  # Use Cholesky decompostition of the Cov matrix for gaussian copula sampling
+
+    n,n2 = size(C.cdfD)
+    
+
+    x = rand(N);    y = rand(N);
+    ux = x;         uy = zeros(N);
+    m = n;
+
+    if family == "M"; return hcat(ux,ux); end
+    if family == "W"; return hcat(ux,1 .- ux); end
+    if family == "π"; return hcat(ux,y); end
+
+    #uy = mid.([cut(conditionalY(C, x[i]), y[i]) for i =1:N])
+
+    uMasses = C.cdfU[2:end, 2:end] + C.cdfU[1:end-1, 1:end-1] - C.cdfU[1:end-1, 2:end] - C.cdfU[2:end, 1:end-1]
+    dMasses = C.cdfD[2:end, 2:end] + C.cdfD[1:end-1, 1:end-1] - C.cdfD[1:end-1, 2:end] - C.cdfD[2:end, 1:end-1]
+
+    is = range(0,1,length = n); js = range(0,1,length = n2)
+    #boxesU = interval.(is[1:end-1], is[2:end]) .× interval.(js[1:end-1], js[2:end])
+    boxesU = [interval(is[i], is[i+1]) × interval(js[j], js[j+1]) for i = 1:n-1, j = 1:n2-1]
+
+    uMass = uMasses[:]
+    boxesU = boxesU[:]
+
+    if !(sum(uMass) == 1); uMass = uMass./sum(uMass);end
+    cdfUs = cumsum(uMass)
+    ux = interval.(zeros(N), zeros(N)); uy = interval.(zeros(N), zeros(N))
+    for i =1:N
+        index = findfirst(x[i] .< cdfUs)
+        ux[i] = boxesU[index][1];
+        uy[i] = boxesU[index][2];
+    end
+
+    return hcat(ux,uy);
+end
+
+
 
 function CholeskyGaussian(N = 1, correlation = 0)
 
@@ -682,6 +728,17 @@ end
 ###
 #   Sampling biv pbox
 ###
+function sampleCond(J :: bivpbox, N = 1)
+
+    C = J.C; x = J.marg1; y = J.marg2
+    copSamples = sampleCond(C,N)
+
+    ux = cut.(x, copSamples[:,1])
+    uy = cut.(y, copSamples[:,2])
+
+    return hcat(ux,uy);
+end
+
 function sample(J :: bivpbox, N = 1)
 
     C = J.C; x = J.marg1; y = J.marg2
@@ -1016,52 +1073,11 @@ function plot(x :: copula; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
 
     ax.view_init(45-27, 180+ 26)
 
-    xlabel("x",fontsize = fontsize)
-    ylabel("y",fontsize = fontsize)
+    xlabel("U",fontsize = fontsize)
+    ylabel("V",fontsize = fontsize)
     ax.zaxis.set_rotate_label(false);
-    zlabel("C(x,y)", rotation = 0, fontsize = fontsize)
-    #xticks(fontsize = fontsize); yticks(fontsize = fontsize);
-    #PyPlot.title(title,fontsize=fontsize)
-    tight_layout()
-end
-
-
-
-function plot(x :: bivpbox; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
-
-    AU = x.C.cdfU
-    AD = x.C.cdfD
-    m = size(AU)[1];
-    if m < pn; ppn = m; else ppn = pn; end
-
-    xus = x.marg1.u; xds = x.marg1.d;
-    yus = x.marg2.u; yds = x.marg2.d;
-
-    nm = round(m/ppn);
-
-    xus = xus[1:Int(nm):end]; xds = xds[1:Int(nm):end]; 
-    yus = yus[1:Int(nm):end]; yds = yds[1:Int(nm):end]; 
-
-    zU = AU[1:Int(nm):end,1:Int(nm):end]
-    zD = AD[1:Int(nm):end,1:Int(nm):end]
-
-    uGridx, uGridy = (repeat(xus',length(yus),1),repeat(yus,1,length(xus)))
-    dGridx, dGridy = (repeat(xds',length(yds),1),repeat(yds,1,length(xds)))
-
-    if ismissing(name); fig = figure(figsize=(10,10)) else fig = figure(name,figsize=(10,10));end
-    ax = fig.add_subplot(1,1,1,projection="3d")
-    #ax = fig.add_subplot(2,1,1)
-    
-    plot_surface(dGridx, dGridy, zD, rstride=2,edgecolors="b", cstride=2, alpha=1, linewidth=1, cmap=ColorMap("Blues"))
-    plot_surface(uGridx, uGridy, zU, rstride=2,edgecolors="r", cstride=2, alpha=alpha, linewidth=1, cmap=ColorMap("RdGy"))
-
-    ax.view_init(45-27, 180+ 26)
-
-    xlabel("x",fontsize = fontsize)
-    ylabel("y",fontsize = fontsize)
-    ax.zaxis.set_rotate_label(false);
-    zlabel("H(x,y)", rotation = 0, fontsize = fontsize)
-    #xticks(fontsize = fontsize); yticks(fontsize = fontsize);
+    zlabel("C(u,v)", rotation = 0, fontsize = fontsize)
+    xticks(fontsize = fontsize ÷ 1.3); yticks(fontsize = fontsize ÷ 1.3);
     #PyPlot.title(title,fontsize=fontsize)
     tight_layout()
 end
