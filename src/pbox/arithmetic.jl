@@ -213,6 +213,133 @@ function sigma(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
     #if (op == -) return sigma(x, negate(y), op=+, C = C); end
     #if (op == /) return sigma(x, reciprocate(y), op = *, C = C);end
 
+    #x = makepbox(x);
+    #y = makepbox(y);
+
+    xus = x.u; xds = x.d;
+    yus = y.u; yds = y.d;
+
+    CU = C.cdfU; CD = C.cdfD;
+
+    bounded = min(x.bounded,y.bounded)  # Is the output bounded on each side?
+
+    uCalc = Distributed.@spawn ProbabilityBoundsAnalysis.calcSigmaBoundLeft(xus, yus, op, CU, bounded[1])
+    dCalc = Distributed.@spawn ProbabilityBoundsAnalysis.calcSigmaBoundRight(xds, yds, op, CD, bounded[2])
+    
+    zu = fetch(uCalc);
+    zd = fetch(dCalc);
+
+    # Mean tranforms the same as independence
+	ml = -Inf;
+    mh = Inf;
+
+    if (op)∈([+, -, *])
+        ml = map(op, x.ml, y.ml);
+        mh = map(op, x.mh, y.mh);
+    end
+
+    # Variance does not
+    vl = 0;
+    vh = Inf;
+
+    if !(C.cdfU == C.cdfD);
+        z1 = deepcopy(zu);  z2 = deepcopy(zd); 
+        zu[2:end]   = min.(z1[2:end], z2[1:end-1]); 
+        zd[1:end-1] = max.(z1[2:end], z2[1:end-1]);
+    end
+
+    return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, bounded = bounded);
+
+end
+convCorr(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula) = sigma(x, y, op = op, C = C)
+
+function calcSigmaBoundLeft(x, y , op,  C, bounded)
+
+    xs = x[1:end-1]; ys = y[1:end-1];
+
+    Ns = ProbabilityBoundsAnalysis.steps
+    
+    zs = zeros(Ns-1, Ns-1)    # cart prod
+    z  = zeros(Ns)            # output vector
+    @threads for i = 1:Ns-1
+        for j = 1:Ns-1
+            zs[i,j] = op(xs[i], ys[j])
+        end
+    end
+
+    zs = zs[:];
+
+    masses = C[2:end, 2:end] + C[1:end-1, 1:end-1] - C[1:end-1, 2:end] - C[2:end, 1:end-1]
+
+    perm = sortperm(zs)
+
+    zs = zs[perm]
+    masses = masses[:][perm]
+
+    z[1] = zs[1]; z[end] = zs[end]
+
+    cdf = cumsum(masses);
+
+    # Shorthand for if, else.
+    bounded ? is = ProbabilityBoundsAnalysis.ii() : is = ProbabilityBoundsAnalysis.iii()
+
+    for i = 2:Ns    # Cannot be threaded
+        these   = findall(is[i-1] .<= cdf .<= is[i]);
+        !isempty(these) ? z[i] = minimum(zs[these]) : z[i] = z[i-1]
+    end
+
+    return z
+
+end
+
+
+function calcSigmaBoundRight(x, y , op,  C, bounded)
+
+
+    xs = x[2:end]; ys = y[2:end];
+
+
+    Ns = ProbabilityBoundsAnalysis.steps
+
+    zs = zeros(Ns-1, Ns-1)    # cart prod
+    z  = zeros(Ns)            # output vector
+    @threads for i = 1:Ns-1
+        for j = 1:Ns-1
+            zs[i,j] = op(xs[i], ys[j])
+        end
+    end
+
+    zs = zs[:]
+    masses = C[2:end, 2:end] + C[1:end-1, 1:end-1] - C[1:end-1, 2:end] - C[2:end, 1:end-1]
+
+    perm = sortperm(zs)
+
+    zs = zs[perm]
+    masses = masses[:][perm]
+
+    z[1] = zs[1]; z[end] = zs[end]
+
+    cdf = reverse(1 .- cumsum(reverse(masses)));
+
+    bounded ? is =  ProbabilityBoundsAnalysis.jj() : is = ProbabilityBoundsAnalysis.jjj()
+
+
+    for i = 2:Ns    # Cannot be threaded, because of 2nd line 
+        these   = findall(is[i-1] .<= cdf .<= is[i]);
+        !isempty(these) ? z[i-1] = maximum(zs[these]) : (i != 2 ?  z[i-1] = z[i-2] : continue)
+    end
+
+    return z
+
+end
+
+
+
+function sigmaOld(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
+
+    #if (op == -) return sigma(x, negate(y), op=+, C = C); end
+    #if (op == /) return sigma(x, reciprocate(y), op = *, C = C);end
+
     x = makepbox(x);
     y = makepbox(y);
 
@@ -295,7 +422,6 @@ function sigma(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
 
 end
 convCorr(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula) = sigma(x, y, op = op, C = C)
-
 
 function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
 
@@ -609,8 +735,8 @@ function copulaSigma( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula
     dx = x.d; dy = y.d; cdf2 =C.cdfD;
     dz = Fz.d
 
-    proc1 = @spawn calcCbound(ux, uy, uz, cdf1, op, true)
-    proc2 = @spawn calcCbound(dx, dy, dz, cdf2, op, false)
+    proc1 = Distributed.@spawn calcCbound(ux, uy, uz, cdf1, op, true)
+    proc2 = Distributed.@spawn calcCbound(dx, dy, dz, cdf2, op, false)
     
     cdfU = fetch(proc1)
     cdfD = fetch(proc2)
@@ -624,10 +750,7 @@ end
 ##
 function calcCbound(x, y, z, C, op, left)
 
-    xs = x[2:end]; ys = y[2:end]
-    if left; xs = x[1:end-1]; ys = y[1:end-1];end
-
-    #zus =  [map(op, ux, uy) for ux in xs, uy in ys]        # Carteesian products
+    left ? (xs = x[1:end-1]; ys = y[1:end-1]) : (xs = x[2:end]; ys = y[2:end])
 
     Nx = length(x); Ny = length(y);
     zus = zeros(Nx-1, Ny-1)     
@@ -641,23 +764,19 @@ function calcCbound(x, y, z, C, op, left)
     cdfC = zeros(Ns, Ns);
 
     masses = C[2:end, 2:end] + C[1:end-1, 1:end-1] - C[1:end-1, 2:end] - C[2:end, 1:end-1]
-    #times = zeros((Ns-1)^2)
+
     @threads for i = 2:Ns             # Cycle through u's
-       for j = 2:Ns         # Cycle through v's
+       for j = 2:Ns                   # Cycle through v's
             indexs = findall((z[i-1] .<= zus .< z[i]));           # This findall may be parallelised
-            #indexs2 = findall(x[j-1] .<= x .< x[j]);
             indexs2 = j-1
-            # times[Int((i-2) *(Ns-1) + (j-1))] = @elapsed 
-            these = getindex.(getproperty.(indexs,:I), 2) .== indexs2       # Very fast
+
+            these = getindex.(getproperty.(indexs,:I), 2) .== indexs2       # Quite fast
     
             us = sum(masses[indexs[these]])
 
             cdfC[i,j] = us 
-            #cdfC[i,j] = us + cdfC[i,j-1] + cdfC[i-1,j] - cdfC[i-1,j-1];
         end
     end
-
-    #cdfC[2:end, 2:end] = [cdfC[i,j] + cdfC[i,j-1] + cdfC[i-1,j] - cdfC[i-1,j-1] for i = 2:Ns, j = 2:Ns]
 
     return cumsum(cumsum(cdfC, dims=1), dims = 2)
 end
@@ -708,8 +827,11 @@ end
 ##
 function pfind(x1 :: Real, x2 :: Real, M :: Array{Float64,2}, lo :: Integer = 1, hi :: Integer = size(M)[1])
 
-    if hi == lo
-        return findall((x1 .<= M[lo:hi] .< x2))
+    if hi - lo < size(M)[1]/10      # If it's in 10% of the size, do normal findall
+        #these = x1 .<= M[:,hi] .< x2
+        #inds = 1:1:size(M)[1]
+        #return CartesianIndex.(hi,inds[these[:]])
+        return findall(x1 .<= M[:,lo:hi] .<x2)
     end
 
     mid = (lo+hi)>>>1
