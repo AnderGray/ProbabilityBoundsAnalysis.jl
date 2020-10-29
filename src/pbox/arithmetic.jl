@@ -627,7 +627,56 @@ function calcCbound(x, y, z, C, op, left)
     xs = x[2:end]; ys = y[2:end]
     if left; xs = x[1:end-1]; ys = y[1:end-1];end
 
-    zus = [map(op, ux, uy) for ux in xs, uy in ys]        # Carteesian products
+    #zus =  [map(op, ux, uy) for ux in xs, uy in ys]        # Carteesian products
+
+    Nx = length(x); Ny = length(y);
+    zus = zeros(Nx-1, Ny-1)     
+    @threads for i = 1:Nx-1            # Threaded
+        for j = 1:Ny-1
+            zus[i,j] = op(xs[i], ys[j])
+        end
+    end
+
+    Ns = size(C)[1]
+    cdfC = zeros(Ns, Ns);
+
+    masses = C[2:end, 2:end] + C[1:end-1, 1:end-1] - C[1:end-1, 2:end] - C[2:end, 1:end-1]
+    #times = zeros((Ns-1)^2)
+    @threads for i = 2:Ns             # Cycle through u's
+       for j = 2:Ns         # Cycle through v's
+            indexs = findall((z[i-1] .<= zus .< z[i]));           # This findall may be parallelised
+            #indexs2 = findall(x[j-1] .<= x .< x[j]);
+            indexs2 = j-1
+            # times[Int((i-2) *(Ns-1) + (j-1))] = @elapsed 
+            these = getindex.(getproperty.(indexs,:I), 2) .== indexs2       # Very fast
+    
+            us = sum(masses[indexs[these]])
+
+            cdfC[i,j] = us 
+            #cdfC[i,j] = us + cdfC[i,j-1] + cdfC[i-1,j] - cdfC[i-1,j-1];
+        end
+    end
+
+    #cdfC[2:end, 2:end] = [cdfC[i,j] + cdfC[i,j-1] + cdfC[i-1,j] - cdfC[i-1,j-1] for i = 2:Ns, j = 2:Ns]
+
+    return cumsum(cumsum(cdfC, dims=1), dims = 2)
+end
+
+
+function calcCbound2(x, y, z, C, op, left)
+
+    xs = x[2:end]; ys = y[2:end]
+    if left; xs = x[1:end-1]; ys = y[1:end-1];end
+
+    #zus =  [map(op, ux, uy) for ux in xs, uy in ys]        # Carteesian products
+
+    Nx = length(x); Ny = length(y);
+    zus = zeros(Nx-1, Ny-1)     
+    for i = 1:Nx-1            # Threaded
+        for j = 1:Ny-1
+            zus[i,j] = op(xs[i], ys[j])
+        end
+    end
 
     Ns = size(C)[1]
     cdfC = zeros(Ns, Ns);
@@ -635,28 +684,42 @@ function calcCbound(x, y, z, C, op, left)
     masses = C[2:end, 2:end] + C[1:end-1, 1:end-1] - C[1:end-1, 2:end] - C[2:end, 1:end-1]
 
     for i = 2:Ns             # Cycle through u's
-        for j = 2:Ns         # Cycle through v's
+       for j = 2:Ns         # Cycle through v's
             indexs = findall((z[i-1] .<= zus .< z[i]));           # This findall may be parallelised
-            indexs2 = findall(x[j-1] .<= x .< x[j]);
+            #indexs2 = findall(x[j-1] .<= x .< x[j]);
+            indexs2 = j-1
 
-            YesNo = [indexs[k][1] .== indexs2 for k = 1:length(indexs)];     # Confusing, but checks which elements share the same indexs
-            sums = sum.(YesNo);          # The zeros will be removed from the integration
+            these = getindex.(getproperty.(indexs,:I), 2) .== indexs2       # Very fast
     
-            newIndx = indexs[sums .> 0];
-    
-            us = sum(masses[newIndx])
-    
-            cdfC[i,j] = us + cdfC[i,j-1] + cdfC[i-1,j] - cdfC[i-1,j-1];
+            us = sum(masses[indexs[these]])
+
+            cdfC[i,j] = us 
+            #cdfC[i,j] = us + cdfC[i,j-1] + cdfC[i-1,j] - cdfC[i-1,j-1];
         end
     end
-    return cdfC
+
+    #cdfC[2:end, 2:end] = [cdfC[i,j] + cdfC[i,j-1] + cdfC[i-1,j] - cdfC[i-1,j-1] for i = 2:Ns, j = 2:Ns]
+
+    return cumsum(cumsum(cdfC, dims=1), dims = 2)
 end
 
-#=
-function pfind(x1 :: Real, x2 :: Real, xs :: Ma)
+## Parallel find
+# Not quite working yet
+##
+function pfind(x1 :: Real, x2 :: Real, M :: Array{Float64,2}, lo :: Integer = 1, hi :: Integer = size(M)[1])
+
+    if hi == lo
+        return findall((x1 .<= M[lo:hi] .< x2))
+    end
+
+    mid = (lo+hi)>>>1
+    half1 = @spawn pfind(x1, x2, M, lo, mid)
+    half2 = @spawn pfind(x1, x2, M, mid+1,hi)
+
+    return [fetch(half1) ; fetch(half2)]
 
 end
-=#
+
 
 function copulaSigmaSlow( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
 
