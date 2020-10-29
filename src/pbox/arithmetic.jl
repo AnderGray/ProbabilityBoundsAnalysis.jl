@@ -458,9 +458,12 @@ function intUnivariate(x :: pbox, op)
     return pbox(yu, yd)
 end
 
-for op in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan)
+for op in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan, :exp,:log)
     @eval ($op)(x :: pbox) = intUnivariate(x, $op)
 end
+
+^(x::pbox, y ::Real) = intUnivariate(x,x->x^y)
+^(x::pbox, y ::Integer) = intUnivariate(x,x->x^y)
 
 
 defaultCorr = 0;
@@ -598,7 +601,7 @@ function copulaSigma( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula
 
     # Another option is to par the i,j search and return the vector of indicies
 
-    Fz = sigma(x, y, op = +, C = C);
+    Fz = sigma(x, y, op = op, C = C);
 
     ux = x.u; uy = y.u; cdf1 = C.cdfU;
     uz = Fz.u;
@@ -606,13 +609,13 @@ function copulaSigma( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula
     dx = x.d; dy = y.d; cdf2 =C.cdfD;
     dz = Fz.d
 
-    proc1 = @spawn calcCbound(ux, ux, uz, cdf1, op, true)
+    proc1 = @spawn calcCbound(ux, uy, uz, cdf1, op, true)
     proc2 = @spawn calcCbound(dx, dy, dz, cdf2, op, false)
     
     cdfU = fetch(proc1)
-    cdfU = fetch(proc2)
+    cdfD = fetch(proc2)
 
-    return copula(cdf1, cdf1), Fz
+    return copula(cdfU, cdfD), Fz
 
 end
 
@@ -649,10 +652,15 @@ function calcCbound(x, y, z, C, op, left)
     return cdfC
 end
 
+#=
+function pfind(x1 :: Real, x2 :: Real, xs :: Ma)
+
+end
+=#
 
 function copulaSigmaSlow( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula)
 
-    Fz = sigma(x, y, op = +, C = C);
+    Fz = sigma(x, y, op = op, C = C);
 
     Ns = size(C.cdfD)[1];
 

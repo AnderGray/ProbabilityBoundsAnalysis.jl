@@ -38,18 +38,22 @@ __precompile__(true)
 
 module ProbabilityBoundsAnalysis
 
-using IntervalArithmetic, Distributions, Interpolations, Statistics, PyPlot, PyCall, LinearAlgebra, Distributed
+using Reexport, Distributions, Interpolations, PyCall, Distributed
+
+@reexport using IntervalArithmetic, PyPlot, Distributed, Statistics, LinearAlgebra
 
 import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
 
 import Base: show, -,
     +, *, /, //,
     <, >, ⊆, ^, intersect, issubset,
-    rand, sin, cos, tan, sinh, cosh, tanh, asin, acos, atan
+    rand, sin, cos, tan, sinh, cosh, tanh, asin, acos, atan, exp, log, Threads.@spawn
 
 import IntervalArithmetic: intersect, issubset
 
 import Statistics: mean, var, std
+
+import PyPlot: plot, scatter
 
 import Distributions: cdf #Normal, Beta, Uniform
 
@@ -126,8 +130,9 @@ export
     # Arithmetic, uniary
     negate, reciprocate, complement, shift, 
 
-    # Univariate functiosn
+    # Univariate functions
     sin, cos, tan, sinh, cosh, tanh, asin, acos, atan,
+    exp, log, ^, 
 
     # Set based operations  
     env, imp,  intersect,# Union, Intersection

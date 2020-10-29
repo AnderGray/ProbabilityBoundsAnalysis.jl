@@ -663,15 +663,3 @@ function checkMomentsAndRanges(Min, Max, Mean=interval(left(Min),right(Max)), Va
     return Min, Max, Mean, Var
 
 end
-
-#=
-myvectormax <- function(..., na.rm = FALSE) {
-  a <- c(...)
-  if (((isTRUE(all.equal(0,length(which.max(a)))))) || (isTRUE(all.equal(0,length(a))))) -Inf else if (!na.rm && any(is.na(a))) NA else a[[which.max(a)]]
-  }
-
-myvectormin <- function(..., na.rm = FALSE) {
-  a <- c(...)
-  if (((isTRUE(all.equal(0,length(which.min(a)))))) || (isTRUE(all.equal(0,length(a))))) +Inf else if (!na.rm && any(is.na(a))) NA else a[[which.min(a)]]
-  }
-  =#
