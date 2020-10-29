@@ -421,7 +421,6 @@ function sigmaOld(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
     return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, bounded = bounded);
 
 end
-convCorr(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula) = sigma(x, y, op = op, C = C)
 
 function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
 
