@@ -11,7 +11,7 @@
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
-function plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 12)
+function plot(s ::pbox, fill = true; name = missing, col = missing, heading = missing, plotting = true, save = false, alpha = 0.2, fontsize = 12)
 
     if (isvacuous(s)); throw(ArgumentError("Pbox is vacuous"));end
     #if (ismissing(name)) name = s.id; end
@@ -19,7 +19,7 @@ function plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2,
     col1 = "red"; col2 = "black"; fillcol = "grey"
     if !(ismissing(col)); col1 = col2 = fillcol = col;end
 
-    #
+    if !plotting; ioff();end
     if (ismissing(name)); fig = figure(figsize=(10,10)); else fig = figure(name,figsize=(10,10));end
 
     ax = fig.add_subplot()
@@ -34,10 +34,12 @@ function plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2,
         Xs, Ylb, Yub = prepFillBounds(s);
         ax.fill_between(Xs, Ylb, Yub, alpha=alpha, color =fillcol)
     end
-
+    if !(ismissing(heading)); title(heading, fontsize = fontsize);end
     xticks(fontsize = fontsize); yticks(fontsize = fontsize)
     xlabel("Distribution range",fontsize = fontsize); ylabel("CDF",fontsize=fontsize);
 
+    if save; savefig("$name.png"); close(fig);end
+    ion()
 end
 
 plot(s :: Union{<:Real, Interval{<:Real}}, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 12) = plot(makepbox(s), fill, name = name, col = col, alpha = alpha, fontsize = fontsize)
