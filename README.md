@@ -23,8 +23,8 @@ Supported dependent arithmetic between uncertain numbers:
 |                           |     independent    | dependency known   | dependency unknown | perfect/opposite     | partial information  |
 |---------------------------|:------------------:|--------------------|--------------------|----------------------|----------------------|
 | intervals                 | not known to exist |         solutions exist        |         yes        |  solutions exist |  solutions exist |
-| probability distributions |         yes        |         yes        |         yes        |          yes         |          solutions exist         |
-| probability boxes         |         yes        |         yes        |         yes        |          yes         |          solutions exist         |
+| probability distributions |         yes        |         yes        |         yes        |          yes         |          yes        |
+| probability boxes         |         yes        |         yes        |         yes        |          yes         |          yes        |
 
 
 
