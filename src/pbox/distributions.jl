@@ -317,7 +317,7 @@ function Sdist1(DistFunc, i, name, shape, Bounded)
 
     Dist = DistFunc(i)
     m = mean(Dist); v = var(Dist);
-    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v, bounded = bounded)
+    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v, bounded = Bounded)
 
 end
 
@@ -330,7 +330,7 @@ function Sdist3(DistFunc, i, j, k, name, shape, Bounded)
 
     Dist = DistFunc(i, j, k)
     m = mean(Dist); v = var(Dist);
-    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v, bounded = bounded)
+    return pbox(quantile.(Dist,is), quantile.(Dist,js),shape=shape, name=name, ml=m, mh=m, vl=v, vh=v, bounded = Bounded)
 
 end
 
