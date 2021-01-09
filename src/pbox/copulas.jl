@@ -1082,6 +1082,44 @@ function plot(x :: copula; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
     tight_layout()
 end
 
+function plot(x :: bivpbox; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
+
+    AU = x.C.cdfU
+    AD = x.C.cdfD
+    m = size(AU)[1];
+    if m < pn; ppn = m; else ppn = pn; end
+
+    xus = x.marg1.u; xds = x.marg1.d;
+    yus = x.marg2.u; yds = x.marg2.d;
+
+    nm = round(m/ppn);
+
+    xus = xus[1:Int(nm):end]; xds = xds[1:Int(nm):end]; 
+    yus = yus[1:Int(nm):end]; yds = yds[1:Int(nm):end]; 
+
+    zU = AU[1:Int(nm):end,1:Int(nm):end]
+    zD = AD[1:Int(nm):end,1:Int(nm):end]
+
+    uGridx, uGridy = (repeat(xus',length(yus),1),repeat(yus,1,length(xus)))
+    dGridx, dGridy = (repeat(xds',length(yds),1),repeat(yds,1,length(xds)))
+
+    if ismissing(name); fig = figure(figsize=(10,10)) else fig = figure(name,figsize=(10,10));end
+    ax = fig.add_subplot(1,1,1,projection="3d")
+   #ax = fig.add_subplot(2,1,1)
+
+    plot_surface(dGridx, dGridy, zD, rstride=2,edgecolors="b", cstride=2, alpha=1, linewidth=1, cmap=ColorMap("Blues"))
+    plot_surface(uGridx, uGridy, zU, rstride=2,edgecolors="r", cstride=2, alpha=alpha, linewidth=1, cmap=ColorMap("RdGy"))
+
+    ax.view_init(45-27, 180+ 26)
+
+    xlabel("y",fontsize = fontsize)
+    ylabel("x",fontsize = fontsize)
+    ax.zaxis.set_rotate_label(false);
+    zlabel("H(x,y)", rotation = 0, fontsize = fontsize)
+    #xticks(fontsize = fontsize); yticks(fontsize = fontsize);
+    #PyPlot.title(title,fontsize=fontsize)
+    tight_layout()
+end
 
 slice(x,y) = pycall(pybuiltin("slice"), PyObject, x, y)         # For performing python array slicing for
 

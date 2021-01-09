@@ -573,18 +573,35 @@ function reciprocate(x)
     return 1/x;
 end
 
-function intUnivariate(x :: pbox, op)
+function intUnivariate(x :: pbox, op, bounded = [false, false])
     Ints = interval.(x.u,x.d)
     yInts = op.(Ints)
 
     yu = sort(left.(yInts))
     yd = sort(right.(yInts))
 
-    return pbox(yu, yd)
+    return pbox(yu, yd, bounded = bounded)
 end
+#=
+function intUnivariate(x :: pbox, op, bounded = [false, false])
+    Ints = interval.(x.u[1:end-1],x.d[2:end])
+    yInts = op.(Ints)
 
-for op in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan, :exp,:log)
-    @eval ($op)(x :: pbox) = intUnivariate(x, $op)
+    xRange = interval(x.u[1], x.d[end])
+
+    yRange = op(xRange)
+
+    yu = sort(left.(yInts))
+    yd = sort(right.(yInts))
+
+    return pbox([yRange.lo; yu], [yd; yRange.hi], bounded = bounded)
+end
+=#
+for op in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan, :exp, :log)
+    bounded = [false, false]
+    if op ∈ (:sin, :cos); bounded = [true, true]; end
+    if op ∈ (:exp, :log); bounded = [true, false]; end
+    @eval ($op)(x :: pbox) = intUnivariate(x, $op, $bounded)
 end
 
 ^(x::pbox, y ::Real) = intUnivariate(x,x->x^y)
@@ -937,19 +954,27 @@ function copulaUnary(x :: pbox, op)
 
     Fz = op(x)
 
-    xInts = interval.(x.u, x.d)
+    #xInts = interval.(x.u, x.d)
+    xRange = range(0, 1,length = Fz.n)
+    xInts = cut.(x,xRange)
     zInts = op.(xInts)
 
-    CopU = zeros(x.n, Fz.n)
-    CopD = zeros(x.n, Fz.n)
+    theseFs = cut.(Fz,xRange)
+    rightF = right.(theseFs)
+    leftF = left.(theseFs)
 
-    for i = 1:x.n
-        for j = 1:Fz.n
-            indexU =  left.(zInts[1:i]) .<= Fz.u[j]
-            indexD =  right.(zInts[1:i]) .<= Fz.d[j]
+    CopU = zeros(Fz.n, x.n)
+    CopD = zeros(Fz.n, x.n)
+    
+    for i = 1:Fz.n
+        for j = 1:x.n
+            indexU =  left.(zInts[1:j]) .< leftF[i]
+            indexD =  right.(zInts[1:j]) .< rightF[i]
             CopU[i, j] = sum(indexU)/Fz.n
             CopD[i, j] = sum(indexD)/Fz.n
         end
     end
-    return copula(CopU,CopD)
+    #CopU[1,:].= CopU[:,1] .=  CopD[1,:] .= CopD[:,1] .= 0;      # Set boundary conditions
+    #CopU[end,:].= CopU[:,end] .=  CopD[end,:] .= CopD[:,end] .= collect(xRange);
+    return copula(CopU,CopD), Fz
 end
