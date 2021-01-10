@@ -1,8 +1,13 @@
 # API
 
+```@meta
+CurrentModule = ProbabilityBoundsAnalysis
+DocTestSetup = quote
+    using ProbabilityBoundsAnalysis
+end
+```
 
 ```@docs
-pbox(u::Union{Missing, Array{<:Real}, Real} = missing, d=u; shape = "", name = "", ml= missing, mh = missing, vl = missing, vh = missing, interpolation = "linear",bob = missing, perfect = missing, opposite = missing, depends = missing, dids=missing, bounded = [false, false])
 
 pbox( x :: Array{Interval{T}, 1}, bounded = [true, true]) where T <: Real
 pbox( x :: Array{T, 2}, bounded = [true, true]) where T <: Real
@@ -27,7 +32,7 @@ imp(x...)
 
 normal(mean, std)
 
-uniform(Min, Max)
+uniform(min :: Interval, max :: Interval)
 
 beta(α, β)
 
