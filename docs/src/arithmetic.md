@@ -1,6 +1,10 @@
 # Arithmetic 
 
-<!--
+
+```@meta
+# foo
+
+#=
 
 Supported dependent arithmetic between uncertain numbers:
 
@@ -17,7 +21,9 @@ Supported dependent arithmetic between uncertain numbers:
 |probability distributions|yes|yes|yes|yes|yes|
 |probability boxes|yes|yes|yes|yes|yes|
 
--->
+=#
+
+```
 
 Most of the fundamental binary operations can be performed between uncertain numbers of all types:
 

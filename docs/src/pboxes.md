@@ -41,14 +41,15 @@ and may be plotted as follows:
 ```julia
 julia> plot(f)
 ```
-![Alt text](./plots/PbaPlot1.png "a probability box")
+!["a probability box"](./plots/PbaPlot1.png)
 
 
 In `ProbabilityBoundsAnalysis.jl` all plots of uncertain numbers are of their cdfs.
 
 Supported parametric distributions:
 
-<!--
+```@meta
+#=
 
 |           |         |        |              |         |             |
 |:---------:|:-------:|:------:|:------------:|:-------:|:-----------:|
@@ -63,7 +64,9 @@ Supported distribution free p-boxes:
 |:---------:|:-------:|:------:|:------------:|:-------:|
 |   meanVar  | meanMin |  meanMax  |   meanMinMax  | minMaxMeanVar|
 
--->
+=#
+```
+
 * normal
 * uniform
 * beta
