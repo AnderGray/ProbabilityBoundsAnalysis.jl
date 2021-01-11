@@ -41,11 +41,13 @@ and may be plotted as follows:
 ```julia
 julia> plot(f)
 ```
-![alt text](https://github.com/AnderGray/pba.jl/blob/master/doc/plots/PbaPlot1.png "a probability box")
+![alt text](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl/tree/master/docs/plots/PbaPlot1.png "a probability box")
 
 In `ProbabilityBoundsAnalysis.jl` all plots of uncertain numbers are of their cdfs.
 
 Supported parametric distributions:
+
+<!-----
 
 |           |         |        |              |         |             |
 |:---------:|:-------:|:------:|:------------:|:-------:|:-----------:|
@@ -59,6 +61,28 @@ Supported distribution free p-boxes:
 |           |         |        |              |         |
 |:---------:|:-------:|:------:|:------------:|:-------:|
 |   meanVar  | meanMin |  meanMax  |   meanMinMax  | minMaxMeanVar|
+
+----->
+* normal
+* uniform
+* beta
+* betaPrime
+* biweght 
+* cauchy
+* chi
+* chisq
+* cosine
+* epanechnikov 
+* erlang
+* exponential
+
+Supported distribution free p-boxes:
+
+* meanVar
+* meanMin
+* meanMax
+* meanMinMax
+* minMaxMeanVar
 
 KN c-boxes also supported.
 
