@@ -25,6 +25,8 @@ Supported uncertain numbers:
 - [Nick Gray](https://riskinstitute.uk/people/nickgray/), Institute for Risk and Uncertainty, University of Liverpool
 - [Alexander Wimbush](https://riskinstitute.uk/people/alexanderwimbush/), Institute for Risk and Uncertainty, University of Liverpool
 
+---
+
 Installation
 ---
 Two ways to install and use:
@@ -38,7 +40,16 @@ julia> ]
 julia> using ProbabilityBoundsAnalysis
 ```
 
-or the lastest version of this repository by:
+or the latest version by:
+
+```julia
+julia> ]
+(v1.0) pkg> add ProbabilityBoundsAnalysis#master
+julia> using ProbabilityBoundsAnalysis
+```
+
+or
+
 ```julia
 julia> ]
 (v1.0) pkg> add https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl.git
@@ -53,6 +64,8 @@ julia> include("ProbabilityBoundsAnalysis.jl/src/ProbabilityBoundsAnalysis.jl")
 julia> using Main.ProbabilityBoundsAnalysis
 ```
 
+---
+
 ### related packages:
 * [pba.py](https://github.com/Institute-for-Risk-and-Uncertainty/pba-for-python): Python version of this software.
 * [pba.r](https://github.com/ScottFerson/pba.r): R version of this software.
@@ -60,3 +73,8 @@ julia> using Main.ProbabilityBoundsAnalysis
 * [IntervalArithmetic.jl](https://github.com/JuliaIntervals/IntervalArithmetic.jl): the interval arithmetic package used in this software.
 * [ValidatedNumerics.jl](https://github.com/JuliaIntervals/ValidatedNumerics.jl): a suite of julia packages for rigorous computations.
 
+---
+
+### Acknowledgements
+
+The authors would like to thank the gracious support from the EPSRC iCase studentship award 15220067. We also gratefully acknowledge funding from UKRI via the EPSRC and ESRC Centre for Doctoral Training in Risk and Uncertainty Quantification and Management in Complex Systems. This research is funded by the Engineering Physical Sciences Research Council (EPSRC) with grant no. EP/R006768/1, which is greatly acknowledged for its funding and support. This work has been carried out within the framework of the EUROfusion Consortium and has received funding from the Euratom research and training programme 2014-2018 and 2019-2020 under grant agreement No 633053. The views and opinions expressed herein do not necessarily reflect those of the European Commission.

@@ -12,6 +12,9 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "Theory" => "theory.md",
+        "Constructing p-boxes" => "pboxes.md",
+        "Arithmetic" => "arithmetic.md",
+        "Dependence" => "copulas.md",
         "User guide" => "userguide.md",
         "Examples" => "examples.md",
         "API" => "api.md"
