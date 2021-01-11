@@ -41,7 +41,8 @@ and may be plotted as follows:
 ```julia
 julia> plot(f)
 ```
-![alt text](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl/tree/master/docs/plots/PbaPlot1.png "a probability box")
+![Alt text](./plots/PbaPlot1.png "a probability box")
+
 
 In `ProbabilityBoundsAnalysis.jl` all plots of uncertain numbers are of their cdfs.
 
