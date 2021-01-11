@@ -19,9 +19,11 @@ julia> C = GauCopula(0.7)
 
 julia> plot(C)
 ```
-![alt text](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl/tree/master/docs/plots/GaussianCopula.png "Gaussian copula with a correlation of 0.7")
+![alt text](./plots/GaussianCopula.png "Gaussian copula with a correlation of 0.7")
 
-A copula C is the function C:[0,1]<sup>d</sup> &rarr;[0,1], where d is the dimension of the copula. Only bivariate copulas are considered so far in `ProbabilityBoundsAnalysis.jl`. A copula can be evaluated and sampled in the following way:
+A copula ``C`` is the function ``C:[0,1]^d \rightarrow [0,1]``, where d is the dimension of the copula. Only bivariate copulas are considered so far in `ProbabilityBoundsAnalysis.jl`. A copula can be evaluated and sampled in the following way:
+
+
 
 
 ```julia
@@ -53,10 +55,14 @@ julia> C([0.2,0.6],[0.3,0.7])
 
 julia> plot(a)
 ```
-![alt text](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl/tree/master/docs/plots/ImpCopula.png "Imprecise Gaussian copula with a correlation in [-0.5, 0.5]")
+![alt text](./plots/ImpCopula.png "Imprecise Gaussian copula with a correlation in [-0.5, 0.5]")
 
 
-Given any marginal distributions F<sub>X</sub>(x) and F<sub>Y</sub>(y) and a copla C( : ), a joint distribution can be created: H(x,y) = C(F<sub>X</sub>(x),F<sub>Y</sub>(y)).  In `ProbabilityBoundsAnalysis.jl` a joint distribution can be created by passing marginals to the copula. For example, a distribution with beta marginals and a gaussian copula:
+Given any marginal distributions ``F_{X}(x)`` and ``F_{Y}(y)`` and a copla ``C( : )``, a joint distribution can be created: ``H(x,y) = C(F_{X}(x), F_{Y}(y))``.  In `ProbabilityBoundsAnalysis.jl` a joint distribution can be created by passing marginals to the copula. For example, a distribution with beta marginals and a gaussian copula:
+
+
+
+
 
 ```julia
 julia> C = GauCopula(0.7);
@@ -65,7 +71,7 @@ BivPbox ~ Gaussian( beta(mean = 0.66666, var = 0.031746), beta(mean = 0.66666, v
 
 julia> plot(J)
 ```
-![alt text](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl/tree/master/docs/plots/JointDist1.png "Bivariate Beta with gaussian copula with correlation of 0.7")
+![alt text](./plots/JointDist1.png "Bivariate Beta with gaussian copula with correlation of 0.7")
 
 A joint distribution can also be sampled:
 
@@ -73,7 +79,7 @@ A joint distribution can also be sampled:
 julia> Jsamps = sample(J,10^4)
 julia> scatter(Jsamps)
 ```
-![alt text](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl/tree/master/docs/plots/Jsamples.png "Scatter plot of samples of J")
+![alt text](./plots/Jsamples.png "Scatter plot of samples of J")
 
 Notice that samples are bivariate intervals, capturing the representation error of the marginals and the copula. This can be reduced by increasing the descritisation.
 
@@ -91,7 +97,7 @@ BivPbox ~ Gaussian( beta(mean = [0.5, 0.833334], var = [0.0198412, 0.0375]), bet
 
 julia> plot(J)
 ```
-![alt text](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl/tree/master/docs/plots/BivPbox.png "Plot of a bivariate p-box")
+![alt text](./plots/BivPbox.png "Plot of a bivariate p-box")
 
 If the copula is precise, but the marginals are p-boxes, then the bivariate p-box may also be samples. This generates a correlated random set.
 
@@ -118,4 +124,4 @@ julia> samps = sample(J,10^3)
 
 julia> scatter(samps)
 ```
-![alt text](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl/tree/master/docs/plots/RandomSet1.png "Samples of a bivariate p-box")
+![alt text](./plots/RandomSet1.png "Samples of a bivariate p-box")

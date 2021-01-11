@@ -48,7 +48,7 @@ In `ProbabilityBoundsAnalysis.jl` all plots of uncertain numbers are of their cd
 
 Supported parametric distributions:
 
-<!-----
+<!--
 
 |           |         |        |              |         |             |
 |:---------:|:-------:|:------:|:------------:|:-------:|:-----------:|
@@ -63,7 +63,7 @@ Supported distribution free p-boxes:
 |:---------:|:-------:|:------:|:------------:|:-------:|
 |   meanVar  | meanMin |  meanMax  |   meanMinMax  | minMaxMeanVar|
 
------>
+-->
 * normal
 * uniform
 * beta
