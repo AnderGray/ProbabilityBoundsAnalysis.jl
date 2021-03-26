@@ -210,6 +210,8 @@ function mass(C :: copula, x :: Interval, y :: Interval)
 
 end
 
+
+
 function massU(C :: copula, x :: Interval, y :: Interval)
 
     C22hi = cdfU(C, x.hi, y.hi).hi
@@ -328,6 +330,9 @@ end
 ###
 #   Copula functions and constructors
 ###
+
+# Copula functions
+
 indep(x,y)          = x * y
 perf(x,y)           = min(x,y)
 opp(x,y)            = max(x+y -1,0)
@@ -343,6 +348,28 @@ function Gau(x,y,r=0)
     return bivariate_cdf(quantile.(Normal(),x),quantile.(Normal(),y), r)
 end
 
+###
+# Copula bounds from Kendal τ and Spearman ρ
+# BOUNDS ON BIVARIATE DISTRIBUTION FUNCTIONS WITH GIVEN MARGINS AND MEASURES OF ASSOCIATION, Roger B. Nelsen et al.
+###
+
+#kenLB(x, y, τ) = max(0, x+y-1, 0.5*( (x+y)-sqrt( (x-y)^2)+1-τ ) )
+kenUB(x, y, τ) = min(x, y, 0.5*( (x+y-1) + sqrt( (x+y-1)^2 +1+τ )) )
+kenLB(x, y, τ) = x - kenUB(x, 1 - y, - τ)
+
+#spearϕ(a, b) = 1/6 * ( (max(0, 9*b + 3*sqrt( 9*b^2 - 3*a^6)))^(1/3) + ( max(0,9*b - 3*sqrt(9*b^2 - 3*a^6)))^(1/3) )
+
+function spearϕ(a, b)
+    A = 9*b 
+    B = max(9*b^2 - 3*a^6, 0) 
+    C = (max(0, A + 3*sqrt(B)))^(1/3)
+    D = (max(0, A - 3*sqrt(B)))^(1/3)
+    return 1/6 * (C + D)
+end
+
+#spearLB(x, y, ρ) = max(0, x + y - 1, (x + y)/2 - spearϕ(x - y, 1 - ρ))
+spearUB(x, y, ρ) = max( opp(x,y), min(x, y, (x + y -1)/2 + spearϕ(x + y - 1, 1 + ρ)))
+spearLB(x, y, τ) = x - spearUB(x, 1 - y, - τ)
 
 ###
 #   Family constructors
@@ -492,6 +519,33 @@ function Frechet()
     return copula(cdfU, cdfD, family = "Frechet");
 end
 
+
+function τCopula( τ = 0 )   # Imprecise copula from kendal tau
+
+    n = ProbabilityBoundsAnalysis.steps
+    x = range(0,stop = 1,length = n);
+
+    cdfU = [kenUB(xs,ys,τ) for xs in x, ys in x]
+    cdfD = [kenLB(xs,ys,τ) for xs in x, ys in x]
+
+    return copula(cdfU, cdfD, family = "Kendal", param = τ)
+
+end
+
+KendalCopula(τ = 0) = τCopula(τ)
+
+function ρCopula( ρ = 0 ) # Imprecise copula from Spearman rho
+    
+    n = ProbabilityBoundsAnalysis.steps
+    x = range(0,stop = 1,length = n);
+
+    cdfU = [spearUB(xs,ys,ρ) for xs in x, ys in x]
+    cdfD = [spearLB(xs,ys,ρ) for xs in x, ys in x]
+
+    return copula(cdfU, cdfD, family = "Spearman", param = ρ)
+end
+
+SpearmanCopula(ρ = 0 ) = ρCopula( ρ )
 
 function env(x::copula, y::copula)
 
@@ -799,6 +853,8 @@ function Base.show(io::IO, z::bivpbox)
         if z.C.family == "Gaussian"; statement2 = "; r = $(z.C.param)"; end
         if z.C.family == "Frank"; statement2 = "; s = $(z.C.param)"; end
         if z.C.family == "Clayton"; statement2 = "; t = $(z.C.param)"; end
+        if z.C.family == "Spearman"; statement2 = "; ρ = $(z.C.param)"; end
+        if z.C.family == "Kendal"; statement2 = "; τ = $(z.C.param)"; end
     end
 
     print(io, "$statement0 ~ $statement1( $xShape(mean = $xMean, var = $xVar), $yShape(mean = $yMean, var = $yVar)$statement2)");

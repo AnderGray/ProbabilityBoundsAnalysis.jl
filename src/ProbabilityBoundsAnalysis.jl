@@ -117,6 +117,8 @@ export
     meanMinMax, MeanMinMax, meanminmax,                                     # Cantelli
     Cantelli, cantelli, 
 
+    minMeanVar, maxMeanVar,
+
     minMaxMeanVar, MinMaxMeanVar, minmaxmeanvar,                            # Ferson
     Ferson, ferson, 
 
@@ -152,7 +154,7 @@ export
     checkMomentsAndRanges,
 
     # Copulas
-    AbstractCopula, copula, GauCopula, πCop, M, W, Frank, Clayton, Frechet, copulaSigma, copulaSigmaSlow,
+    AbstractCopula, copula, GauCopula, πCop, M, W, Frank, Clayton, Frechet, copulaSigma, copulaSigmaSlow, τCopula, KendalCopula, ρCopula, SpearmanCopula,
     copulaTau, copulaUnary, cdfU, cdfD, mass, conditionalX, conditionalY, bivpbox, plotStep, sample, sampleCond, scatter,
     plotBoxes
 
