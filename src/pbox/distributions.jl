@@ -228,7 +228,7 @@ Uniform shaped pbox. Parameters can be Real or Intervals.
 
 # Examples
 ```jldoctest
-julia> a = normal(interval(0, 1), interval(1,2))
+julia> a = uniform(interval(0, 1), interval(1,2))
 Pbox: 	  ~ uniform ( range=[0.0, 2.0], mean=[1.0, 1.5], var=[0.083333, 0.33333])
 ```
 See also: [`normal`](@ref), [`beta`](@ref), [`meanMinMax`](@ref), [`plot`](@ref)
@@ -523,6 +523,53 @@ end
 Cantelli(x...)      = meanMinMax(x...);     cantelli(x...)      = meanMinMax(x...);
 MeanMinMax(x...)    = meanMinMax(x...);     meanminmax(x...)    = meanMinMax(x...);
 
+
+function cantelliIneq2(minX = 0, meanX = 0.5, varX = 1, name = "")
+
+    if meanX < minX; minX = meanX; end
+
+    meanY = meanX - minX; # Transform to 0
+
+    p = ii();          
+    u = max.(0, meanY .-  sqrt.(varX .*(1 ./p .- 1)))
+    p = jjj()
+    d = Base.min.(meanY ./ (1 .- p), meanY .+ sqrt.((p .* varX) ./ (1 .- p)))
+
+    s = pbox(u, d, shape = "cantelli2", name = name, ml = meanY, mh = meanY, vl = varX, 
+    vh = varX, bounded = [true, false])
+
+    return s + minX
+end
+
+function minMeanVar(min = 0, mean = 0.5, var = 1, name = "")
+
+    mean = interval(mean); var = interval(var);
+
+    Envelope = env(
+        cantelliIneq2(left(min), left(mean), right(var)),
+        cantelliIneq2(right(min), right(mean), right(var))
+    )
+    Envelope.shape = "cantelli"; Envelope.name = name; 
+    Envelope.vl = var.lo; Envelope.vh = var.hi;
+    return Envelope
+end
+
+function maxMeanVar(max = 1, mean = 0.5, var=1, name = "")
+
+    mean = interval(mean); var = interval(var);
+    
+    minZ = -max
+    meanZ = - mean
+
+    Envelope = env(
+        cantelliIneq2(left(minZ), left(meanZ), right(var)),
+        cantelliIneq2(right(minZ), right(meanZ), right(var))
+    )
+    Envelope.shape = "cantelli"; Envelope.name = name; 
+    Envelope.vl = var.lo; Envelope.vh = var.hi;
+    return -Envelope
+
+end
 
 ###
 #   Ferson Pbox (min - max - mean - var)

@@ -99,7 +99,7 @@ julia> plot(J)
 ```
 !["Plot of a bivariate p-box"](./plots/BivariatPbox1.png)
 
-If the copula is precise, but the marginals are p-boxes, then the bivariate p-box may also be samples. This generates a correlated random set.
+If the copula is precise, but the marginals are p-boxes, then the bivariate p-box may also be sampled. This generates a correlated random set.
 
 ```julia
 julia> a = b = beta(interval(3,5),interval(1,3));
