@@ -22,7 +22,7 @@ IntervalArithmetic = "0.15.2, 0.16, 0.17"
 PyCall = "1.91.4"
 PyPlot = "2.9.0"
 Reexport = "0.2"
-julia = "1.0.3"
+julia = "1"
 
 [target]
 test = ["Test"]
