@@ -121,7 +121,7 @@ end
 
 ###
 #   Constructs a pbox from a parametric distribution. Takes endpoints of given intervals.
-#   Requires a dname function, which will give quantiles to the pbox. 
+#   Requires a dname function, which will give quantiles to the pbox.
 #   envConstFunc is a version of this function which does not require a dname function
 ###
 function envConstruct(dname, i , j, x...)
@@ -190,7 +190,7 @@ N = gaussian = normal
 
 
 ###
-#   Env constructor specifically for the uniform distribtion. 
+#   Env constructor specifically for the uniform distribtion.
 ###
 function envUnif( i, j, x...)
 
@@ -204,7 +204,7 @@ function envUnif( i, j, x...)
 end
 
 function Suniform(Min, Max, case = 1; name="")
-    
+
     if (case==1) && (Max <= Min); Min = Max; end
     if Max <= Min; Max = Min; end
 
@@ -234,6 +234,33 @@ Pbox: 	  ~ uniform ( range=[0.0, 2.0], mean=[1.0, 1.5], var=[0.083333, 0.33333])
 See also: [`normal`](@ref), [`beta`](@ref), [`meanMinMax`](@ref), [`plot`](@ref)
 """
 U = uniform(Min, Max, x...) = envUnif(Min,Max, x...)
+
+function uniform(;mean, std)
+
+    meanLo = left(mean); meanHi = right(mean)
+
+    m = meanLo
+
+    Min = m - sqrt(12)/2 * std
+    Max = m + sqrt(12)/2 * std
+
+    u1 = U(Min.hi, Max.lo)
+    u2 = U(Min.lo, Max.hi)
+
+    uu = env(u1, u2)
+
+    m = meanHi
+
+    Min = m - sqrt(12)/2 * std
+    Max = m + sqrt(12)/2 * std
+
+    u1 = U(Min.hi, Max.lo)
+    u2 = U(Min.lo, Max.hi)
+
+    uu = env(u1, u2, uu)
+
+    return uu
+end
 
 
 ###
@@ -266,8 +293,8 @@ function envConstFunc(Dist, i, j, name, shape, Bounded)
     Sdist(Dist, right(i), right(j), name, shape, Bounded),
     Sdist(Dist, left(i),  right(j), name, shape, Bounded),
     Sdist(Dist, right(i), left(j),  name, shape, Bounded));
-    
-    a.bounded = Bounded; 
+
+    a.bounded = Bounded;
     return a;
 
 end
@@ -277,7 +304,7 @@ function envConstFunc1(Dist, i, name, shape, Bounded)
     a = env(
     Sdist1(Dist, left(i),  name, shape, Bounded),
     Sdist1(Dist, right(i), name, shape, Bounded))
-    
+
     return a;
 
 end
@@ -289,7 +316,7 @@ function envConstFunc3(Dist, i, j, k,  name, shape, Bounded)
     Sdist(Dist, right(i), right(j), name, shape, Bounded),
     Sdist(Dist, left(i),  right(j), name, shape, Bounded),
     Sdist(Dist, right(i), left(j),  name, shape, Bounded));
-    
+
     return a;
 
 end
@@ -299,7 +326,7 @@ end
 ###
 function Sdist(DistFunc, i, j, name, shape, Bounded)
 
-    is = iii(); js = jjj(); 
+    is = iii(); js = jjj();
     if Bounded[1]; is = ii(); end
     if Bounded[2]; js = jj(); end
 
@@ -311,7 +338,7 @@ end
 
 function Sdist1(DistFunc, i, name, shape, Bounded)
 
-    is = iii(); js = jjj(); 
+    is = iii(); js = jjj();
     if Bounded[1]; is = ii(); end
     if Bounded[2]; js = jj(); end
 
@@ -324,7 +351,7 @@ end
 
 function Sdist3(DistFunc, i, j, k, name, shape, Bounded)
 
-    is = iii(); js = jjj(); 
+    is = iii(); js = jjj();
     if Bounded[1]; is = ii(); end
     if Bounded[2]; js = jj(); end
 
@@ -366,7 +393,7 @@ chisq(      k,              name = "")      = envConstFunc1(    Chisq,      k,  
 cosine(     α,      β,      name = "")      = envConstFunc(     Cosine,     α, β, name, "cosine",       [true,true])    # http://en.wikipedia.org/wiki/Raised_cosine_distribution
 epanechnikov(α,     β,      name = "")      = envConstFunc(     Epanechnikov, α, β, name, "epanechnikov",[true,true])
 erlang(     α=1,    β=1,    name = "")      = envConstFunc(     Erlang,     α, β, name, "erlang",       [true,false])   # http://en.wikipedia.org/wiki/Erlang_distribution
-exponential(θ=1,            name = "")      = envConstFunc1(    Exponential, θ,   name, "exponential",  [true,false])   # http://en.wikipedia.org/wiki/Exponential_distribution         
+exponential(θ=1,            name = "")      = envConstFunc1(    Exponential, θ,   name, "exponential",  [true,false])   # http://en.wikipedia.org/wiki/Exponential_distribution
 fDist(      ν1,     ν2,     name = "")      = envConstFunc(     FDist,     ν1,ν2, name, "fDist",        [true,false])   # http://en.wikipedia.org/wiki/F-distribution
 frechet(    α=1,    θ=1,    name = "")      = envConstFunc(     Frechet,    α, θ, name, "frechet",      [true,false])   # http://en.wikipedia.org/wiki/Fréchet_distribution
 gamma(      α=1,    θ=1,    name = "")      = envConstFunc(     Gamma,      α, θ, name, "gamma",        [true,false])   # http://en.wikipedia.org/wiki/Gamma_distribution
@@ -397,7 +424,7 @@ lognormal(  μ=1,    θ=1,    name = "")      = envConstFunc(     pbaLogNormal, 
 """
     KN(k :: Interval, n :: Interval)
 
-k out of N confidence box (c-box), a pbox shaped confidence structure. Quantifies inferential uncertainty in binomial counts, 
+k out of N confidence box (c-box), a pbox shaped confidence structure. Quantifies inferential uncertainty in binomial counts,
 where k successes were observed out of n trails. One sided or two sided confidence intervals may be drawn
 
 # Constructors
@@ -413,7 +440,7 @@ function KN(k, n)
     if right(n) < right(k)
         throw(ArgumentError("k < n must be true, provided: k = $k | n = $n"))
     end
-    return env( beta( left(k), right(n)-left(k)+1 ),  beta( right(k)+1, max(0, left(n)-right(k)) ) ) 
+    return env( beta( left(k), right(n)-left(k)+1 ),  beta( right(k)+1, max(0, left(n)-right(k)) ) )
 end
 kn(x...) = KN(x...)
 
@@ -495,12 +522,12 @@ function cantelliIneq(mean = 0.5, min = 0, max = 1, name = "")
     if mean > max; max = mean; end
 
     mid = (max - mean) / (max - min);
-    p = ii();   
+    p = ii();
     u = ifelse.(p .<= mid, min, (mean - max) ./p .+ max )
     p = jj();
     d = ifelse.(mid .<= p, max, (mean .- min .*p ) ./(1 .- p))
-    
-    return pbox(u, d, shape = "cantelli", name = name, ml = mean, mh = mean, vl = 0, 
+
+    return pbox(u, d, shape = "cantelli", name = name, ml = mean, mh = mean, vl = 0,
     vh = (max-min)*(max-mean)-(max-mean)*(max-mean), bounded = [true, true])
 
 end
@@ -515,7 +542,7 @@ function meanMinMax(mean = 0.5, min = 0, max = 1, name = "")
         cantelliIneq(left(mean1), left(min), right(max)),
         cantelliIneq(right(mean1), left(min), right(max))
     )
-    Envelope.shape = "cantelli"; Envelope.name = name; 
+    Envelope.shape = "cantelli"; Envelope.name = name;
     Envelope.vl = var.lo; Envelope.vh = var.hi;
     return Envelope
 end
@@ -530,12 +557,12 @@ function cantelliIneq2(minX = 0, meanX = 0.5, varX = 1, name = "")
 
     meanY = meanX - minX; # Transform to 0
 
-    p = ii();          
+    p = ii();
     u = max.(0, meanY .-  sqrt.(varX .*(1 ./p .- 1)))
     p = jjj()
     d = Base.min.(meanY ./ (1 .- p), meanY .+ sqrt.((p .* varX) ./ (1 .- p)))
 
-    s = pbox(u, d, shape = "cantelli2", name = name, ml = meanY, mh = meanY, vl = varX, 
+    s = pbox(u, d, shape = "cantelli2", name = name, ml = meanY, mh = meanY, vl = varX,
     vh = varX, bounded = [true, false])
 
     return s + minX
@@ -549,7 +576,7 @@ function minMeanVar(min = 0, mean = 0.5, var = 1, name = "")
         cantelliIneq2(left(min), left(mean), right(var)),
         cantelliIneq2(right(min), right(mean), right(var))
     )
-    Envelope.shape = "cantelli"; Envelope.name = name; 
+    Envelope.shape = "cantelli"; Envelope.name = name;
     Envelope.vl = var.lo; Envelope.vh = var.hi;
     return Envelope
 end
@@ -557,7 +584,7 @@ end
 function maxMeanVar(max = 1, mean = 0.5, var=1, name = "")
 
     mean = interval(mean); var = interval(var);
-    
+
     minZ = -max
     meanZ = - mean
 
@@ -565,7 +592,7 @@ function maxMeanVar(max = 1, mean = 0.5, var=1, name = "")
         cantelliIneq2(left(minZ), left(meanZ), right(var)),
         cantelliIneq2(right(minZ), right(meanZ), right(var))
     )
-    Envelope.shape = "cantelli"; Envelope.name = name; 
+    Envelope.shape = "cantelli"; Envelope.name = name;
     Envelope.vl = var.lo; Envelope.vh = var.hi;
     return -Envelope
 
@@ -574,8 +601,8 @@ end
 ###
 #   Ferson Pbox (min - max - mean - var)
 ###
-function FersonEvalEasy(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
-    
+function fersonEvalEasy(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
+
     fer = pbox(imp(meanVar(mean,var), imp(meanmin(mean,min),meanmax(mean,max))),
     ml = left(mean), mh = right(mean), vl = left(var), vh =right(var), bounded = [true, true])
     fer.shape = "ferson"; fer.name = name;
@@ -583,17 +610,24 @@ function FersonEvalEasy(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
     return fer
 end
 
+function fersonIneq(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
+
+
+
+    return
+end
+
 function minMaxMeanVar(min = 0, max = 1, mean = 0.5, var = 0.1, name = "")
 
     min1,max1,mean1,var1 = checkMomentsAndRanges(min,max,mean,var);
 
     if all(!isa([mean, var], Interval));
-        return FersonEvalEasy(left(min),right(max),mean,var,name);
+        return fersonEvalEasy(left(min),right(max),mean,var,name);
     end
 
     Envelope = env(
-        FersonEvalEasy(left(min1), right(max1), left(mean1), right(var1)),            # pba.r has it like this (left(var) not used?)
-        FersonEvalEasy(left(min1), right(max1), right(mean1), right(var1)),
+        fersonEvalEasy(left(min1), right(max1), left(mean1), right(var1)),            # pba.r has it like this (left(var) not used?)
+        fersonEvalEasy(left(min1), right(max1), right(mean1), right(var1)),
     )
     Envelope.shape = "ferson"; Envelope.name = name;
     return Envelope
@@ -661,7 +695,7 @@ rand(a :: pbox, n :: Int64 = 1) = cut.(a,rand(n));
 
 
 ###
-#   Checks consitency of provided moments and ranges, which may all be intervals. 
+#   Checks consitency of provided moments and ranges, which may all be intervals.
 #   Returns consitent intervals. If var not provided, returns best var. Could maybe make this a macro?
 ###
 function checkMomentsAndRanges(Min, Max, Mean=interval(left(Min),right(Max)), Var = interval(0,Inf))
@@ -690,13 +724,13 @@ function checkMomentsAndRanges(Min, Max, Mean=interval(left(Min),right(Max)), Va
     MIN = left(Min); MAX = right(Max);
     v1 = (MAX-MIN)*(MAX-ml)-(MAX-ml)*(MAX-ml);
     v2 = (MAX-MIN)*(MAX-mh)-(MAX-mh)*(MAX-mh);
-    v3 = 0; 
+    v3 = 0;
 
     # Use mid point if it is in mean
     mid = (MAX-MIN)/2;
     if (mid ∈ Mean); v3 = (MAX-MIN)*(MAX-mid)-(MAX-mid)*(MAX-mid); end
 
-    vh = max(v1, v2, v3); vl = 0;    
+    vh = max(v1, v2, v3); vl = 0;
     maxVar = interval(vl,vh);
 
     if (Var ∩ maxVar == ∅); throw(ArgumentError("Provided information not valid. Variance ∩ VarBounds = ∅.\n       $Var ∩ $maxVar = ∅")); end
