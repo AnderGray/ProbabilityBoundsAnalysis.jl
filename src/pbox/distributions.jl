@@ -610,13 +610,89 @@ function fersonEvalEasy(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
     return fer
 end
 
-function fersonIneq(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
+function mmms(minimum :: Real, maximum :: Real, mean :: Real, stddev :: Real; steps = 200)
 
+    if iszero(maximum - minimum); return pbox((maximum + minimum)/2); end
+    range = maximum - minimum;
+    min1, max1, mean1,var1 = checkMomentsAndRanges(minimum,maximum, mean, stddev^2);
 
+    s = sqrt(var1)
 
-    return
+    ml = (left(mean1)-minimum)/range;       sl = left(s)/range;
+    mr = (right(mean1)-minimum)/range;      sr = right(s)/range;
+
+    n  = steps;
+    us = zeros(n);
+    ds = zeros(n);
+    for i = 1:n
+
+        p = (i-1)/n
+        if p <= 0.0; x2 = 0.0;
+        else; x2 = ml - sr * sqrt(1 / p - 1); end
+        if ml + p <= 1.0;
+            x3 = 0.0;
+        else
+            x5 = p*p + sl*sl - p;
+            if x5 >= 0.0
+                x4 = 1.0 - p + sqrt(x5);
+                if x4 < ml
+                    x4 = ml;
+                end
+            else
+                x4 = ml;
+            end
+            x3 = (p + sl*sl + x4*x4 - 1.0) / (x4 + p - 1.0);
+        end
+
+        if ((p <= 0.0) || (p <= (1.0 - ml)))
+            x6 = 0.0;
+        else
+            x6 = (ml - 1.0) / p + 1.0;
+        end
+
+        us[i] = max(max(max(x2, x3), x6),0.0) * range + minimum;
+
+        p = i/n;
+
+        if (p >= 1.0)
+            x2 = 1.0;
+        else
+            x2 = mr + sr * sqrt(1.0/(1.0/p - 1.0));
+        end
+        if (mr + p >= 1.0)
+            x3 = 1.0;
+        else
+            x5 = p*p + sl*sl - p;
+            if x5 >= 0.0
+                x4 = 1.0 - p - sqrt(x5);
+                if (x4 > mr) x4 = mr; end
+
+            else
+                x4 = mr;
+            end
+            x3 = (p + sl*sl + x4*x4 - 1.0) / (x4 + p - 1.0) - 1.0;
+        end
+        if (((1.0 - mr) <= p) || (1.0 <= p))
+            x6 = 1.0;
+        else
+            x6 = mr / (1.0 - p);
+        end
+
+        ds[i] = min(min(min(x2,x3),x6),1.0) * range + minimum;
+
+    end
+
+    return pbox(us, ds, ml = left(mean1), mh = right(mean1), vl = left(var1), vh = right(var1), shape = "ferson")
 end
 
+#mmms(minimum :: Real, maximum :: Real, mean :: Real, std :: Real; steps = 200) = mmms(minimum, maximum, interval(mean), interval(std), steps = steps)
+
+mmmv(minimum :: Real, maximum :: Real, mean :: Real, var :: Real; steps = 200) = mmms(minimum, maximum, mean, sqrt(var), steps = steps)
+minMaxMeanVar(minimum :: Real, maximum :: Real, mean :: Real, var :: Real; steps = 200) = mmmv(minimum , maximum , mean, var; steps = steps)
+minMaxMeanStd(minimum :: Real, maximum :: Real, mean :: Real, std :: Real; steps = 200) = mmmv(minimum , maximum , mean, std^2; steps = steps)
+
+
+#=
 function minMaxMeanVar(min = 0, max = 1, mean = 0.5, var = 0.1, name = "")
 
     min1,max1,mean1,var1 = checkMomentsAndRanges(min,max,mean,var);
@@ -633,7 +709,7 @@ function minMaxMeanVar(min = 0, max = 1, mean = 0.5, var = 0.1, name = "")
     return Envelope
 
 end
-
+=#
 Ferson(x...)        = minMaxMeanVar(x...);         ferson(x...) = minMaxMeanVar(x...);
 MinMaxMeanVar(x...) = minMaxMeanVar(x...);  minmaxmeanvar(x...) = minMaxMeanVar(x...);
 

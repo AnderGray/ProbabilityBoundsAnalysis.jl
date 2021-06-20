@@ -24,7 +24,7 @@
 #   ->  id and dids don't work. When a pbox is made, 4 is added to the id counter
 #
 #   ->  Check bounded. What is the reciprocal of bounded? What is it's complement?
-#       -> Does my arithmetic with bounded make sense?       
+#       -> Does my arithmetic with bounded make sense?
 #
 #   Severe:
 #       ->  makepbox() won't work when both a pbox and an interval type are introduced as arguments
@@ -135,14 +135,14 @@ Returns cdf value (interval) at x
 
 See also: [`cut`](@ref), [`mass`](@ref), [`rand`](@ref)
 """
-function cdf(s :: pbox, x::Real)   
+function cdf(s :: pbox, x::Real)
     d = s.d; u = s.u; n = s.n;
     bounded = s.bounded;
 
-    if x < u[1]; 
-        return interval(0,1/n) * (1-bounded[1]); 
+    if x < u[1];
+        return interval(0,1/n) * (1-bounded[1]);
     end;
-    if x > d[end]; 
+    if x > d[end];
         if bounded[2]; return 1; end
         return interval((n-1)/n, 1);
     end;
@@ -187,8 +187,8 @@ function mass(s :: pbox, lo :: Real, hi :: Real)
     cdfHi = cdf(s, hi)
     cdfLo = cdf(s, lo)
 
-    ub = min(1, cdfHi.hi - cdfLo.lo)
-    lb = max(0, cdfHi.lo - cdfLo.hi)
+    ub = min(1, right(cdfHi) - left(cdfLo))
+    lb = max(0, right(cdfHi) - right(cdfLo))
 
     return interval(lb, ub)
 
@@ -277,7 +277,7 @@ function pbox( x :: Array{Interval{T}, 1}, bounded = [true, true]) where T <: Re
     end
 
     dNew = reverse(dNew)
-    
+
     return pbox(uNew, dNew, bounded = bounded)
 
 end
@@ -301,7 +301,7 @@ function pbox( x :: Array{T, 2}, bounded = [true, true]) where T <: Real
 
     us = sort(us', dims=1)
     ds = sort(ds', dims=1)
-    
+
     n = ProbabilityBoundsAnalysis.steps;
 
     uNew = zeros(n);    dNew = zeros(n);
@@ -327,7 +327,7 @@ function pbox( x :: Array{T, 2}, bounded = [true, true]) where T <: Real
     end
 
     dNew = reverse(dNew)
-    
+
     return pbox(uNew, dNew, bounded = bounded)
 
 end

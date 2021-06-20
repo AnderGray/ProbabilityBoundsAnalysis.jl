@@ -23,7 +23,7 @@
 #           ->  download package directly from github:
 #
 #               julia> ]                                                     (opens package manager)
-#               (v1.0) pkg> add https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl.git  
+#               (v1.0) pkg> add https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl.git
 #               julia> using ProbabilityBoundsAnalysis
 #
 #           ->  or if you have source code
@@ -38,6 +38,7 @@ __precompile__(true)
 
 module ProbabilityBoundsAnalysis
 
+using Base: Float64
 using Reexport, Distributions, Interpolations, PyCall, Distributed
 
 @reexport using IntervalArithmetic, PyPlot, Distributed, Statistics, LinearAlgebra
@@ -94,12 +95,12 @@ end
 
 export
     # Constructors
-    Interval, interval, AbstractInterval, AbstractPbox, pbox, makepbox, 
+    Interval, interval, AbstractInterval, AbstractPbox, pbox, makepbox,
 
     # Parametric
     normal, gaussian, N,
     U, uniform,
-    beta, betaPrime, biweight, cauchy, 
+    beta, betaPrime, biweight, cauchy,
     chi, chisq, cosine,epanechnikov, erlang,
     exponential, fDist, frechet, gamma, ksdist,
     laplace, levy, lognormal,
@@ -107,20 +108,22 @@ export
     # C-boxes
     KN,
 
-    # Distribution free 
+    # Distribution free
     meanVar, MeanVar, minvar, meanVar, meanStd,                             # Chebyshev
     Chebyshev, chebyshev, cheb,
-    
+
     meanMin, MeanMin, meanmin, meanMax, MeanMax, meanmax,                   # Markov
-    Markov, markov, 
+    Markov, markov,
 
     meanMinMax, MeanMinMax, meanminmax,                                     # Cantelli
-    Cantelli, cantelli, 
+    Cantelli, cantelli,
 
     minMeanVar, maxMeanVar,
 
+    mmms, mmmv, minMaxMeanStd,
+
     minMaxMeanVar, MinMaxMeanVar, minmaxmeanvar,                            # Ferson
-    Ferson, ferson, 
+    Ferson, ferson,
 
     # Moments
     mean, var, std, sideVariance, dwmean, dwVariance,
@@ -128,16 +131,16 @@ export
     # Arithmetic, binary
     conv, convIndep, convFrechet, convPerfect, convOpposite, convFrechetNaive, balchProd,
     VKmeanproduct, VKmeanlo,VKmeanup,VKmeanlower, VKmeanupper, tauRho, sigma, convCorr,
-    +, -, /, *, 
+    +, -, /, *,
 
     # Arithmetic, uniary
-    negate, reciprocate, complement, shift, 
+    negate, reciprocate, complement, shift,
 
     # Univariate functions
     sin, cos, tan, sinh, cosh, tanh, asin, acos, atan,
-    exp, log, ^, 
+    exp, log, ^,
 
-    # Set based operations  
+    # Set based operations
     env, imp,  intersect,# Union, Intersection
 
     # Plots
