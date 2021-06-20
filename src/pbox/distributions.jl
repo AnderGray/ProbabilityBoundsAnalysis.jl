@@ -610,11 +610,11 @@ function fersonEvalEasy(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
     return fer
 end
 
-function mmms(minimum :: Real, maximum :: Real, mean :: Interval, stddev :: Interval; steps = 200)
+function mmms(minimum :: Real, maximum :: Real, mean :: Real, stddev :: Real; steps = 200)
 
     if iszero(maximum - minimum); return pbox((maximum + minimum)/2); end
     range = maximum - minimum;
-    min1,max1,mean1,var1 = checkMomentsAndRanges(minimum,maximum,mean,stddev^2);
+    min1, max1, mean1,var1 = checkMomentsAndRanges(minimum,maximum, mean, stddev^2);
 
     s = sqrt(var1)
 
@@ -682,11 +682,17 @@ function mmms(minimum :: Real, maximum :: Real, mean :: Interval, stddev :: Inte
 
     end
 
-    return pbox(us, ds, ml = left(mean1), mh = right(mean1), vl = left(var1), vh = right(var1))
+    return pbox(us, ds, ml = left(mean1), mh = right(mean1), vl = left(var1), vh = right(var1), shape = "ferson")
 end
 
-mmmv(minimum :: Real, maximum :: Real, mean :: Interval, var :: Interval; steps = 200) = mmms(minimum, maximum, mean, sqrt(var), steps = steps)
+#mmms(minimum :: Real, maximum :: Real, mean :: Real, std :: Real; steps = 200) = mmms(minimum, maximum, interval(mean), interval(std), steps = steps)
 
+mmmv(minimum :: Real, maximum :: Real, mean :: Real, var :: Real; steps = 200) = mmms(minimum, maximum, mean, sqrt(var), steps = steps)
+minMaxMeanVar(minimum :: Real, maximum :: Real, mean :: Real, var :: Real; steps = 200) = mmmv(minimum , maximum , mean, var; steps = steps)
+minMaxMeanStd(minimum :: Real, maximum :: Real, mean :: Real, std :: Real; steps = 200) = mmmv(minimum , maximum , mean, std^2; steps = steps)
+
+
+#=
 function minMaxMeanVar(min = 0, max = 1, mean = 0.5, var = 0.1, name = "")
 
     min1,max1,mean1,var1 = checkMomentsAndRanges(min,max,mean,var);
@@ -703,7 +709,7 @@ function minMaxMeanVar(min = 0, max = 1, mean = 0.5, var = 0.1, name = "")
     return Envelope
 
 end
-
+=#
 Ferson(x...)        = minMaxMeanVar(x...);         ferson(x...) = minMaxMeanVar(x...);
 MinMaxMeanVar(x...) = minMaxMeanVar(x...);  minmaxmeanvar(x...) = minMaxMeanVar(x...);
 
