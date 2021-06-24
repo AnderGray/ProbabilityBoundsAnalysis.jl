@@ -29,12 +29,12 @@
 # Convolutions operations #
 ###########################
 
-function conv(x::pbox, y::pbox; op = +, corr =0) 
+function conv(x::pbox, y::pbox; op = +, corr =0)
     if corr == 0; return convIndep(x,y,op = op); end
     if corr == 1; return convPerfect(x,y, op = op);end
     if corr ==-1; return convOpposite(x,y,op = op);end
     if corr ==interval(-1,1); return convFrechet(x,y, op = op); end
-    
+
     if isinterval(corr)
         Lower = sigma(x, y, C = GauCopula(left(corr)), op=op);
         Upper = sigma(x, y, C = GauCopula(right(corr)), op=op);
@@ -110,7 +110,7 @@ end
 
 
 function convPerfect(x::pbox, y::pbox; op = +)
-    
+
     if (op)∈([-,/])
         cu = map(op, x.u[:],y.d[:]);
         cd = map(op, x.d[:],y.u[:]);
@@ -118,7 +118,7 @@ function convPerfect(x::pbox, y::pbox; op = +)
         cu = map(op, x.u[:], y.u[:]);
         cd = map(op, x.d[:], y.d[:]);
     end
-    
+
     #cu = map(op, x.u[:],y.u[:]);
     #cd = map(op, x.d[:],y.d[:]);
     scu = sort(cu);
@@ -136,7 +136,7 @@ end
 
 function convOpposite(x::pbox, y::pbox; op = +)
 
-    
+
     if (op)∈([-,/])
         cu = map(op, x.u[:],y.d[end:-1:1]);
         cd = map(op, x.d[:],y.u[end:-1:1]);
@@ -144,7 +144,7 @@ function convOpposite(x::pbox, y::pbox; op = +)
         cu = map(op, x.u[:], y.u[end:-1:1]);
         cd = map(op, x.d[:], y.d[end:-1:1]);
     end
-    
+
     #cu = map(op, x.u[:], y.u[end:-1:1]);
     #cd = map(op, x.d[:], y.d[end:-1:1]);
     scu = sort(cu);
@@ -225,7 +225,7 @@ function sigma(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
 
     uCalc = Distributed.@spawn ProbabilityBoundsAnalysis.calcSigmaBoundLeft(xus, yus, op, CU, bounded[1])
     dCalc = Distributed.@spawn ProbabilityBoundsAnalysis.calcSigmaBoundRight(xds, yds, op, CD, bounded[2])
-    
+
     zu = fetch(uCalc);
     zd = fetch(dCalc);
 
@@ -243,8 +243,8 @@ function sigma(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
     vh = Inf;
 
     if !(C.cdfU == C.cdfD);
-        z1 = deepcopy(zu);  z2 = deepcopy(zd); 
-        zu[2:end]   = min.(z1[2:end], z2[1:end-1]); 
+        z1 = deepcopy(zu);  z2 = deepcopy(zd);
+        zu[2:end]   = min.(z1[2:end], z2[1:end-1]);
         zd[1:end-1] = max.(z1[2:end], z2[1:end-1]);
     end
 
@@ -258,7 +258,7 @@ function calcSigmaBoundLeft(x, y , op,  C, bounded)
     xs = x[1:end-1]; ys = y[1:end-1];
 
     Ns = ProbabilityBoundsAnalysis.steps
-    
+
     zs = zeros(Ns-1, Ns-1)    # cart prod
     z  = zeros(Ns)            # output vector
     @threads for i = 1:Ns-1
@@ -324,7 +324,7 @@ function calcSigmaBoundRight(x, y , op,  C, bounded)
     bounded ? is =  ProbabilityBoundsAnalysis.jj() : is = ProbabilityBoundsAnalysis.jjj()
 
 
-    for i = 2:Ns    # Cannot be threaded, because of 2nd line 
+    for i = 2:Ns    # Cannot be threaded, because of 2nd line
         these   = findall(is[i-1] .<= cdf .<= is[i]);
         !isempty(these) ? z[i-1] = maximum(zs[these]) : (i != 2 ?  z[i-1] = z[i-2] : continue)
     end
@@ -365,7 +365,7 @@ function sigmaOld(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
 
     zus = zus[pU]
     zds = zds[pD]
-    
+
     uMasses = uMasses[:][pU]
     dMasses = dMasses[:][pD]
 
@@ -373,7 +373,7 @@ function sigmaOld(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
 
     #push!(zus, zu[end])
     #pushfirst!(zds, zd[1])
-    
+
     #uCdf[2:end] = cumsum(uMasses);
     #dCdf[1:end-1] = cumsum(dMasses);
 
@@ -398,7 +398,7 @@ function sigmaOld(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
         if !isempty(downs); zd[i-1] = maximum(zds[downs]); elseif i!=2; zd[i-1] = zd[i-2]; end
 
     end
-    
+
     # Mean tranforms the same as independence
 	ml = -Inf;
     mh = Inf;
@@ -413,8 +413,8 @@ function sigmaOld(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
     vh = Inf;
 
     if !(C.cdfU == C.cdfD);
-        z1 = deepcopy(zu);  z2 = deepcopy(zd); 
-        zu[2:end]   = min.(z1[2:end], z2[1:end-1]); 
+        z1 = deepcopy(zu);  z2 = deepcopy(zd);
+        zu[2:end]   = min.(z1[2:end], z2[1:end-1]);
         zd[1:end-1] = max.(z1[2:end], z2[1:end-1]);
     end
 
@@ -422,10 +422,71 @@ function sigmaOld(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
 
 end
 
+
 function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
 
-    #if (op == -) return (tauRho(x,negate(y), C, +));end             # Odd behaviour, negating has no effect if we don't do something to copula
-    #if (op == /) return (tauRho(x,reciprocate(y), C, *));end
+    #if (op == -) return (tauRho(x, negate(y), rotate(C), +));end             # Odd behaviour, negating has no effect if we don't do something to copula
+    #if (op == /) return (tauRho(x, reciprocate(y), rotate(C), *));end
+    #if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (throw(ArgumentError("Not sure if straddles"))); end; end
+    ## Unsure about the above line. It looks like if it straddles 0, we need to do the naive frechet and the balch prod (?) and impose one on the other
+
+    x = makepbox(x);
+    y = makepbox(y);
+
+    Ns = ProbabilityBoundsAnalysis.steps
+
+    zd = zeros(Ns);
+    zu = zeros(Ns);
+
+    zds = [map(op, dx, dy) for dx in x.d, dy in y.d]        # Carteesian products
+    zus = [map(op, ux, uy) for ux in x.u, uy in y.u]
+
+    is = ProbabilityBoundsAnalysis.ii(); js = ProbabilityBoundsAnalysis.jj()
+
+    cop = left.(C(js,js))
+    dual = right.([is[i] + is[j] - C(is[i], is[j]) for i in 1:Ns, j in 1:Ns])
+
+    cop = cop[:]
+    dual = dual[:]
+
+    zds = zds[:]
+    zus = zus[:]
+
+    for i = 1:Ns
+
+        downs = findall( cop .>= js[end + 1 - i] );
+        ups   = findall( dual .<= is[i] );
+
+
+        if !isempty(downs);
+            zd[i] = minimum(zds[downs]);
+            deleteat!(cop, downs);
+            deleteat!(zds, downs);
+        else zd[i] = zd[i-1]; end
+
+
+        if !isempty(ups);
+            zu[i]   = maximum(zus[ups]);
+            deleteat!(dual, ups);
+            deleteat!(zus, ups);
+        else zu[i]   = zu[i-1]; end
+
+
+
+    end
+
+    bounded = min(x.bounded,y.bounded);
+
+    zd = reverse(zd)
+
+    return pbox(zu, zd, bounded = bounded);
+
+end
+
+function tauRhoOld2(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
+
+    #if (op == -) return (tauRho(x, negate(y), rotate(C), +));end             # Odd behaviour, negating has no effect if we don't do something to copula
+    #if (op == /) return (tauRho(x, reciprocate(y), rotate(C), *));end
     #if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (throw(ArgumentError("Not sure if straddles"))); end; end
     ## Unsure about the above line. It looks like if it straddles 0, we need to do the naive frechet and the balch prod (?) and impose one on the other
 
@@ -444,27 +505,94 @@ function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
 
     cop = C.cdfD;
     dual = [is[i] + js[j] - cop[i,j] for i in 1:Ns, j in 1:Ns]
-    
+
     downs = findall(cop .== 1); ups = findall(dual .== 0);
 
     zd[end] = minimum(zds[downs]); zu[1] = maximum(zus[ups])
 
     for i = 2:Ns
 
-        downs = findall( is[i-1] .<= cop .<= is[i]);
+        downs = findall( is[i-1] .< cop .<= is[i]);
         ups   = findall( js[i-1] .<= dual .<= js[i]);
-        
+
         zd[i-1] = minimum(zds[downs]);
         zu[i]   = maximum(zus[ups]);
 
     end
-    
+
     bounded = min(x.bounded,y.bounded);
 
     return pbox(zu, zd, bounded = bounded);
 
 end
 
+
+function tauRhoNew(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
+
+    #if (op == -) return (tauRho(x, negate(y), rotate(C), +));end             # Odd behaviour, negating has no effect if we don't do something to copula
+    #if (op == /) return (tauRho(x, reciprocate(y), rotate(C), *));end
+    #if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (throw(ArgumentError("Not sure if straddles"))); end; end
+    ## Unsure about the above line. It looks like if it straddles 0, we need to do the naive frechet and the balch prod (?) and impose one on the other
+
+    x = makepbox(x);
+    y = makepbox(y);
+
+    Ns = ProbabilityBoundsAnalysis.steps
+
+    zd = zeros(Ns);
+    zu = zeros(Ns);
+
+    zds = [map(op, dx, dy) for dx in x.d, dy in y.d]        # Carteesian products
+    zus = [map(op, ux, uy) for ux in x.u, uy in y.u]
+
+    is = range(0, stop = 1, length = Ns); js = range(0, stop = 1, length = Ns)
+
+    #is = reverse(is)
+
+    cop = C.cdfD;
+    dual = [is[i] + js[j] - cop[i,j] for i in 1:Ns, j in 1:Ns]
+
+    cop = cop[:]
+    dual = dual[:]
+
+    zds = zds[:]
+    zus = zus[:]
+
+    downs = findall(cop .== 1); ups = findall(dual .== 0);
+
+    zd[end] = minimum(zds[downs]); zu[1] = maximum(zus[ups])
+
+    deleteat!(cop, downs)
+    deleteat!(dual, ups)
+
+    deleteat!(zds, downs)
+    deleteat!(zus, ups)
+
+
+    for i = 2:Ns
+
+        downs = findall( cop .<= is[i]);
+        ups   = findall( dual .< js[i]);
+
+        if !isempty(downs);
+            zd[i-1] = minimum(zds[downs]);
+            deleteat!(cop, downs);
+            deleteat!(zds, downs);
+        elseif i!=2; zd[i-1] = zd[i-2]; end
+
+        if !isempty(ups);
+            zu[i]   = maximum(zus[ups]);
+            deleteat!(dual, ups);
+            deleteat!(zus, ups);
+        else zu[i]   = zu[i-1]; end
+
+    end
+
+    bounded = min(x.bounded,y.bounded);
+
+    return pbox(zu, zd, bounded = bounded);
+
+end
 
 function tauRho2(x::Real, y::Real, C:: AbstractCopula, op = +)
 
@@ -488,7 +616,7 @@ function tauRho2(x::Real, y::Real, C:: AbstractCopula, op = +)
 
     cop = C.cdf;
     dual = [is[i] + js[j] - cop[i,j] for i in 1:Ns, j in 1:Ns]
-    
+
     downs = findall(cop .== 1); ups = findall(dual .== 0);
 
     zd[end] = minimum(zds[downs]); zu[1] = maximum(zus[ups])
@@ -497,12 +625,12 @@ function tauRho2(x::Real, y::Real, C:: AbstractCopula, op = +)
 
         downs = findall( is[i-1] .<= cop .<= is[i]);
         ups   = findall(js[i-1] .<= dual .<= js[i]);
-        
+
         zd[i-1] = minimum(zds[downs]);
         zu[i]   = maximum(zus[ups]);
 
     end
-    
+
     bounded = min(x.bounded,y.bounded);
 
     return pbox(zu, zd, bounded=bounded);
@@ -517,7 +645,7 @@ end
 
 function shift(x :: pbox, ss :: Real)
      if (x.shape) ∈ (["uniform","normal","cauchy","triangular","skew-normal"]) s = x.shape; else s = ""; end
-    return pbox(ss .+ x.u, ss .+ x.d, shape=s, name="", ml = x.ml+ss, mh=x.mh+ss, 
+    return pbox(ss .+ x.u, ss .+ x.d, shape=s, name="", ml = x.ml+ss, mh=x.mh+ss,
     vl=x.vl, vh=x.vh, bounded = x.bounded)
 end
 
@@ -525,14 +653,14 @@ function mult(x::pbox, m :: Real)
     if (x.shape) ∈ (["uniform","normal","cauchy","triangular","skew-normal"]) s = x.shape; else s = ""; end
     if ((x.shape) ∈ (["exponential","lognormal"]) && 0 <= x.u[1]) s = x.shape; else s = ""; end
     if (m < 0) return negate(mult(x,abs(m))) end
-    return pbox(m*x.u, m*x.d, shape=s, name="", ml=m*x.ml, mh=m*x.mh, vl=(m^2)*x.vl, 
+    return pbox(m*x.u, m*x.d, shape=s, name="", ml=m*x.ml, mh=m*x.mh, vl=(m^2)*x.vl,
     vh=(m^2)*x.vh, bounded = x.bounded)   ################## mean if m<0
 end
 
 function negate(x)
     if (ispbox(x))
         if ((x.shape)∈(["uniform", "normal", "cauchy", "triangular"])) s = x.shape; else s = ""; end
-        return pbox(-x.d[end:-1:1],-x.u[end:-1:1],shape=s,name = "", ml=-x.mh, mh=-x.ml, 
+        return pbox(-x.d[end:-1:1],-x.u[end:-1:1],shape=s,name = "", ml=-x.mh, mh=-x.ml,
         vl=x.vl, vh=x.vh, bounded = reverse(x.bounded));
     end
     return -x;
@@ -540,7 +668,7 @@ end
 
 function complement(x::pbox)
     if ((x.shape)∈(["uniform", "normal", "cauchy", "triangular", "skew-normal"])) s = x.shape; else s = ""; end
-    return pbox(1 .-x.d[end:-1:1],1 .-x.u[end:-1:1],shape=s,name = "", ml=1-x.mh, 
+    return pbox(1 .-x.d[end:-1:1],1 .-x.u[end:-1:1],shape=s,name = "", ml=1-x.mh,
     mh=1-x.ml, vl=x.vl, vh=x.vh, bounded = x.bounded);
 end
 
@@ -567,7 +695,7 @@ function reciprocate(x)
         myMean = interval(x.ml, x.mh);
         myVar = interval(x.vl, x.vh);
 
-        return pbox(1 ./reverse(x.d[:]), 1 ./ reverse(x.u[:]), shape = sh, name="", ml=left(myMean), 
+        return pbox(1 ./reverse(x.d[:]), 1 ./ reverse(x.u[:]), shape = sh, name="", ml=left(myMean),
         mh=right(myMean), vl=left(myVar), vh=right(myVar), bounded = [true, true]);
     end
     return 1/x;
@@ -608,7 +736,7 @@ end
 ^(x::pbox, y ::Integer) = intUnivariate(x,x->x^y)
 
 
-defaultCorr = 0;
+defaultCorr = interval(-1, 1);
 
 -(x::pbox) = negate(x);
 /(x::pbox) = reciprocate(x);
@@ -747,13 +875,13 @@ function copulaSigma( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCopula
 
     ux = x.u; uy = y.u; cdf1 = C.cdfU;
     uz = Fz.u;
-    
+
     dx = x.d; dy = y.d; cdf2 =C.cdfD;
     dz = Fz.d
 
     proc1 = Distributed.@spawn calcCbound(ux, uy, uz, cdf1, op, true)
     proc2 = Distributed.@spawn calcCbound(dx, dy, dz, cdf2, op, false)
-    
+
     cdfU = fetch(proc1)
     cdfD = fetch(proc2)
 
@@ -769,7 +897,7 @@ function calcCbound(x, y, z, C, op, left)
     left ? (xs = x[1:end-1]; ys = y[1:end-1]) : (xs = x[2:end]; ys = y[2:end])
 
     Nx = length(x); Ny = length(y);
-    zus = zeros(Nx-1, Ny-1)     
+    zus = zeros(Nx-1, Ny-1)
     @threads for i = 1:Nx-1            # Threaded
         for j = 1:Ny-1
             zus[i,j] = op(xs[i], ys[j])
@@ -787,10 +915,10 @@ function calcCbound(x, y, z, C, op, left)
             indexs2 = j-1
 
             these = getindex.(getproperty.(indexs,:I), 2) .== indexs2       # Quite fast
-    
+
             us = sum(masses[indexs[these]])
 
-            cdfC[i,j] = us 
+            cdfC[i,j] = us
         end
     end
 
@@ -806,7 +934,7 @@ function calcCbound2(x, y, z, C, op, left)
     #zus =  [map(op, ux, uy) for ux in xs, uy in ys]        # Carteesian products
 
     Nx = length(x); Ny = length(y);
-    zus = zeros(Nx-1, Ny-1)     
+    zus = zeros(Nx-1, Ny-1)
     for i = 1:Nx-1            # Threaded
         for j = 1:Ny-1
             zus[i,j] = op(xs[i], ys[j])
@@ -825,10 +953,10 @@ function calcCbound2(x, y, z, C, op, left)
             indexs2 = j-1
 
             these = getindex.(getproperty.(indexs,:I), 2) .== indexs2       # Very fast
-    
+
             us = sum(masses[indexs[these]])
 
-            cdfC[i,j] = us 
+            cdfC[i,j] = us
             #cdfC[i,j] = us + cdfC[i,j-1] + cdfC[i-1,j] - cdfC[i-1,j-1];
         end
     end
@@ -881,11 +1009,11 @@ function copulaSigmaSlow( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCo
 
             YesNo = [indexs[k][1] .== indexs2 for k = 1:length(indexs)];     # Confusing, but checks which elements share the same indexs
             sums = sum.(YesNo);          # The zeros will be removed from the integration
-    
+
             newIndx = indexs[sums .> 0];
-    
+
             us = sum(uMasses[newIndx])
-    
+
             cdfU[i,j] = us + cdfU[i,j-1] + cdfU[i-1,j] - cdfU[i-1,j-1];
 
             indexs = findall((Fz.d[i-1] .<= zds .< Fz.d[i]));
@@ -893,11 +1021,11 @@ function copulaSigmaSlow( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCo
 
             YesNo = [indexs[k][1] .== indexs2 for k = 1:length(indexs)];     # Confusing, but checks which elements share the same indexs
             sums = sum.(YesNo);          # The zeros will be removed from the integration
-    
+
             newIndx = indexs[sums .> 0];
-    
+
             ds = sum(dMasses[newIndx])
-    
+
             cdfD[i,j] = ds + cdfD[i,j-1] + cdfD[i-1,j] - cdfD[i-1,j-1];
 
         end
@@ -934,7 +1062,7 @@ function copulaSigmaHard( x :: pbox, y :: pbox; op = +,  C = πCop()::AbstractCo
 
             YesNo = [indexs[k][1] .== indexs2 for k = 1:length(indexs)];     # Confusing, but checks which elements share the same indexs
             sums = sum.(YesNo);          # The zeros will be removed from the integration
-    
+
             newIndx = indexs[sums .> 0];
 
             us = sum(uMasses[newIndx])
@@ -965,7 +1093,7 @@ function copulaUnary(x :: pbox, op)
 
     CopU = zeros(Fz.n, x.n)
     CopD = zeros(Fz.n, x.n)
-    
+
     for i = 1:Fz.n
         for j = 1:x.n
             indexU =  left.(zInts[1:j]) .< leftF[i]
