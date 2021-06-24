@@ -1106,3 +1106,8 @@ function copulaUnary(x :: pbox, op)
     #CopU[end,:].= CopU[:,end] .=  CopD[end,:] .= CopD[:,end] .= collect(xRange);
     return copula(CopU,CopD), Fz
 end
+	
+# return the range of a univariate p-box
+function Base.range(p::pbox)
+    return interval(p.u[1], p.d[end])
+end
