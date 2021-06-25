@@ -37,7 +37,7 @@
     @test x.ml == x.mh
     @test x.ml == 0.5
     @test x.vh == x.vl
-    
+
     x = pbox(interval(0,4), ml=1, mh = 3, vl = 0.2, vh = 2)
 
     @test isinterval(x)
@@ -51,14 +51,28 @@
 
     x = pbox.(0,1:3)
     @test all(isinterval.(x))
-    
+
     x = makepbox(1,2,3)
     @test all(isscalar.(x))
-    
+
     x = makepbox.(interval.(0,1:3))
     @test all(isinterval.(x))
 
-    
+
+end
+
+@testset "Pbox range" begin
+    # univariate pbox
+    u = uniform(interval(-1, 0), interval(0, 1))
+    @test range(u) == interval(-1, 1)
+end
+
+@testset "Pbox mass" begin
+    # univariate pbox
+    x = interval(1.12, 1.15)
+    pb = pbox(mince(x, 10))
+    m = mass(pb, 1.14, 100.0)
+    @test m.lo ≈ 0.295 && m.hi ≈ 0.395
 end
 
 ##
@@ -68,4 +82,3 @@ end
 ##
 # Interpolations
 ##
-
