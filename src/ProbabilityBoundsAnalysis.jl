@@ -39,7 +39,9 @@ __precompile__(true)
 module ProbabilityBoundsAnalysis
 
 using Base: Float64
-using Reexport, Distributions, Interpolations, PyCall, Distributed, PyPlot
+using Reexport, Distributions, Interpolations, PyCall, Distributed
+
+using Requires
 
 @reexport using IntervalArithmetic, Distributed, Statistics, LinearAlgebra
 
@@ -57,7 +59,7 @@ import IntervalArithmetic: intersect, issubset
 
 import Statistics: mean, var, std
 
-import PyPlot: plot, scatter
+#import PyPlot: plot, scatter
 
 import Distributions: cdf #Normal, Beta, Uniform
 
@@ -146,7 +148,7 @@ export
     env, imp,  intersect,# Union, Intersection
 
     # Plots
-    plot,
+    plot_pbox,
 
     # Checks
     ispbox, isinterval, isscalar, isvacuous, isequal,
@@ -174,8 +176,16 @@ include("pbox/arithmetic.jl")
 include("pbox/MomentTransformations.jl")
 include("pbox/distributions.jl")
 include("pbox/special.jl")
-include("pbox/plot_recipes.jl")
-include("intervalStatistics/IntervalStatistics.jl")
+#include("pbox/plot_recipes.jl")
+#include("intervalStatistics/IntervalStatistics.jl")
+
+
+function __init__()
+
+    @require PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee" begin
+        include("pbox/plot_recipes.jl")
+    end
+end
 
 
 

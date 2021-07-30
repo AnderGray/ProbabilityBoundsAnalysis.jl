@@ -43,10 +43,12 @@ include("NormalDistribution.jl")
 #global bOt = 0.001;              # smallest quamtile to use if left tail is unbounded
 #global tOp = 0.999;              # largest quamtile to use if right tail is unbounded
 
+#=
 pyimport_conda("mpl_toolkits.mplot3d", "mpl_toolkits")
 art3d = PyObject(PyPlot.art3D)
 mpl = pyimport("matplotlib")
 using3D()
+=#
 
 abstract type AbstractCopula <: Real end
 abstract type AbstractJoint <: Real end
@@ -119,7 +121,7 @@ end
 
 (obj::copula)(X :: StepRangeLen, Y :: Real, useInterp = false)  = [obj(i,Y,useInterp) for i in X]
 
-function (obj::copula)(X :: Interval, Y::Interval, useInterp = false) 
+function (obj::copula)(X :: Interval, Y::Interval, useInterp = false)
 
     cdfLo = obj(X.lo,Y.lo, useInterp).lo
     cdfHi = obj(X.hi,Y.hi, useInterp).hi
@@ -128,12 +130,12 @@ function (obj::copula)(X :: Interval, Y::Interval, useInterp = false)
 
 end
 
-function (obj::copula)(X :: Interval, Y::Real, useInterp = false) 
+function (obj::copula)(X :: Interval, Y::Real, useInterp = false)
     Y = interval(Y);
     return obj(X,Y,useInterp)
 end
 
-function (obj::copula)(X :: Real, Y::Interval, useInterp = false) 
+function (obj::copula)(X :: Real, Y::Interval, useInterp = false)
     X = interval(X);
     return obj(X,Y,useInterp)
 end
@@ -157,7 +159,7 @@ function cdfU(C :: copula, X, Y)
 
     #w = [opp(x,y) for x in X, y in Y]
     #m = [perf(x,y) for x in X, y in Y]
-    
+
     #cdfLo = max.(C.cdfU[xIndexLower, yIndexLower], w)
     #cdfHi = min.(C.cdfU[xIndexUpper, yIndexUpper], m)
 
@@ -177,10 +179,10 @@ function cdfD(C :: copula, X, Y)
 
     xIndexUpper = Int.(ceil.(X .* (nX-1)))  .+ 1
     yIndexUpper = Int.(ceil.(Y .* (nY-1)))  .+ 1
-    
+
     #w = [opp(x,y) for x in X, y in Y]
     #m = [perf(x,y) for x in X, y in Y]
-    
+
     #cdfLo = max.(C.cdfD[xIndexLower, yIndexLower], w)
     #cdfHi = min.(C.cdfD[xIndexUpper, yIndexUpper], m)
 
@@ -256,7 +258,7 @@ function conditionalX(C :: AbstractCopula, xVal :: Real)
     Nsx, Nsy = size(C.cdfU)
 
     n = ProbabilityBoundsAnalysis.steps
-    
+
     yGridU = ProbabilityBoundsAnalysis.ii();
     yGridD = ProbabilityBoundsAnalysis.jj();
 
@@ -266,7 +268,7 @@ function conditionalX(C :: AbstractCopula, xVal :: Real)
     zD = (right.(C(xVal + diff/2, yGridD) - right.(C(xVal - diff/2, yGridD))))/diff
 
     ###
-    #   zU are the cdf values, and yGridU/D are the physical values, which is a uniform grid. 
+    #   zU are the cdf values, and yGridU/D are the physical values, which is a uniform grid.
     #   We need to "invert" it so that zU is a uniform grid.
     ###
 
@@ -291,7 +293,7 @@ function conditionalY(C :: AbstractCopula, yVal :: Real)
     zD = (right.(C(xGridD,yVal + diff/2) - right.(C(xGridD,yVal - diff/2))))/diff
 
     ###
-    #   zU are the cdf values, and yGridU/D are the physical values, which is a uniform grid. 
+    #   zU are the cdf values, and yGridU/D are the physical values, which is a uniform grid.
     #   We need to "invert" it so that zU is a uniform grid.
     ###
 
@@ -307,7 +309,7 @@ function conditionalY(C :: AbstractCopula, yVal :: Real)
 end
 
 ###
-#   Copula generators for Archimedean (Frank and Clayton) copulas. Allows for easy and accurate copula generation 
+#   Copula generators for Archimedean (Frank and Clayton) copulas. Allows for easy and accurate copula generation
 #   at any dimension in terms of univariate functions (generator and inverse generator).
 ###
 
@@ -360,8 +362,8 @@ kenLB(x, y, τ) = x - kenUB(x, 1 - y, - τ)
 #spearϕ(a, b) = 1/6 * ( (max(0, 9*b + 3*sqrt( 9*b^2 - 3*a^6)))^(1/3) + ( max(0,9*b - 3*sqrt(9*b^2 - 3*a^6)))^(1/3) )
 
 function spearϕ(a, b)
-    A = 9*b 
-    B = max(9*b^2 - 3*a^6, 0) 
+    A = 9*b
+    B = max(9*b^2 - 3*a^6, 0)
     C = (max(0, A + 3*sqrt(B)))^(1/3)
     D = (max(0, A - 3*sqrt(B)))^(1/3)
     return 1/6 * (C + D)
@@ -396,7 +398,7 @@ function W()
 end
 
 function πCop()
-    
+
     n = ProbabilityBoundsAnalysis.steps
 
     x = range(0,1,length = n);
@@ -424,7 +426,7 @@ function Frank(s = 1)                       #   s is real; inf for perfect, 0 fo
     end
 
     n = ProbabilityBoundsAnalysis.steps
-    x = range(0, 1, length = n);                     
+    x = range(0, 1, length = n);
     cdf = [F(xs, ys, s) for xs in x, ys in x];
 
     return copula(cdf, family = "Frank", param = s);
@@ -515,7 +517,7 @@ function Frechet()
 
     cdfU = [perf(xs,ys) for xs in x, ys in x]
     cdfD = [opp(xs,ys) for xs in x, ys in x]
-    
+
     return copula(cdfU, cdfD, family = "Frechet");
 end
 
@@ -535,7 +537,7 @@ end
 KendalCopula(τ = 0) = τCopula(τ)
 
 function ρCopula( ρ = 0 ) # Imprecise copula from Spearman rho
-    
+
     n = ProbabilityBoundsAnalysis.steps
     x = range(0,stop = 1,length = n);
 
@@ -598,7 +600,7 @@ function sample(C :: AbstractCopula, N = 1)
     if (family == "Gaussian") return CholeskyGaussian(N, Float64(C.param)) ;end  # Use Cholesky decompostition of the Cov matrix for gaussian copula sampling
 
     n,n2 = size(C.cdfD)
-    
+
 
     x = rand(N);    y = rand(N);
     ux = x;         uy = zeros(N);
@@ -656,7 +658,7 @@ function rotate90(x :: copula)
 
     n1,n2 = size(cdfU);
 
-    u1 = range(0, 1, length = n1); 
+    u1 = range(0, 1, length = n1);
     u2 = range(0, 1, length = n2);
 
     cdfU = u1 .- right.(cdfU(x, 1 .- u2, u1))
@@ -669,7 +671,7 @@ function rotate180(x :: copula)
 
     n1,n2 = size(cdfU);
 
-    u1 = range(0, 1, length = n1); 
+    u1 = range(0, 1, length = n1);
 
 end
 
@@ -679,7 +681,7 @@ function rotate270(x :: copula)
 
     n1,n2 = size(cdfU);
 
-    u1 = range(0, 1, length = n1); 
+    u1 = range(0, 1, length = n1);
 
 end
 =#
@@ -859,433 +861,3 @@ function Base.show(io::IO, z::bivpbox)
 
     print(io, "$statement0 ~ $statement1( $xShape(mean = $xMean, var = $xVar), $yShape(mean = $yMean, var = $yVar)$statement2)");
 end
-
-function plotStep(cop :: copula; name = missing, pn = 50, fontsize = 18, alpha = 0.3)
-
-    AU = cop.cdfU
-    AD = cop.cdfD
-    m = size(AU)[1];
-    if m < pn; ppn = m; else ppn = pn; end      #pn is the plot "sub-sample", we can't plot all elements
-
-    x = y = range(0, stop = 1,length=m)
-    #xgrid = repeat(x',ppn,1)
-    #ygrid = repeat(y,1,ppn)
-
-    nm = round(m/ppn); 
-
-    x = x[1:Int(nm):end]
-    oneIn = x[end] == 1
-    
-    if !oneIn; x = [x; 1]; end                             # We always want to include 1 in the plot
-
-    zU = AU[1:Int(nm):end,1:Int(nm):end]
-    zD = AD[1:Int(nm):end,1:Int(nm):end]
-
-    if !oneIn;
-
-        zU = [zU AU[end, 1:Int(nm):end]]
-        zU = [zU' [AU[1:Int(nm):end, end]; 1]]
-
-        zD = [zD AD[end, 1:Int(nm):end]]
-        zD = [zD' [AD[1:Int(nm):end, end]; 1]]
-    end
-
-    if ismissing(name); fig = figure(figsize=(10,10)) else fig = figure(name,figsize=(10,10));end
-    ax = fig.add_subplot(1,1,1,projection="3d")
-
-    Ufaces = prepPolysU(zU,x);
-    Dfaces = prepPolysD(zD,x);
-
-    p3Ufaces = PyObject(art3d.Poly3DCollection(Ufaces, alpha=alpha))
-    p3Dfaces = PyObject(art3d.Poly3DCollection(Dfaces, alpha=1))
-    
-    face_colorU = [1, 0, 0]
-    face_colorD = [0, 0, 1]
-    edge_color = [0.4, 0.4, 0.4]
-
-    pycall(p3Ufaces.set_facecolor, PyAny, face_colorU)
-    pycall(p3Ufaces.set_edgecolor, PyAny, edge_color)
-
-    pycall(p3Dfaces.set_facecolor, PyAny, face_colorD)
-    pycall(p3Dfaces.set_edgecolor, PyAny, edge_color)
-
-    pycall(ax.add_collection3d, PyAny, p3Dfaces)
-    pycall(ax.add_collection3d, PyAny, p3Ufaces)
-    
-
-end
-
-function prepPolysU(us, x)
-
-    ppn = length(x)
-
-    p1 = [x[1]; x[1]; us[2, 2]]
-    p2 = [x[1]; x[2]; us[2, 2]]
-    p3 = [x[2]; x[2]; us[2, 2]]
-    p4 = [x[2]; x[1]; us[2, 2]]
-    tops = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-
-    for i = 1:1:ppn-1
-        for j = 1:1:ppn-1
-            p1 = [x[i]; x[j]; us[i+1,j+1]]
-            p2 = [x[i]; x[j+1]; us[i+1, j+1]]
-            p3 = [x[i+1]; x[j+1]; us[i+1, j+1]]
-            p4 = [x[i+1]; x[j]; us[i+1, j+1]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            tops = [tops; this]
-        end
-    end
-    
-    tops = tops[2:end]
-
-    p1 = [x[1]; x[1]; us[1, 1]]
-    p2 = [x[1]; x[1]; us[2, 2]]
-    p3 = [x[1]; x[2]; us[2, 2]]
-    p4 = [x[1]; x[2]; us[1, 1]]
-
-    sides = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-
-    for i = 1:1:ppn-1
-        
-        for j = i:1:ppn-1
-            
-            p1 = [x[i]; x[j]; us[i,j+1]]
-            p2 = [x[i]; x[j]; us[i+1, j+1]]
-            p3 = [x[i]; x[j+1]; us[i+1, j+1]]
-            p4 = [x[i]; x[j+1]; us[i, j+1]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            
-            p1 = [x[i]; x[j]; us[i+1,j]]
-            p2 = [x[i]; x[j]; us[i+1, j+1]]
-            p3 = [x[i+1]; x[j]; us[i+1, j+1]]
-            p4 = [x[i+1]; x[j]; us[i+1, j]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            
-            p1 = [x[j]; x[i]; us[j,i+1]]
-            p2 = [x[j]; x[i]; us[j+1, i+1]]
-            p3 = [x[j]; x[i+1]; us[j+1, i+1]]
-            p4 = [x[j]; x[i+1]; us[j, i+1]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            
-            p1 = [x[j]; x[i]; us[j+1,i]]
-            p2 = [x[j]; x[i]; us[j+1, i+1]]
-            p3 = [x[j+1]; x[i]; us[j+1, i+1]]
-            p4 = [x[j+1]; x[i]; us[j+1, i]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-
-        end
-    end
-
-    sides = unique(sides, dims=1)
-
-    #return tops
-    return [tops; sides]
-
-end
-
-function prepPolysD(us, x)
-
-    ppn = length(x)
-
-    p1 = [x[1]; x[1]; us[1, 1]]
-    p2 = [x[1]; x[2]; us[1, 1]]
-    p3 = [x[2]; x[2]; us[1, 1]]
-    p4 = [x[2]; x[1]; us[1, 1]]
-    tops = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-
-    
-    for i = 1:1:ppn-1
-        for j = i:1:ppn-1
-            p1 = [x[i]; x[j]; us[i+1, j]]
-            p2 = [x[i]; x[j+1]; us[i+1, j]]
-            p3 = [x[i+1]; x[j+1]; us[i+1, j]]
-            p4 = [x[i+1]; x[j]; us[i+1, j]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            tops = [tops; this]
-            
-            p1 = [x[j]; x[i]; us[j, i+1]]
-            p2 = [x[j]; x[i+1]; us[j, i+1]]
-            p3 = [x[j+1]; x[i+1]; us[j, i+1]]
-            p4 = [x[j+1]; x[i]; us[j, i+1]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            tops = [tops; this]
-
-        end
-    end
-    
-    p1 = [x[2]; x[2]; us[1, 1]]
-    p2 = [x[2]; x[2]; us[2, 2]]
-    p3 = [x[2]; x[3]; us[2, 2]]
-    p4 = [x[2]; x[3]; us[1, 1]]
-
-    sides = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-#=
-    for i = 2:1:ppn-1
-        for j = i:1:ppn-1
-            
-            p1 = [x[i-1]; x[j-1]; us[i-1,j]]
-            p2 = [x[i-1]; x[j-1]; us[i, j]]
-            p3 = [x[i-1]; x[j]; us[i, j]]
-            p4 = [x[i-1]; x[j]; us[i-1, j]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            
-            p1 = [x[i-1]; x[j-1]; us[i,j-1]]
-            p2 = [x[i-1]; x[j-1]; us[i, j]]
-            p3 = [x[i]; x[j-1]; us[i, j]]
-            p4 = [x[i]; x[j-1]; us[i, j-1]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            
-            p1 = [x[j-1]; x[i-1]; us[j-1,i]]
-            p2 = [x[j-1]; x[i-1]; us[j, i]]
-            p3 = [x[j-1]; x[i]; us[j, i]]
-            p4 = [x[j-1]; x[i]; us[j-1, i]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            
-            p1 = [x[j-1]; x[i-1]; us[j,i-1]]
-            p2 = [x[j-1]; x[i-1]; us[j, i]]
-            p3 = [x[j]; x[i-1]; us[j, i]]
-            p4 = [x[j]; x[i-1]; us[j, i-1]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-
-        end
-    end
-    =#
-
-    
-    for i = 1:1:ppn-1
-        for j = i:1:ppn-1
-            
-            p1 = [x[i]; x[j]; us[i+1,j]]
-            p2 = [x[i]; x[j]; us[i, j]]
-            p3 = [x[i]; x[j+1]; us[i, j]]
-            p4 = [x[i]; x[j+1]; us[i+1, j]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            #=
-            p1 = [x[i+1]; x[j]; us[i,j+1]]
-            p2 = [x[i+1]; x[j]; us[i+1, j]]
-            p3 = [x[i]; x[j]; us[i+1, j]]
-            p4 = [x[i]; x[j]; us[i, j+1]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            =#
-            
-            p1 = [x[j]; x[i]; us[j,i+1]]
-            p2 = [x[j]; x[i]; us[j, i]]
-            p3 = [x[j]; x[i+1]; us[j, i]]
-            p4 = [x[j]; x[i+1]; us[j, i+1]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            
-            #=
-            p1 = [x[j]; x[i]; us[j+1,i]]
-            p2 = [x[j]; x[i]; us[j+1, i+1]]
-            p3 = [x[j+1]; x[i]; us[j+1, i+1]]
-            p4 = [x[j+1]; x[i]; us[j+1, i]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            =#
-        end
-    end
-    
-    
-    tops = unique(tops, dims=1)
-    sides = unique(sides, dims=1)
-    
-    return [tops; sides]
-
-end
-
-function plot(x :: copula; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
-
-    AU = x.cdfU
-    AD = x.cdfD
-    m = size(AU)[1];
-    if m < pn; ppn = m; else ppn = pn; end
-
-    x = y = range(0, stop = 1,length=ppn)
-    xgrid = repeat(x',ppn,1)
-    ygrid = repeat(y,1,ppn)
-
-    nm = round(m/ppn);
-
-    zU = AU[1:Int(nm):end,1:Int(nm):end]
-    zD = AD[1:Int(nm):end,1:Int(nm):end]
-
-    if ismissing(name); fig = figure(figsize=(10,10)) else fig = figure(name,figsize=(10,10));end
-    ax = fig.add_subplot(1,1,1,projection="3d")
-    #ax = fig.add_subplot(2,1,1)
-    
-    plot_surface(xgrid, ygrid, zD, rstride=2,edgecolors="b", cstride=2, alpha=1, linewidth=1, cmap=ColorMap("Blues"))
-    plot_surface(xgrid, ygrid, zU, rstride=2,edgecolors="r", cstride=2, alpha=alpha, linewidth=1, cmap=ColorMap("RdGy"))
-
-    ax.view_init(45-27, 180+ 26)
-
-    xlabel("U",fontsize = fontsize)
-    ylabel("V",fontsize = fontsize)
-    ax.zaxis.set_rotate_label(false);
-    zlabel("C(u,v)", rotation = 0, fontsize = fontsize)
-    xticks(fontsize = fontsize ÷ 1.3); yticks(fontsize = fontsize ÷ 1.3);
-    #PyPlot.title(title,fontsize=fontsize)
-    tight_layout()
-end
-
-function plot(x :: bivpbox; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
-
-    AU = x.C.cdfU
-    AD = x.C.cdfD
-    m = size(AU)[1];
-    if m < pn; ppn = m; else ppn = pn; end
-
-    xus = x.marg1.u; xds = x.marg1.d;
-    yus = x.marg2.u; yds = x.marg2.d;
-
-    nm = round(m/ppn);
-
-    xus = xus[1:Int(nm):end]; xds = xds[1:Int(nm):end]; 
-    yus = yus[1:Int(nm):end]; yds = yds[1:Int(nm):end]; 
-
-    zU = AU[1:Int(nm):end,1:Int(nm):end]
-    zD = AD[1:Int(nm):end,1:Int(nm):end]
-
-    uGridx, uGridy = (repeat(xus',length(yus),1),repeat(yus,1,length(xus)))
-    dGridx, dGridy = (repeat(xds',length(yds),1),repeat(yds,1,length(xds)))
-
-    if ismissing(name); fig = figure(figsize=(10,10)) else fig = figure(name,figsize=(10,10));end
-    ax = fig.add_subplot(1,1,1,projection="3d")
-   #ax = fig.add_subplot(2,1,1)
-
-    plot_surface(dGridx, dGridy, zD, rstride=2,edgecolors="b", cstride=2, alpha=1, linewidth=1, cmap=ColorMap("Blues"))
-    plot_surface(uGridx, uGridy, zU, rstride=2,edgecolors="r", cstride=2, alpha=alpha, linewidth=1, cmap=ColorMap("RdGy"))
-
-    ax.view_init(45-27, 180+ 26)
-
-    xlabel("y",fontsize = fontsize)
-    ylabel("x",fontsize = fontsize)
-    ax.zaxis.set_rotate_label(false);
-    zlabel("H(x,y)", rotation = 0, fontsize = fontsize)
-    #xticks(fontsize = fontsize); yticks(fontsize = fontsize);
-    #PyPlot.title(title,fontsize=fontsize)
-    tight_layout()
-end
-
-slice(x,y) = pycall(pybuiltin("slice"), PyObject, x, y)         # For performing python array slicing for
-
-function scatter(a :: Array{Float64,2}; title = "samples")
-
-    x = a[:,1];
-    y = a[:,2];
-
-    fig = plt.figure(title, figsize=(10, 10))
-    grid = plt.GridSpec(4, 4, hspace=0.2, wspace=0.2)
-    main_ax = fig.add_subplot(get(grid, (slice(1,4),slice(0,3))))
-    y_hist  = fig.add_subplot(get(grid, (slice(1,4),3)), xticklabels=[], sharey=main_ax)
-    x_hist  = fig.add_subplot(get(grid, (0,slice(0,3))), yticklabels=[], sharex=main_ax)
-
-    # scatter points on the main axes
-    main_ax.plot(x, y, "o", markersize=3, alpha=0.2)
-
-    # histogram on the attached axes
-    x_hist.hist(x, 40, histtype="stepfilled", orientation="vertical", color="gray")
-    #x_hist.invert_yaxis()
-
-    y_hist.hist(y, 40, histtype="stepfilled", orientation="horizontal", color="gray")
-    #y_hist.invert_xaxis()
-
-end
-
-function plotBoxes(xs :: Array{Interval{T},1}, ys  :: Array{Interval{T},1},  subpl = missing; linewidth = 1, alpha=0.2, fillcol= "grey") where T <: Real
-
-    if ismissing(subpl); 
-        fig = plt.figure("boxes", figsize=(10, 10));
-        subpl = fig.add_subplot()
-    end
-    Asize = length(xs)
-    for i = 1:Asize
-
-        #println(" $(a[i]) |  $(a[i+1])")
-        xlo = xs[i].lo; xhi = xs[i].hi
-        ylo = ys[i].lo; yhi = ys[i].hi
-
-        subpl.plot([xlo; xhi], [ ylo; ylo], color = "red", linewidth = linewidth)
-        subpl.plot([xhi; xhi], [ylo; yhi], color = "red", linewidth = linewidth)
-        subpl.plot([xhi; xlo], [yhi; yhi], color = "red", linewidth = linewidth)
-        subpl.plot([xlo; xlo], [yhi; ylo], color = "red", linewidth = linewidth)
-
-        subpl.fill_between([xlo, xhi], [ylo, ylo], [yhi, yhi], alpha=alpha, color =fillcol)
-    end
-
-end
-
-function scatter(a :: Array{Interval{T},2}; title = "samples", fontsize = 18) where T <: Real
-
-    x = a[:,1];
-    y = a[:,2];
-
-    fig = plt.figure(title, figsize=(10, 10))
-    grid = plt.GridSpec(4, 4, hspace=0.2, wspace=0.2)
-    main_ax = fig.add_subplot(get(grid, (slice(1,4),slice(0,3))))
-
-    # scatter points on the main axes
-    #main_ax.plot(xMids, yMids, "o", markersize=3, alpha=0.2)
-    plotBoxes(x, y, main_ax,linewidth = 0.5, alpha=0.1, fillcol= "grey")
-    
-    xticks(fontsize = fontsize); yticks(fontsize = fontsize)
-    xlabel("x",fontsize = fontsize); ylabel("y",fontsize=fontsize);
-
-    y_hist  = fig.add_subplot(get(grid, (slice(1,4),3)), xticklabels=[], sharey=main_ax)
-    x_hist  = fig.add_subplot(get(grid, (0,slice(0,3))), yticklabels=[], sharex=main_ax)
-
-    xPbox = pbox(x);
-    yPbox = pbox(y);    
-
-    alpha = 0.2;
-
-    col1 = "red"; col2 = "black"; fillcol = "grey"
-
-    j = (0:(xPbox.n-1))/xPbox.n;
-    x_hist.step([xPbox.u[:];xPbox.u[xPbox.n];xPbox.d[xPbox.n]], [j;1;1], color = col1, where = "pre");
-
-    i = (1:(xPbox.n))/xPbox.n;
-    x_hist.step([xPbox.u[1];xPbox.d[1];xPbox.d[:]], [0;0;i], color = col2,     where = "post");
-
-    Xs, Ylb, Yub = prepFillBounds(xPbox);
-    x_hist.fill_between(Xs, Ylb, Yub, alpha=alpha, color =fillcol)
-
-    j = (0:(yPbox.n-1))/yPbox.n;
-    y_hist.step([j;1;1], [yPbox.u[:];yPbox.u[yPbox.n];yPbox.d[yPbox.n]], color = col1, where = "post");
-
-    i = (1:(yPbox.n))/yPbox.n;
-    y_hist.step([0;0;i],[yPbox.u[1];yPbox.d[1];yPbox.d[:]], color = col2,     where = "pre");
-
-    #Xs, Ylb, Yub = prepFillBounds(yPbox);
-    #y_hist.fill_between(Ylb,Xs,Yub, alpha=alpha, color =fillcol)
-    #y_hist.invert_yaxis()
-
-end
-
-#=
-function piLoop() 
-    x = range(0, 1, length = 200)
-    [indep(xs,ys) for xs in x, ys in x]
-end
-
-indepVec(x,y) = x .* y
-
-meshgrid(x,y) = (repeat(x',length(y),1),repeat(y,1,length(x)))
-
-function piVec() 
-    x = range(0, 1, length = 200)
-    X, Y = meshgrid(x,x)
-    cdf = indepVec(X[:], Y[:])
-    cdf = reshape(cdf,200,200)
-end
-=#
