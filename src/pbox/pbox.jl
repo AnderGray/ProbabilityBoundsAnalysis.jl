@@ -472,6 +472,80 @@ end
 end
 
 
+######
+#   Make stochastic mixture of p-boxes
+######
+
+function mixture( x :: Vector{pbox}, w :: Vector{<:Real} = ones(length(x)))
+
+    k = length(x);
+    if k != length(w); throw(ArgumentError("Number of weights and mixture elements not equal")); end
+
+    w = w ./ sum(w);
+
+    u, d, n = Float64[], Float64[], Float64[]
+    ml, mh, m, vl, vh, v = [], [], [], [], [], []
+
+    for i = 1:k
+        u = [u; x[i].u]
+        d = [d; x[i].d]
+        steps = length(x[i].d)
+        n = [n; w[i] * repeat([1/steps], steps)]
+
+        mu = mean(x[i]);
+        ml = [ml; left(mu)];
+        mh = [mh; right(mu)];
+        m  = [m; mu]
+
+        σ2 = var(x[i])
+        vl = [vl; left(σ2)]
+        vh = [vh; right(σ2)]
+        v = [v; σ2]
+
+    end
+
+    n = n / sum(n)
+    su = sort(u); su = [su[1]; su]
+    pu = [0; cumsum(n[1:length(u)])]
+
+    sd = sort(d); sd = [sd; sd[end]]
+    pd = [cumsum(n[1:length(d)]); 1]
+
+    u, d = Float64[], Float64[]
+    j = length(pu);
+
+    for p in reverse(ProbabilityBoundsAnalysis.ii())
+        while true
+            if pu[j] <= p
+                break
+            end
+            j = j - 1
+        end
+        u = [su[j]; u]
+    end
+
+    j = 1
+
+    for p in ProbabilityBoundsAnalysis.jj()
+        while true
+            if  p <= pd[j]
+                break
+            end
+            j = j + 1
+        end
+        d = [d; sd[j]]
+    end
+
+    mu = interval(sum(w .* ml), sum(w .* mh))
+
+    s2 = 0
+    for i = 1:k; s2 = s2 + w[i] * (v[i] + pow(m[i],2)); end
+    s2 = s2 - pow(mu, 2)
+
+    return pbox(u, d, ml = left(mu), mh = right(mu), vl = left(s2), vh = right(s2))
+
+end
+
 ####################################
 # Interpolation schemes            #
 ####################################

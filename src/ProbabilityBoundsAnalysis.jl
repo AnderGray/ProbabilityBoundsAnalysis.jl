@@ -38,6 +38,7 @@ __precompile__(true)
 
 module ProbabilityBoundsAnalysis
 
+using Core: Vector
 using Base: Float64
 using Reexport, Distributions, Interpolations, PyCall, Distributed
 
@@ -155,6 +156,8 @@ export
 
     left, right, lefts, rights,
     checkMomentsAndRanges,
+
+    mixture,
 
     # Copulas
     AbstractCopula, copula, GauCopula, πCop, M, W, Frank, Clayton, Frechet, copulaSigma, copulaSigmaSlow, τCopula, KendalCopula, ρCopula, SpearmanCopula,
