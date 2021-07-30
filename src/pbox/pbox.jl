@@ -552,12 +552,11 @@ end
 #   Stochastic mixture of intervals
 ###
 
-
 function mixture( x :: Vector{Interval{T}}, w :: Vector{<:Real} = ones(length(x))) where T
     return mixture( makepbox.(x), w)
 end
 
-pbox(x :: Vector{Interval{T}}, w :: Vector{<:Real} = ones(length(x))) where T = mixture(x, w)
+pbox(x :: Vector{Interval{T}}, w :: Vector{<:Real} = ones(length(x))) where T <: Real = mixture(x, w)
 
 ####################################
 # Interpolation schemes            #
