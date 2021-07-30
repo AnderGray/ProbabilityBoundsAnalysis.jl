@@ -43,10 +43,10 @@ include("NormalDistribution.jl")
 #global bOt = 0.001;              # smallest quamtile to use if left tail is unbounded
 #global tOp = 0.999;              # largest quamtile to use if right tail is unbounded
 
-pyimport_conda("mpl_toolkits.mplot3d", "mpl_toolkits")
-art3d = PyObject(PyPlot.art3D)
-mpl = pyimport("matplotlib")
-using3D()
+#pyimport_conda("mpl_toolkits.mplot3d", "mpl_toolkits")
+#art3d = PyObject(PyPlot.art3D)
+#mpl = pyimport("matplotlib")
+#using3D()
 
 abstract type AbstractCopula <: Real end
 abstract type AbstractJoint <: Real end
@@ -119,7 +119,7 @@ end
 
 (obj::copula)(X :: StepRangeLen, Y :: Real, useInterp = false)  = [obj(i,Y,useInterp) for i in X]
 
-function (obj::copula)(X :: Interval, Y::Interval, useInterp = false) 
+function (obj::copula)(X :: Interval, Y::Interval, useInterp = false)
 
     cdfLo = obj(X.lo,Y.lo, useInterp).lo
     cdfHi = obj(X.hi,Y.hi, useInterp).hi
@@ -128,12 +128,12 @@ function (obj::copula)(X :: Interval, Y::Interval, useInterp = false)
 
 end
 
-function (obj::copula)(X :: Interval, Y::Real, useInterp = false) 
+function (obj::copula)(X :: Interval, Y::Real, useInterp = false)
     Y = interval(Y);
     return obj(X,Y,useInterp)
 end
 
-function (obj::copula)(X :: Real, Y::Interval, useInterp = false) 
+function (obj::copula)(X :: Real, Y::Interval, useInterp = false)
     X = interval(X);
     return obj(X,Y,useInterp)
 end
@@ -157,7 +157,7 @@ function cdfU(C :: copula, X, Y)
 
     #w = [opp(x,y) for x in X, y in Y]
     #m = [perf(x,y) for x in X, y in Y]
-    
+
     #cdfLo = max.(C.cdfU[xIndexLower, yIndexLower], w)
     #cdfHi = min.(C.cdfU[xIndexUpper, yIndexUpper], m)
 
@@ -177,10 +177,10 @@ function cdfD(C :: copula, X, Y)
 
     xIndexUpper = Int.(ceil.(X .* (nX-1)))  .+ 1
     yIndexUpper = Int.(ceil.(Y .* (nY-1)))  .+ 1
-    
+
     #w = [opp(x,y) for x in X, y in Y]
     #m = [perf(x,y) for x in X, y in Y]
-    
+
     #cdfLo = max.(C.cdfD[xIndexLower, yIndexLower], w)
     #cdfHi = min.(C.cdfD[xIndexUpper, yIndexUpper], m)
 
@@ -256,7 +256,7 @@ function conditionalX(C :: AbstractCopula, xVal :: Real)
     Nsx, Nsy = size(C.cdfU)
 
     n = ProbabilityBoundsAnalysis.steps
-    
+
     yGridU = ProbabilityBoundsAnalysis.ii();
     yGridD = ProbabilityBoundsAnalysis.jj();
 
@@ -266,7 +266,7 @@ function conditionalX(C :: AbstractCopula, xVal :: Real)
     zD = (right.(C(xVal + diff/2, yGridD) - right.(C(xVal - diff/2, yGridD))))/diff
 
     ###
-    #   zU are the cdf values, and yGridU/D are the physical values, which is a uniform grid. 
+    #   zU are the cdf values, and yGridU/D are the physical values, which is a uniform grid.
     #   We need to "invert" it so that zU is a uniform grid.
     ###
 
@@ -291,7 +291,7 @@ function conditionalY(C :: AbstractCopula, yVal :: Real)
     zD = (right.(C(xGridD,yVal + diff/2) - right.(C(xGridD,yVal - diff/2))))/diff
 
     ###
-    #   zU are the cdf values, and yGridU/D are the physical values, which is a uniform grid. 
+    #   zU are the cdf values, and yGridU/D are the physical values, which is a uniform grid.
     #   We need to "invert" it so that zU is a uniform grid.
     ###
 
@@ -307,7 +307,7 @@ function conditionalY(C :: AbstractCopula, yVal :: Real)
 end
 
 ###
-#   Copula generators for Archimedean (Frank and Clayton) copulas. Allows for easy and accurate copula generation 
+#   Copula generators for Archimedean (Frank and Clayton) copulas. Allows for easy and accurate copula generation
 #   at any dimension in terms of univariate functions (generator and inverse generator).
 ###
 
@@ -360,8 +360,8 @@ kenLB(x, y, τ) = x - kenUB(x, 1 - y, - τ)
 #spearϕ(a, b) = 1/6 * ( (max(0, 9*b + 3*sqrt( 9*b^2 - 3*a^6)))^(1/3) + ( max(0,9*b - 3*sqrt(9*b^2 - 3*a^6)))^(1/3) )
 
 function spearϕ(a, b)
-    A = 9*b 
-    B = max(9*b^2 - 3*a^6, 0) 
+    A = 9*b
+    B = max(9*b^2 - 3*a^6, 0)
     C = (max(0, A + 3*sqrt(B)))^(1/3)
     D = (max(0, A - 3*sqrt(B)))^(1/3)
     return 1/6 * (C + D)
@@ -396,7 +396,7 @@ function W()
 end
 
 function πCop()
-    
+
     n = ProbabilityBoundsAnalysis.steps
 
     x = range(0,1,length = n);
@@ -424,7 +424,7 @@ function Frank(s = 1)                       #   s is real; inf for perfect, 0 fo
     end
 
     n = ProbabilityBoundsAnalysis.steps
-    x = range(0, 1, length = n);                     
+    x = range(0, 1, length = n);
     cdf = [F(xs, ys, s) for xs in x, ys in x];
 
     return copula(cdf, family = "Frank", param = s);
@@ -515,7 +515,7 @@ function Frechet()
 
     cdfU = [perf(xs,ys) for xs in x, ys in x]
     cdfD = [opp(xs,ys) for xs in x, ys in x]
-    
+
     return copula(cdfU, cdfD, family = "Frechet");
 end
 
@@ -535,7 +535,7 @@ end
 KendalCopula(τ = 0) = τCopula(τ)
 
 function ρCopula( ρ = 0 ) # Imprecise copula from Spearman rho
-    
+
     n = ProbabilityBoundsAnalysis.steps
     x = range(0,stop = 1,length = n);
 
@@ -598,7 +598,7 @@ function sample(C :: AbstractCopula, N = 1)
     if (family == "Gaussian") return CholeskyGaussian(N, Float64(C.param)) ;end  # Use Cholesky decompostition of the Cov matrix for gaussian copula sampling
 
     n,n2 = size(C.cdfD)
-    
+
 
     x = rand(N);    y = rand(N);
     ux = x;         uy = zeros(N);
@@ -648,41 +648,46 @@ end
 
 ###
 #   Copula rotations. Rotates the mass by 90° (makes M -> W), 180° or 270°
+#   "Dependence modeling with C-and D-vine copulas: The R-package CDVine"
+#
+#   Results from C*product give these rotations: "REMARKS ON TWO PRODUCT LIKE CONSTRUCTIONS FOR COPULAS"
 ###
 #=
-# C⁹⁰(u1, u2) = u1 - C(1-u2, u1)
+# C270(u1,u2) = u1 - C(u1, 1 - u2)
+function rotate270(x :: copula)
+    cdfU = x.cdfU; cdfD = x.cdfD
+
+    n1,n2 = size(cdfU);
+
+    u1 = range(0, 1, length = n1);
+
+end
+
+# R90(u1, u2) = u2 - C(1 - u1, u2)
 function rotate90(x :: copula)
     cdfU = x.cdfU; cdfD = x.cdfD
 
     n1,n2 = size(cdfU);
 
-    u1 = range(0, 1, length = n1); 
+    u1 = range(0, 1, length = n1);
     u2 = range(0, 1, length = n2);
 
     cdfU = u1 .- right.(cdfU(x, 1 .- u2, u1))
 
 end
 
-# C180(u1,u2) = u1 + u2 + C(1 - u1, 1 - u2) -1
+# C180(u1,u2) = u1 + u2 - 1 + C(1 - u1, 1 - u2)
 function rotate180(x :: copula)
     cdfU = x.cdfU; cdfD = x.cdfD
 
     n1,n2 = size(cdfU);
 
-    u1 = range(0, 1, length = n1); 
-
-end
-
-# C270(u1,u2) = u2 - C(u2, 1 - u1)
-function rotate270(x :: copula)
-    cdfU = x.cdfU; cdfD = x.cdfD
-
-    n1,n2 = size(cdfU);
-
-    u1 = range(0, 1, length = n1); 
+    u1 = range(0, 1, length = n1);
 
 end
 =#
+
+
 ###
 #   Bivaraite pbox
 ###
@@ -871,11 +876,11 @@ function plotStep(cop :: copula; name = missing, pn = 50, fontsize = 18, alpha =
     #xgrid = repeat(x',ppn,1)
     #ygrid = repeat(y,1,ppn)
 
-    nm = round(m/ppn); 
+    nm = round(m/ppn);
 
     x = x[1:Int(nm):end]
     oneIn = x[end] == 1
-    
+
     if !oneIn; x = [x; 1]; end                             # We always want to include 1 in the plot
 
     zU = AU[1:Int(nm):end,1:Int(nm):end]
@@ -898,7 +903,7 @@ function plotStep(cop :: copula; name = missing, pn = 50, fontsize = 18, alpha =
 
     p3Ufaces = PyObject(art3d.Poly3DCollection(Ufaces, alpha=alpha))
     p3Dfaces = PyObject(art3d.Poly3DCollection(Dfaces, alpha=1))
-    
+
     face_colorU = [1, 0, 0]
     face_colorD = [0, 0, 1]
     edge_color = [0.4, 0.4, 0.4]
@@ -911,7 +916,7 @@ function plotStep(cop :: copula; name = missing, pn = 50, fontsize = 18, alpha =
 
     pycall(ax.add_collection3d, PyAny, p3Dfaces)
     pycall(ax.add_collection3d, PyAny, p3Ufaces)
-    
+
 
 end
 
@@ -935,7 +940,7 @@ function prepPolysU(us, x)
             tops = [tops; this]
         end
     end
-    
+
     tops = tops[2:end]
 
     p1 = [x[1]; x[1]; us[1, 1]]
@@ -946,30 +951,30 @@ function prepPolysU(us, x)
     sides = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
 
     for i = 1:1:ppn-1
-        
+
         for j = i:1:ppn-1
-            
+
             p1 = [x[i]; x[j]; us[i,j+1]]
             p2 = [x[i]; x[j]; us[i+1, j+1]]
             p3 = [x[i]; x[j+1]; us[i+1, j+1]]
             p4 = [x[i]; x[j+1]; us[i, j+1]]
             this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
             sides = [sides; this]
-            
+
             p1 = [x[i]; x[j]; us[i+1,j]]
             p2 = [x[i]; x[j]; us[i+1, j+1]]
             p3 = [x[i+1]; x[j]; us[i+1, j+1]]
             p4 = [x[i+1]; x[j]; us[i+1, j]]
             this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
             sides = [sides; this]
-            
+
             p1 = [x[j]; x[i]; us[j,i+1]]
             p2 = [x[j]; x[i]; us[j+1, i+1]]
             p3 = [x[j]; x[i+1]; us[j+1, i+1]]
             p4 = [x[j]; x[i+1]; us[j, i+1]]
             this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
             sides = [sides; this]
-            
+
             p1 = [x[j]; x[i]; us[j+1,i]]
             p2 = [x[j]; x[i]; us[j+1, i+1]]
             p3 = [x[j+1]; x[i]; us[j+1, i+1]]
@@ -997,7 +1002,7 @@ function prepPolysD(us, x)
     p4 = [x[2]; x[1]; us[1, 1]]
     tops = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
 
-    
+
     for i = 1:1:ppn-1
         for j = i:1:ppn-1
             p1 = [x[i]; x[j]; us[i+1, j]]
@@ -1006,7 +1011,7 @@ function prepPolysD(us, x)
             p4 = [x[i+1]; x[j]; us[i+1, j]]
             this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
             tops = [tops; this]
-            
+
             p1 = [x[j]; x[i]; us[j, i+1]]
             p2 = [x[j]; x[i+1]; us[j, i+1]]
             p3 = [x[j+1]; x[i+1]; us[j, i+1]]
@@ -1016,7 +1021,7 @@ function prepPolysD(us, x)
 
         end
     end
-    
+
     p1 = [x[2]; x[2]; us[1, 1]]
     p2 = [x[2]; x[2]; us[2, 2]]
     p3 = [x[2]; x[3]; us[2, 2]]
@@ -1026,28 +1031,28 @@ function prepPolysD(us, x)
 #=
     for i = 2:1:ppn-1
         for j = i:1:ppn-1
-            
+
             p1 = [x[i-1]; x[j-1]; us[i-1,j]]
             p2 = [x[i-1]; x[j-1]; us[i, j]]
             p3 = [x[i-1]; x[j]; us[i, j]]
             p4 = [x[i-1]; x[j]; us[i-1, j]]
             this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
             sides = [sides; this]
-            
+
             p1 = [x[i-1]; x[j-1]; us[i,j-1]]
             p2 = [x[i-1]; x[j-1]; us[i, j]]
             p3 = [x[i]; x[j-1]; us[i, j]]
             p4 = [x[i]; x[j-1]; us[i, j-1]]
             this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
             sides = [sides; this]
-            
+
             p1 = [x[j-1]; x[i-1]; us[j-1,i]]
             p2 = [x[j-1]; x[i-1]; us[j, i]]
             p3 = [x[j-1]; x[i]; us[j, i]]
             p4 = [x[j-1]; x[i]; us[j-1, i]]
             this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
             sides = [sides; this]
-            
+
             p1 = [x[j-1]; x[i-1]; us[j,i-1]]
             p2 = [x[j-1]; x[i-1]; us[j, i]]
             p3 = [x[j]; x[i-1]; us[j, i]]
@@ -1059,10 +1064,10 @@ function prepPolysD(us, x)
     end
     =#
 
-    
+
     for i = 1:1:ppn-1
         for j = i:1:ppn-1
-            
+
             p1 = [x[i]; x[j]; us[i+1,j]]
             p2 = [x[i]; x[j]; us[i, j]]
             p3 = [x[i]; x[j+1]; us[i, j]]
@@ -1077,14 +1082,14 @@ function prepPolysD(us, x)
             this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
             sides = [sides; this]
             =#
-            
+
             p1 = [x[j]; x[i]; us[j,i+1]]
             p2 = [x[j]; x[i]; us[j, i]]
             p3 = [x[j]; x[i+1]; us[j, i]]
             p4 = [x[j]; x[i+1]; us[j, i+1]]
             this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
             sides = [sides; this]
-            
+
             #=
             p1 = [x[j]; x[i]; us[j+1,i]]
             p2 = [x[j]; x[i]; us[j+1, i+1]]
@@ -1095,11 +1100,11 @@ function prepPolysD(us, x)
             =#
         end
     end
-    
-    
+
+
     tops = unique(tops, dims=1)
     sides = unique(sides, dims=1)
-    
+
     return [tops; sides]
 
 end
@@ -1123,7 +1128,7 @@ function plot(x :: copula; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
     if ismissing(name); fig = figure(figsize=(10,10)) else fig = figure(name,figsize=(10,10));end
     ax = fig.add_subplot(1,1,1,projection="3d")
     #ax = fig.add_subplot(2,1,1)
-    
+
     plot_surface(xgrid, ygrid, zD, rstride=2,edgecolors="b", cstride=2, alpha=1, linewidth=1, cmap=ColorMap("Blues"))
     plot_surface(xgrid, ygrid, zU, rstride=2,edgecolors="r", cstride=2, alpha=alpha, linewidth=1, cmap=ColorMap("RdGy"))
 
@@ -1150,8 +1155,8 @@ function plot(x :: bivpbox; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
 
     nm = round(m/ppn);
 
-    xus = xus[1:Int(nm):end]; xds = xds[1:Int(nm):end]; 
-    yus = yus[1:Int(nm):end]; yds = yds[1:Int(nm):end]; 
+    xus = xus[1:Int(nm):end]; xds = xds[1:Int(nm):end];
+    yus = yus[1:Int(nm):end]; yds = yds[1:Int(nm):end];
 
     zU = AU[1:Int(nm):end,1:Int(nm):end]
     zD = AD[1:Int(nm):end,1:Int(nm):end]
@@ -1204,7 +1209,7 @@ end
 
 function plotBoxes(xs :: Array{Interval{T},1}, ys  :: Array{Interval{T},1},  subpl = missing; linewidth = 1, alpha=0.2, fillcol= "grey") where T <: Real
 
-    if ismissing(subpl); 
+    if ismissing(subpl);
         fig = plt.figure("boxes", figsize=(10, 10));
         subpl = fig.add_subplot()
     end
@@ -1237,7 +1242,7 @@ function scatter(a :: Array{Interval{T},2}; title = "samples", fontsize = 18) wh
     # scatter points on the main axes
     #main_ax.plot(xMids, yMids, "o", markersize=3, alpha=0.2)
     plotBoxes(x, y, main_ax,linewidth = 0.5, alpha=0.1, fillcol= "grey")
-    
+
     xticks(fontsize = fontsize); yticks(fontsize = fontsize)
     xlabel("x",fontsize = fontsize); ylabel("y",fontsize=fontsize);
 
@@ -1245,7 +1250,7 @@ function scatter(a :: Array{Interval{T},2}; title = "samples", fontsize = 18) wh
     x_hist  = fig.add_subplot(get(grid, (0,slice(0,3))), yticklabels=[], sharex=main_ax)
 
     xPbox = pbox(x);
-    yPbox = pbox(y);    
+    yPbox = pbox(y);
 
     alpha = 0.2;
 
@@ -1273,7 +1278,7 @@ function scatter(a :: Array{Interval{T},2}; title = "samples", fontsize = 18) wh
 end
 
 #=
-function piLoop() 
+function piLoop()
     x = range(0, 1, length = 200)
     [indep(xs,ys) for xs in x, ys in x]
 end
@@ -1282,7 +1287,7 @@ indepVec(x,y) = x .* y
 
 meshgrid(x,y) = (repeat(x',length(y),1),repeat(y,1,length(x)))
 
-function piVec() 
+function piVec()
     x = range(0, 1, length = 200)
     X, Y = meshgrid(x,x)
     cdf = indepVec(X[:], Y[:])

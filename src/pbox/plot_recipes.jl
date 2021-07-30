@@ -25,10 +25,15 @@ function plot(s ::pbox, fill = true; name = missing, col = missing, heading = mi
     ax = fig.add_subplot()
     j = (0:(s.n-1))/s.n;
 
-    PyPlot.step([s.u[:];s.u[s.n];s.d[s.n]], [j;1;1], color = col1, where = "pre");
+    #PyPlot.step([s.u[:];s.u[s.n];s.d[s.n]], [j;1;1], color = col1, where = "pre");
+
+    Plots.plot([s.u[:];s.u[s.n];s.d[s.n]], [j;1;1], linetype=:steppre, color = col1)
 
     i = (1:(s.n))/s.n;
-    PyPlot.step([s.u[1];s.d[1];s.d[:]], [0;0;i], color = col2,     where = "post");
+
+    Plots.plot!([s.u[1];s.d[1];s.d[:]], [0;0;i], linetype=:steppost, color = col2)
+
+    #PyPlot.step([s.u[1];s.d[1];s.d[:]], [0;0;i], color = col2,     where = "post");
 
     if fill
         Xs, Ylb, Yub = prepFillBounds(s);

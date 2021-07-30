@@ -39,9 +39,9 @@ __precompile__(true)
 module ProbabilityBoundsAnalysis
 
 using Base: Float64
-using Reexport, Distributions, Interpolations, PyCall, Distributed
+using Reexport, Distributions, Interpolations, PyCall, Distributed, Plots
 
-@reexport using IntervalArithmetic, PyPlot, Distributed, Statistics, LinearAlgebra
+@reexport using IntervalArithmetic, Distributed, Statistics, LinearAlgebra
 
 import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
 
@@ -55,7 +55,7 @@ import IntervalArithmetic: intersect, issubset
 
 import Statistics: mean, var, std
 
-import PyPlot: plot, scatter
+#import PyPlot: plot, scatter
 
 import Distributions: cdf #Normal, Beta, Uniform
 
