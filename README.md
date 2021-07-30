@@ -18,6 +18,8 @@ Supported uncertain numbers:
 
 For more information and use, please see the [docs](https://andergray.github.io/ProbabilityBoundsAnalysis.jl/dev/)
 
+[JuliaCon 2021 video](https://www.youtube.com/watch?v=ZndC2YXa-t0&t=1s)
+
 Installation
 ---
 

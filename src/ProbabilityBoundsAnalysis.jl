@@ -39,9 +39,11 @@ __precompile__(true)
 module ProbabilityBoundsAnalysis
 
 using Base: Float64
+
 using Reexport, Distributions, Interpolations, PyCall, Distributed, Plots
 
 @reexport using IntervalArithmetic, Distributed, Statistics, LinearAlgebra
+
 
 import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
 
@@ -155,6 +157,8 @@ export
 
     left, right, lefts, rights,
     checkMomentsAndRanges,
+
+    mixture,
 
     # Copulas
     AbstractCopula, copula, GauCopula, πCop, M, W, Frank, Clayton, Frechet, copulaSigma, copulaSigmaSlow, τCopula, KendalCopula, ρCopula, SpearmanCopula,
