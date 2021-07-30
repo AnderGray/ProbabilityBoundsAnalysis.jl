@@ -366,6 +366,8 @@ See also: [`var`](@ref), [`mean`](@ref)
 """
 std(x::pbox) = √(var(x));
 
+var(x :: Interval) = var(pbox(x))
+
 dwmean( x :: pbox) = Interval(mean(x.u),mean(x.d));
 
 function dwVariance(x :: pbox)
@@ -545,6 +547,17 @@ function mixture( x :: Vector{pbox}, w :: Vector{<:Real} = ones(length(x)))
     return pbox(u, d, ml = left(mu), mh = right(mu), vl = left(s2), vh = right(s2))
 
 end
+
+###
+#   Stochastic mixture of intervals
+###
+
+
+function mixture( x :: Vector{Interval{T}}, w :: Vector{<:Real} = ones(length(x))) where T
+    return mixture( makepbox.(x), w)
+end
+
+pbox(x :: Vector{Interval{T}}, w :: Vector{<:Real} = ones(length(x))) where T = mixture(x, w)
 
 ####################################
 # Interpolation schemes            #

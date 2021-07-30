@@ -38,11 +38,12 @@ __precompile__(true)
 
 module ProbabilityBoundsAnalysis
 
-using Core: Vector
 using Base: Float64
-using Reexport, Distributions, Interpolations, PyCall, Distributed
+using Reexport, Distributions, Interpolations, PyCall, Distributed, PyPlot
 
-@reexport using IntervalArithmetic, PyPlot, Distributed, Statistics, LinearAlgebra
+@reexport using IntervalArithmetic, Distributed, Statistics, LinearAlgebra
+
+#using PyPlot
 
 import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
 
