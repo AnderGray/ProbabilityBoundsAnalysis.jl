@@ -245,7 +245,7 @@ end
 
 Constructs a pbox from an array of intervals with equal mass. Left and right bounds are sorted to construct cdf bounds.
 """
-function pbox( x :: Array{Interval{T}, 1}, bounded = [true, true]) where T <: Real
+function pbox( x :: Array{Interval{T}, 1}, bounded :: Vector{Bool} = [true, true]) where T <: Real
 
     us = left.(x);  ds = right.(x)
     us = sort(us);  ds = sort(ds)
@@ -291,7 +291,7 @@ end
 
 Constructs a pbox from a matrix of 2nd order samples [Nouter x Ninner]
 """
-function pbox( x :: Array{T, 2}, bounded = [true, true]) where T <: Real
+function pbox( x :: Array{T, 2}, bounded :: Vector{Bool} = [true, true]) where T <: Real
 
     x = sort(x, dims = 2);
 
@@ -552,11 +552,59 @@ end
 #   Stochastic mixture of intervals
 ###
 
-function mixture( x :: Vector{Interval{T}}, w :: Vector{<:Real} = ones(length(x))) where T
-    return mixture( makepbox.(x), w)
+function mixture( x :: Vector{Interval{T}}, w :: Vector{<:Real}) where T <: Real
+
+    ws = w ./sum(w);
+
+    lefts = left.(x)
+    rights = right.(x)
+
+    ls = sortperm(lefts)
+    rs = sortperm(rights)
+
+    lefts = lefts[ls]
+    rights = rights[rs]
+
+    wL = ws[ls]
+    wR = ws[rs]
+
+    su = lefts; su = [su[1]; su]
+    pu = [0; cumsum(wL)]
+
+    sd = rights; sd = [sd; sd[end]]
+    pd = [cumsum(wR); 1]
+
+    u, d = Float64[], Float64[]
+    j = length(pu);
+
+    for p in reverse(ProbabilityBoundsAnalysis.ii())
+        while true
+            if pu[j] <= p
+                break
+            end
+            j = j - 1
+        end
+        u = [su[j]; u]
+    end
+
+    j = 1
+
+    for p in ProbabilityBoundsAnalysis.jj()
+        while true
+            if  p <= pd[j]
+                break
+            end
+            j = j + 1
+        end
+        d = [d; sd[j]]
+    end
+
+    return pbox(u, d, bounded = [true, true])
+
+
 end
 
-pbox(x :: Vector{Interval{T}}, w :: Vector{<:Real} = ones(length(x))) where T <: Real = mixture(x, w)
+pbox(x :: Vector{Interval{T}}, w :: Vector{<:Real} ) where T <: Real = mixture(x, w)
 
 ####################################
 # Interpolation schemes            #
