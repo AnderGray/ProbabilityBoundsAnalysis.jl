@@ -1,0 +1,22 @@
+title: "ProbabilityBoundsAnalysis.jl:\\\\ an arithmetic of probabilities and sets of probabilities"
+keywords:
+  - Julia
+  - Probability
+  - Uncertainty
+  - Interval Arithmetic
+  - Probabilistic Arithmetic
+authors:
+  - name: Ander Gray
+    orcid: 0000-0003-1361-440X
+    affiliation: 1
+  - name: Scott Ferson
+    affiliation: 1
+  - name: Edoardo Patelli
+    affiliation: 1, 2
+affiliations:
+  - name: Institute for Risk and Uncertainty, University of Liverpool
+    index: 1
+  - name: Centre for Intelligent Infrastructure, University of Strathclyde
+    index: 2
+date: 10 September 2021
+bibliography: ref.bib

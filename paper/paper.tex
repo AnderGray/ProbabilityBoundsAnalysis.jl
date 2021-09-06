@@ -1,0 +1,115 @@
+% JuliaCon proceedings template
+\documentclass{juliacon}
+\setcounter{page}{1}
+\usepackage{caption}
+\usepackage{csquotes}
+%\bibliographystyle{juliacon}
+
+\begin{document}
+
+\input{header}
+
+\maketitle
+
+\begin{abstract}
+
+Probability Bounds Analysis combines interval arithmetic with probability theory, and provides a representation of sets of distributions in structures called probability boxes (p-boxes), which generalise both distribution functions and intervals. P-boxes generally return interval bounds on all probabilistic quantities, for example samples, cdfs, and probability measures are all intervals. This framework also allows for the comprehensive propagation of probabilities through calculations in a rigorous way, in a similar fashion that interval arithmetic does for sets. As such, ProbabilityBoundsAnalysis.jl gives a rigorous arithmetic of random variables, where both marginal (univariate) and dependency information can be known, partially known or missing completely.
+
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+
+An arithmetic of probability distributions has held a long interest among mathematicians and engineers:
+\begin{displayquote}
+  A question asked by Kolmogorov, \\
+  answered for the sum by Marakov, \\
+  partially answered by Sklar and Frank (for which the copula was invented),\\
+  made algorithmically available by Williamson, \\
+  and generalised by others.
+\end{displayquote}
+
+\noindent Indeed it was Kolmogorov who originally asked what the result of a sum of two distributions without knowing their joint distribution. This was answered for the sum by Marakov \cite{makarov1982estimates}, who showed the result was a set of distributions and was able to provide bounds on this function. Sklar, Schweizer and Frank generalised this result to other (positive) binary operations \cite{frank1987best,schweizer2011probabilistic}. In this pursuit they created copulas, a general way to encode probabilistic dependence independently from marginals, and a now essential object used in probabilistic modelling. In his seminal dissertation \cite{williamson1989probabilistic}, Williamson described an algorithm for efficiently performing these arithmetic operations, which can give guaranteed bounds on probability distributions in terms of an upper and lower cdf. He called his method \textit{Probabilistic Arithmetic} and his sets of distributions \textit{Dependency Bounds}. Since then the method has been generalised \cite{ferson2015constructing,ferson1996whereof,ferson2004arithmetic} to most of the base binary and unary operations that would be present in a programming language. Probability Boxes (p-boxes) are the name now given to these structures, and Probability Bounds Analysis (PBA) the name of the method.
+
+The goal of PBA can be stated as \textbf{to compute guaranteed bounds on functions of random variables given only partial knowledge of the input probability distributions and their dependencies}. That is to compute with partial knowledge about the input joint distribution. Ideally all of the available information about random variables should be used, but no more than what actually is available.
+
+The idea of bounding probability has a very long tradition throughout the history of probability theory. George Boole \cite{boole1854investigation, hailperin1986boole} used the notion of interval bounds on probability. Chebyshev \cite{chebyshev1874valeurs} described bounds on a distribution when only the mean and variance of the variable are known, and Markov \cite{markoff1900question} found bounds on a positive variable when only the mean is known.  Fréchet \cite{frechet1935generalisation} discovered how to bound joint distributions solely from knowing the marginal distributions, without making independence assumptions. Bounding probabilities has continued to the present day, culminating into the modern theory of Imprecise Probabilities \cite{walley1991statistical, klir2013uncertainty, troffaes2014lower, augustin2014introduction}.
+
+Imprecise probabilities is effectively a generalisation of probability theory where uncertainty can be expressed about the probability measure. This 
+is particularly relevant when information is scarce, unreliable, vague, conflicting or imprecise. In such cases defining a unique probability distribution is difficult. P-boxes are one of many ways to describe a set of distributions, others include: Dempster-Shafer structures \cite{dempster2008upper,shafer1976mathematical}, random sets \cite{molchanov2005theory}, possibility distributions \cite{zadeh1978fuzzy,dubois1988possibility, hose2019possibilistic} and lower previsions \cite{troffaes2014lower}. These structures were discovered independently, but are often synonymous and can be translated from one to another, with different degrees of generality. Imprecise probabilities links all these theories into one. For a comprehensive overview of the theory, and a for a formal description of uncertainty and information in terms of these structures, \cite{klir2013uncertainty} is recommended. In that sense PBA is a part of imprecise probabilities but provides a framework for computing with p-boxes. In this section we review the main elements of the PBA.
+
+
+
+\iffalse
+Probability bounds analysis is a combination of the methods of standard interval analysis \cite{moore1996interval, jaulin2001interval} and classical probability theory (see, inter alia, \cite{feller1968probability, feller1971probability}).  The idea of bounding probability has a very long tradition throughout the history of probability theory.  Indeed, George Boole \cite{boole1854investigation, hailperin1986boole} used the notion of interval bounds on probability.  Chebyshev \cite{chebyshev1874valeurs} described bounds on a distribution when only the mean and variance of the variable are known, and Markov \cite{markoff1900question} found bounds on a positive variable when only the mean is known.  Fréchet \cite{frechet1935generalisation} discovered how to make calculations with uncertain estimates of joint probabilities without making independence assumptions.  Bounding probabilities has continued to the present day \cite{walley1991statistical, klir2013uncertainty, troffaes2014lower, augustin2014introduction}, culminating into the modern theory of Imprecise Probabilities.
+
+An arithmetic of probability distributions has held a long interest among mathematicians and engineers
+
+
+
+
+Computations with probabilities are usually performed by Monte-Carlo style simulations, where essentially many random realisations of functions are required to be run. These sampling methods require many thousands of realisations to be accurate, and even then will only produce an approximation of the desired probabilistic quantity. In contrast, the methods ProbabilityBoundsAnalysis.jl are exact rather than approximate, and give no restriction to the distribution shape or dependency.
+\fi
+
+
+\section{Probability Boxes}
+\label{sec:pboxes}
+
+A probability box defines a set of distributions with the following three constrains:
+
+
+\subsection{Where do p-boxes come from?}
+
+In this section we discuss some situations where p-boxes arise naturally.
+
+
+\subsubsection{Partial distributional information} %\hfill \break
+
+
+
+\subsubsection{Partial moment information} %\hfill \break
+%It is well known that a random variables distribution function cannot be 
+
+
+\subsubsection{Operations involving intervals and distributions} %\hfill \break
+
+\subsubsection{When dependencies between distributions are uknown} %\hfill \break
+
+\subsubsection{Outer approximations of precise distributions} %\hfill \break
+%P-boxes generalise intervals and distribution functions. 
+
+\subsubsection{Inferential methods where data is limited or bad} %\hfill \break
+
+%Probabilities are 
+
+\subsection{Relationship to other ideas}
+
+\subsubsection{Random set theory}
+
+\subsubsection{Possibility theory}
+
+
+%\section{Operations on p-boxes}
+
+%\section{P boxes}
+
+\subsection{Bivariate p-boxes}
+
+
+\section{Operations on p-boxes}
+
+\subsection{Uniary operations}
+
+
+
+\section{An uncertain programming language}
+\label{sec:additional_faci}
+
+The long term goal of such a framework is to create a fully uncertain programming language, where any computer variable may be represented as an interval, distribution, p-box or other uncertain quantity. Such a framework would allow for uncertain extensions of deterministic functions to be computed in an automatic, rigorous and tight fashion. In this section we argue why Julia is an ideal target language for such a framework, and discuss the remaining theoretical tasks required to make such a goal a reality. 
+
+\input{bib.tex}
+
+\end{document}
+
+% Inspired by the International Journal of Computer Applications template

@@ -1,0 +1,120 @@
+\begin{thebibliography}{10}
+
+\bibitem{augustin2014introduction}
+Thomas Augustin, Frank~PA Coolen, Gert De~Cooman, and Matthias~CM Troffaes.
+{\em Introduction to imprecise probabilities}.
+John Wiley \& Sons, 2014.
+
+\bibitem{boole1854investigation}
+George Boole.
+{\em An investigation of the laws of thought: on which are founded the
+  mathematical theories of logic and probabilities}, volume~2.
+Walton and Maberly, 1854.
+
+\bibitem{chebyshev1874valeurs}
+Pafnutii~L. Chebyshev~[Tchebichef].
+{\em Sur les valeurs limites des int{\'e}grales}.
+Imprimerie de Gauthier-Villars, 1874.
+
+\bibitem{dempster2008upper}
+Arthur~P Dempster.
+Upper and lower probabilities induced by a multivalued mapping.
+In {\em Classic works of the Dempster-Shafer theory of belief functions}, pages
+  57--72. Springer, 2008.
+
+\bibitem{dubois1988possibility}
+D~Dubois and H~Prade.
+possibility theory: Approach to computerized processing of uncertainty, plennm
+  n. 4.
+1988.
+
+\bibitem{ferson1996whereof}
+Scott Ferson, Lev Ginzburg, and Resit Ak{\c{c}}akaya.
+Whereof one cannot speak: when input distributions are unknown.
+{\em Risk Analysis}, 1996.
+
+\bibitem{ferson2004arithmetic}
+Scott Ferson and Janos~G Hajagos.
+Arithmetic with uncertain numbers: rigorous and (often) best possible answers.
+{\em Reliability Engineering \& System Safety}, 85(1-3):135--152, 2004.
+
+\bibitem{ferson2015constructing}
+Scott Ferson, Vladik Kreinovich, Lev Grinzburg, Davis Myers, and Kari Sentz.
+Constructing probability boxes and dempster-shafer structures.
+Technical report, Sandia National Lab.(SNL-NM), Albuquerque, NM (United
+  States), 2015.
+
+\bibitem{frank1987best}
+Maurice~J Frank, Roger~B Nelsen, and Berthold Schweizer.
+Best-possible bounds for the distribution of a sum—a problem of kolmogorov.
+{\em Probability theory and related fields}, 74(2):199--211, 1987.
+
+\bibitem{frechet1935generalisation}
+Maurice Fr{\'e}chet.
+G{\'e}n{\'e}ralisation du th{\'e}oreme des probabilit{\'e}s totales.
+{\em Fundamenta mathematicae}, 1(25):379--387, 1935.
+
+\bibitem{hailperin1986boole}
+Theodore Hailperin.
+{\em Boole's logic and probability: a critical exposition from the standpoint
+  of contemporary algebra, logic and probability theory}.
+Elsevier, 1986.
+
+\bibitem{hose2019possibilistic}
+Dominik Hose and Michael Hanss.
+Possibilistic calculus as a conservative counterpart to probabilistic calculus.
+{\em Mechanical Systems and Signal Processing}, 133:106290, 2019.
+
+\bibitem{klir2013uncertainty}
+George~J Klir and Mark~J Wierman.
+{\em Uncertainty-based information: elements of generalized information
+  theory}, volume~15.
+Physica, 2013.
+
+\bibitem{makarov1982estimates}
+GD~Makarov.
+Estimates for the distribution function of a sum of two random variables when
+  the marginal distributions are fixed.
+{\em Theory of Probability \& its Applications}, 26(4):803--806, 1982.
+
+\bibitem{markoff1900question}
+A~Markov~[Markoff].
+Sur une question de maximum et de minimum: Propos{\'e}e par m. tchebycheff.
+{\em Acta Mathematica}, 9:57--70, 1900.
+
+\bibitem{molchanov2005theory}
+Ilya Molchanov and Ilya~S Molchanov.
+{\em Theory of random sets}, volume~19.
+Springer, 2005.
+
+\bibitem{schweizer2011probabilistic}
+Berthold Schweizer and Abe Sklar.
+{\em Probabilistic metric spaces}.
+Courier Corporation, 2011.
+
+\bibitem{shafer1976mathematical}
+Glenn Shafer.
+{\em A mathematical theory of evidence}, volume~42.
+Princeton university press, 1976.
+
+\bibitem{troffaes2014lower}
+Matthias~CM Troffaes and Gert De~Cooman.
+{\em Lower previsions}.
+John Wiley \& Sons, 2014.
+
+\bibitem{walley1991statistical}
+Peter Walley.
+{\em Statistical reasoning with imprecise probabilities}.
+Chapman and Hall, London, 1991.
+
+\bibitem{williamson1989probabilistic}
+Robert~Charles Williamson et~al.
+{\em Probabilistic arithmetic}.
+PhD thesis, University of Queensland Australia, 1989.
+
+\bibitem{zadeh1978fuzzy}
+Lotfi~Asker Zadeh.
+Fuzzy sets as a basis for a theory of possibility.
+{\em Fuzzy sets and systems}, 1(1):3--28, 1978.
+
+\end{thebibliography}
