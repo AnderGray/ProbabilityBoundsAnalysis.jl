@@ -1,12 +1,12 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.12.12)  6 SEP 2021 18:48
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.12.12)  7 SEP 2021 17:33
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/paper.tex
-(/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/paper.tex
+**/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/paper.tex
+(/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/paper.tex
 LaTeX2e <2018-12-01>
-(/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/juliacon.cls (/usr/local/texlive/2019/texmf-dist/tex/latex/psnfss/helvet.sty
+(/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/juliacon.cls (/usr/local/texlive/2019/texmf-dist/tex/latex/psnfss/helvet.sty
 Package: helvet 2005/04/12 PSNFSS-v9.2a (WaS) 
  (/usr/local/texlive/2019/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
@@ -38,7 +38,7 @@ LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
 \normaltextheight=\dimen106
 \blindfoliodrop=\dimen107
 \tempbox=\box27
- (/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/journal_dat.tex)
+ (/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/journal_dat.tex)
 \tempdimen=\dimen108
 \normaltextheight=\dimen109
 \c@secnumbookdepth=\count80
@@ -182,7 +182,7 @@ Package: rerunfilecheck 2016/05/16 v1.8 Rerun checks for auxiliary files (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 282.
 )
 \Hy@SectionHShift=\skip42
-) (/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/jlcode.sty
+) (/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/jlcode.sty
 -- Package: `jlcode' 2.1 <2018/03/06> --
 Package: jlcode 2018/03/06 2.1
 (/usr/local/texlive/2019/texmf-dist/tex/latex/listings/listings.sty
@@ -465,48 +465,103 @@ Package csquotes Info: Trying to load configuration file 'csquotes.cfg'...
 Package csquotes Info: ... configuration file loaded successfully.
  (/usr/local/texlive/2019/texmf-dist/tex/latex/csquotes/csquotes.cfg
 File: csquotes.cfg 
-))
+)) (/usr/local/texlive/2019/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2018/12/01 v2.17b AMS math features
+\@mathmargin=\skip52
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2019/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+ (/usr/local/texlive/2019/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks20
+\ex@=\dimen132
+)) (/usr/local/texlive/2019/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+LaTeX Info: Redefining \boldsymbol on input line 28.
+\pmbraise@=\dimen133
+) (/usr/local/texlive/2019/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count126
+LaTeX Info: Redefining \frac on input line 223.
+\uproot@=\count127
+\leftroot@=\count128
+LaTeX Info: Redefining \overline on input line 385.
+\classnum@=\count129
+\DOTSCASE@=\count130
+LaTeX Info: Redefining \ldots on input line 482.
+LaTeX Info: Redefining \dots on input line 485.
+LaTeX Info: Redefining \cdots on input line 606.
+\Mathstrutbox@=\box37
+\strutbox@=\box38
+\big@size=\dimen134
+LaTeX Font Info:    Redeclaring font encoding OML on input line 729.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 730.
+\macc@depth=\count131
+\c@MaxMatrixCols=\count132
+\dotsspace@=\muskip11
+\c@parentequation=\count133
+\dspbrk@lvl=\count134
+\tag@help=\toks21
+\row@=\count135
+\column@=\count136
+\maxfields@=\count137
+\andhelp@=\toks22
+\eqnshift@=\dimen135
+\alignsep@=\dimen136
+\tagshift@=\dimen137
+\tagwidth@=\dimen138
+\totwidth@=\dimen139
+\lineht@=\dimen140
+\@envbody=\toks23
+\multlinegap=\skip53
+\multlinetaggap=\skip54
+\mathdisplay@stack=\toks24
+LaTeX Info: Redefining \[ on input line 2844.
+LaTeX Info: Redefining \] on input line 2845.
+)
 Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... none found.
- (/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/paper.aux)
+ (/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/paper.aux)
 \openout1 = `paper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 8.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 8.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 9.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 9.
  (/usr/local/texlive/2019/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Try loading font information for T1+ptm on input line 8.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Try loading font information for T1+ptm on input line 9.
  (/usr/local/texlive/2019/texmf-dist/tex/latex/psnfss/t1ptm.fd
 File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
 ) (/usr/local/texlive/2019/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count126
-\scratchdimen=\dimen132
-\scratchbox=\box37
-\nofMPsegments=\count127
-\nofMParguments=\count128
-\everyMPshowfont=\toks20
-\MPscratchCnt=\count129
-\MPscratchDim=\dimen133
-\MPnumerator=\count130
-\makeMPintoPDFobject=\count131
-\everyMPtoPDFconversion=\toks21
+\scratchcounter=\count138
+\scratchdimen=\dimen141
+\scratchbox=\box39
+\nofMPsegments=\count139
+\nofMParguments=\count140
+\everyMPshowfont=\toks25
+\MPscratchCnt=\count141
+\MPscratchDim=\dimen142
+\MPnumerator=\count142
+\makeMPintoPDFobject=\count143
+\everyMPtoPDFconversion=\toks26
 ) (/usr/local/texlive/2019/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
  (/usr/local/texlive/2019/texmf-dist/tex/latex/oberdiek/grfext.sty
@@ -519,56 +574,64 @@ Package grfext Info: Graphics extension search list:
  (/usr/local/texlive/2019/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-\AtBeginShipoutBox=\box38
-Package hyperref Info: Link coloring OFF on input line 8.
+\AtBeginShipoutBox=\box40
+Package hyperref Info: Link coloring OFF on input line 9.
  (/usr/local/texlive/2019/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
  (/usr/local/texlive/2019/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count132
+\c@section@level=\count144
 )
-LaTeX Info: Redefining \ref on input line 8.
-LaTeX Info: Redefining \pageref on input line 8.
-LaTeX Info: Redefining \nameref on input line 8.
- (/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/paper.out) (/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/paper.out)
+LaTeX Info: Redefining \ref on input line 9.
+LaTeX Info: Redefining \pageref on input line 9.
+LaTeX Info: Redefining \nameref on input line 9.
+ (/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/paper.out) (/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/paper.out)
 \@outlinefile=\write3
 \openout3 = `paper.out'.
 
-\c@lstlisting=\count133
+\c@lstlisting=\count145
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
- (/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/header.tex
+ (/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/header.tex
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
 (hyperref)                removing `\\' on input line 18.
 
 )
-<logojuliacon.pdf, id=72, 430.91032pt x 145.96547pt>
+<logojuliacon.pdf, id=76, 430.91032pt x 145.96547pt>
 File: logojuliacon.pdf Graphic file (type pdf)
 <use logojuliacon.pdf>
-Package pdftex.def Info: logojuliacon.pdf  used on input line 12.
+Package pdftex.def Info: logojuliacon.pdf  used on input line 13.
 (pdftex.def)             Requested size: 72.26999pt x 24.4797pt.
-LaTeX Font Info:    Try loading font information for U+lasy on input line 12.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 13.
  (/usr/local/texlive/2019/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-LaTeX Font Info:    Try loading font information for U+msa on input line 12.
+LaTeX Font Info:    Try loading font information for U+msa on input line 13.
  (/usr/local/texlive/2019/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 12.
+LaTeX Font Info:    Try loading font information for U+msb on input line 13.
  (/usr/local/texlive/2019/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Font shape `U/lasy/b/n' in size <8> not available
-(Font)              Font shape `U/lasy/m/n' tried instead on input line 12.
+(Font)              Font shape `U/lasy/m/n' tried instead on input line 13.
 LaTeX Font Info:    Font shape `U/lasy/b/n' in size <6> not available
-(Font)              Font shape `U/lasy/m/n' tried instead on input line 12.
+(Font)              Font shape `U/lasy/m/n' tried instead on input line 13.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 14.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 15.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <9> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 35.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 36.
+LaTeX Font Info:    Font shape `U/lasy/b/n' in size <9> not available
+(Font)              Font shape `U/lasy/m/n' tried instead on input line 63.
+LaTeX Font Info:    Font shape `U/lasy/b/n' in size <5> not available
+(Font)              Font shape `U/lasy/m/n' tried instead on input line 63.
+
+
+Package amsfonts Warning: Obsolete command \bold; \mathbf should be used instead on input line 71.
+
 
 Underfull \hbox (badness 10000) has occurred while \output is active
   
@@ -579,7 +642,34 @@ Non-PDF special ignored!
 <special> papersize=8.5in,11in
 
 
- </Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/logojuliacon.pdf>] (/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/bib.tex (/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/paper.bbl
+ </Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/logojuliacon.pdf>]
+<../examples/JuliaCon/fig1/fig1_dist.pdf, id=143, 722.7pt x 722.7pt>
+File: ../examples/JuliaCon/fig1/fig1_dist.pdf Graphic file (type pdf)
+<use ../examples/JuliaCon/fig1/fig1_dist.pdf>
+Package pdftex.def Info: ../examples/JuliaCon/fig1/fig1_dist.pdf  used on input line 102.
+(pdftex.def)             Requested size: 151.20154pt x 151.19804pt.
+<../examples/JuliaCon/fig1/fig1_interval.pdf, id=144, 722.7pt x 692.3466pt>
+File: ../examples/JuliaCon/fig1/fig1_interval.pdf Graphic file (type pdf)
+<use ../examples/JuliaCon/fig1/fig1_interval.pdf>
+Package pdftex.def Info: ../examples/JuliaCon/fig1/fig1_interval.pdf  used on input line 103.
+(pdftex.def)             Requested size: 151.20154pt x 144.84773pt.
+<../examples/JuliaCon/fig1/fig1_pbox.pdf, id=145, 722.7pt x 692.3466pt>
+File: ../examples/JuliaCon/fig1/fig1_pbox.pdf Graphic file (type pdf)
+<use ../examples/JuliaCon/fig1/fig1_pbox.pdf>
+Package pdftex.def Info: ../examples/JuliaCon/fig1/fig1_pbox.pdf  used on input line 104.
+(pdftex.def)             Requested size: 151.20154pt x 144.84773pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Overfull \vbox (2.39996pt too high) has occurred while \output is active []
+
+
+Underfull \hbox (badness 10000) has occurred while \output is active
+  \T1/ptm/m/n/9 2
+ []
+
+[2] (/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/bib.tex (/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/paper.bbl
 Underfull \hbox (badness 1062) in paragraph at lines 42--46
 \T1/ptm/m/n/9 ers, and Kari Sentz. Con-struct-ing prob-a-bil-ity boxes and
  []
@@ -589,42 +679,54 @@ Underfull \hbox (badness 1406) in paragraph at lines 91--94
 []\T1/ptm/m/n/9 Berthold Schweizer and Abe Sklar. \T1/ptm/m/it/9 Prob-a-bilis-tic met-ric
  []
 
-))
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 113.
-LaTeX Font Info:    Font shape `U/lasy/b/n' in size <9> not available
-(Font)              Font shape `U/lasy/m/n' tried instead on input line 113.
-LaTeX Font Info:    Font shape `U/lasy/b/n' in size <5> not available
-(Font)              Font shape `U/lasy/m/n' tried instead on input line 113.
 
 Overfull \vbox (2.39996pt too high) has occurred while \output is active []
 
 
 Underfull \hbox (badness 10000) has occurred while \output is active
-  \T1/ptm/m/n/9 2
+  \T1/ptm/m/n/9 3
  []
 
-[2]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 113.
- (/Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/paper.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 113.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 113.
+[3 <../examples/JuliaCon/fig1/fig1_dist.pdf> <../examples/JuliaCon/fig1/fig1_interval.pdf
+
+pdfTeX warning: pdflatex (file ../examples/JuliaCon/fig1/fig1_interval.pdf): PDF inclusion: multiple pdfs with page group included in a single page
+> <../examples/JuliaCon/fig1/fig1_pbox.pdf
+
+pdfTeX warning: pdflatex (file ../examples/JuliaCon/fig1/fig1_pbox.pdf): PDF inclusion: multiple pdfs with page group included in a single page
+>]))
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 213.
+
+Overfull \vbox (2.39996pt too high) has occurred while \output is active []
+
+
+Underfull \hbox (badness 10000) has occurred while \output is active
+  \T1/ptm/m/n/9 4
+ []
+
+[4
+
+]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 213.
+ (/Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/paper.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 213.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 213.
 Package rerunfilecheck Info: File `paper.out' has not changed.
-(rerunfilecheck)             Checksum: 57DB210964C6ED254CD1C57473F7C191;1318.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 113.
+(rerunfilecheck)             Checksum: C0020477FFD86704087D455D008988B1;1395.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 213.
  ) 
 Here is how much of TeX's memory you used:
- 10416 strings out of 492616
- 154756 string characters out of 6129480
- 272651 words of memory out of 5000000
- 14129 multiletter control sequences out of 15000+600000
- 44666 words of font info for 100 fonts, out of 8000000 for 9000
+ 11020 strings out of 492616
+ 162352 string characters out of 6129480
+ 287218 words of memory out of 5000000
+ 14703 multiletter control sequences out of 15000+600000
+ 49032 words of font info for 103 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 40i,11n,44p,1449b,366s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2019/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2019/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on /Users/akgray/Documents/juliaStuff/UQ/ProbabilityBoundsAnalysis.jl/paper/paper.pdf (2 pages, 65843 bytes).
+ 40i,11n,44p,1456b,483s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2019/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex9.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on /Users/akgray/Documents/juliaStuff/UQ/pbaTmp/ProbabilityBoundsAnalysis.jl/paper/paper.pdf (4 pages, 193790 bytes).
 PDF statistics:
- 161 PDF objects out of 1000 (max. 8388607)
- 151 compressed objects within 2 object streams
- 44 named destinations out of 1000 (max. 500000)
- 142 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 273 PDF objects out of 1000 (max. 8388607)
+ 210 compressed objects within 3 object streams
+ 53 named destinations out of 1000 (max. 500000)
+ 165 words of extra memory for PDF output out of 10000 (max. 10000000)
 
