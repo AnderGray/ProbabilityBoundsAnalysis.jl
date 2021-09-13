@@ -14,7 +14,7 @@
 
 \begin{abstract}
 
-Probability Bounds Analysis combines interval arithmetic with probability theory, and provides a representation of sets of distributions in structures called probability boxes (p-boxes), which generalise both distribution functions and intervals. P-boxes generally return interval bounds on all probabilistic quantities, for example samples, cdfs, and probability measures are all intervals. This framework also allows for the comprehensive propagation of probabilities through calculations in a rigorous way, in a similar fashion that interval arithmetic does for sets. As such, ProbabilityBoundsAnalysis.jl gives a rigorous arithmetic of random variables, where both marginal (univariate) and dependency information can be known, partially known or missing completely.
+Probability Bounds Analysis combines interval arithmetic with probability theory, and provides a representation of sets of distributions in structures called probability boxes (p-boxes), which generalise both distribution functions and intervals. P-boxes generally return interval bounds on all probabilistic quantities, for example samples, cdfs, and probability measures are all intervals. This framework also allows for the comprehensive propagation of probabilities through calculations in a rigorous way, in a similar fashion that interval arithmetic does for sets. As such, ProbabilityBoundsAnalysis.jl gives a rigorous arithmetic of random variables, where both marginal (univariate) and dependency information can be known, partially known or missing completely. We describe the main theoretical elements of probability bounds analysis, and describe a minimal implementation of the method and it's main algorithms in Julia.
 
 \end{abstract}
 
@@ -31,7 +31,7 @@ An arithmetic of probability distributions has held a long interest among mathem
   and generalised by others.
 \end{displayquote}
 
-\noindent Indeed it was Kolmogorov who originally asked what the result of a sum of two distributions without knowing their joint distribution. This was answered for the sum by Marakov \cite{makarov1982estimates}, who showed the result was a set of distributions and was able to provide bounds on this function. Sklar, Schweizer and Frank generalised this result to other (positive) binary operations \cite{frank1987best,schweizer2011probabilistic}. In this pursuit they created copulas, a general way to encode probabilistic dependence independently from marginals, and a now essential object used in probabilistic modelling. In his seminal dissertation \cite{williamson1989probabilistic}, Williamson described an algorithm for efficiently performing these arithmetic operations, which can give guaranteed bounds on probability distributions in terms of an upper and lower cdf. He called his method \textit{Probabilistic Arithmetic} and his sets of distributions \textit{Dependency Bounds}. Since then the method has been generalised \cite{ferson2015constructing,ferson1996whereof,ferson2004arithmetic} to most of the base binary and unary operations that would be present in a programming language. Probability Boxes (p-boxes) are the name now given to these structures, and Probability Bounds Analysis (PBA) the name of the method.
+\noindent Indeed it was Kolmogorov who originally asked about the result of a sum of two distributions without knowing their joint distribution. This was answered for the sum by Marakov \cite{makarov1982estimates}, who showed the result was a set of distributions and was able to provide bounds on this function. Sklar, Schweizer and Frank generalised this result to other (positive) binary operations \cite{frank1987best,schweizer2011probabilistic}. In this pursuit they created copulas, a general way to encode probabilistic dependence independently from marginals, and a now essential object used in probabilistic modelling. In his seminal dissertation \cite{williamson1989probabilistic}, Williamson described an algorithm for efficiently performing these arithmetic operations, which can give guaranteed bounds on probability distributions in terms of an upper and lower cdf. He called his method \textit{Probabilistic Arithmetic} and his sets of distributions \textit{Dependency Bounds}. Since then the method has been generalised \cite{ferson2015constructing,ferson1996whereof,ferson2004arithmetic} to most of the base binary and unary operations that would be present in a programming language. Probability Boxes (p-boxes) are the name now given to these structures, and Probability Bounds Analysis (PBA) the name of the method.
 
 The goal of PBA can be stated as \textbf{to compute guaranteed bounds on functions of random variables given only partial knowledge of the input probability distributions and their dependencies}. That is to compute with partial knowledge about the input joint distribution. Ideally all of the available information about random variables should be used, but no more than what actually is available.
 
@@ -93,7 +93,7 @@ All of a p-box's probabilistic quantities are intervals. The cdf of a p-box may 
   \overline{\mathbb{P}}(U)  &= \overline{F}(b) - \underline{F}(a) ,
 \end{align*}
 
-where the max operator is required when $\underline{F}(b) < \overline{F}(a)$. Note the same can be achieved by using the standard formula for finding the measure from the cdf, $F(b)- F(a)$, and using interval arithmetic.
+where the max operator is required when $\underline{F}(b) < \overline{F}(a)$. Note the same can be achieved by using the standard formula for finding the measure from the cdf, $\mathbb{P}(U) = F(b)- F(a)$, and using interval arithmetic.
 
 
 \begin{figure*}[htp]
@@ -104,7 +104,7 @@ where the max operator is required when $\underline{F}(b) < \overline{F}(a)$. No
   \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig1/fig1_pbox.pdf}
   
   \caption{A precise distribution, an interval and a probability box}
-  \label{fig:figure3}
+  \label{fig:figure1}
   
 \end{figure*}
 
@@ -146,12 +146,42 @@ That is, it is not possible to find a distribution whose range is in $[a, b]$ an
   \end{cases}
 \end{equation*}
 
-\noindent That is, if the set $U$ does not intersect the interval $X$, $\mathbb{P}_{X}=0$, i.e. $U$ certainly does not contain any of the random variables. If the X is fully contained in $U$, $\mathbb{P}_{X}=1$, i.e. $U$ certainly contains all of the random variables. And finally if $U$ intersects (but does not contain) $X$, the probability measure is the vacuous probability interval $\mathbb{P}_{X} = [0, 1]$, i.e. we are completely uncertain about the containment. Note that the $P_{X} = \{0, 1, [0,1]\}$ is due to the interval bounds being step function. Generally p-boxes may yield any probability interval.
+\noindent That is, if the set $U$ does not intersect the interval $X$, $\mathbb{P}_{X}=0$, i.e. $U$ certainly does not contain any of the random variables. If $X$ is fully contained in $U$, $\mathbb{P}_{X}=1$, i.e. $U$ certainly contains all of the random variables. And finally if $U$ intersects (but does not contain) $X$, the probability measure is the vacuous probability interval $\mathbb{P}_{X} = [0, 1]$, i.e. we are completely uncertain about the containment. Note that the $P_{X} = \{0, 1, [0,1]\}$ is due to the interval bounds being step functions. Generally p-boxes may yield any probability interval.
 
 \subsection{Outer representations of p-boxes}
 
 An important feature of probability bounds analysis is how distribution functions and p-boxes are represented. Generally, analytical solutions for cdfs are not readily available, for example the normal distribution's cdf can only be found by integrating the density, usually done with Gaussian quadrature. However, even if the functions were available analytically, when the variables are used in an arithmetic operation the output distribution will not necessarily belong to the same family. Therefore we require a representation of these continuous functions which is not dependent on the distribution family (for example Polynomial chaos expansion), and ideally is robust.
 
+We follow the representation first introduced by Williamson and Downs \cite{williamson1990probabilistic}, where a discrete upper and lower approximations of distribution functions are constructed using the inverse cdfs. A minimal p-box structure is as follows:
+
+\begin{lstlisting}[language = Julia]
+  using IntervalArithmetic
+
+  struct pbox{T<: Real}
+    u :: Vector{T}    # right descrete inverse
+    d :: Vector{T}    # left descrete inverse
+    m :: Interval{T}  # interval mean
+    v :: Interval{T}  # interval variance
+    shape :: String   # shape
+  end
+\end{lstlisting}
+
+\noindent where the vectors $u$ and $d$ are the "up" and "down", or the "left" and "right", edges of the p-box. The intervals $m$ and $v$ are the interval moments, and the $shape$ is a string containing any distribution family information.
+
+
+
+
+\begin{figure*}[htp]
+
+  \centering
+  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox1.pdf}\hfill
+  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox2.pdf}\hfill
+  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox3.pdf}
+  
+  \caption{A precise distribution, an interval and a probability box}
+  \label{fig:figure2}
+  
+\end{figure*}
 
 
 \subsection{Where do p-boxes come from?}
