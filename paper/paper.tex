@@ -6,6 +6,12 @@
 \usepackage{amsmath}
 %\bibliographystyle{juliacon}
 
+\usepackage[labelformat=simple]{subfig}
+
+\renewcommand\thesubfigure{\arabic{subfigure}}
+\renewcommand{\subfigurename}{Figure}
+
+
 \begin{document}
 
 \input{header}
@@ -174,6 +180,29 @@ We follow the representation first introduced by Williamson and Downs \cite{will
   d[i] &= \underline{F}^{-1}(p_{i+1}) & \text{for } i = 1, ..., N
 \end{align*}
 
+
+
+\begin{figure*}[htp]
+
+  \centering
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/normal.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/uniform.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/beta.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/gamma.pdf}
+  
+
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/lognormal.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/exponential.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/chisquared.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/cauchy.pdf}
+  
+
+  \caption{Various parametrically constructed p-boxes with interval parameters}
+  \label{fig:figure3}
+  
+\end{figure*}
+
+
 The vectors $u$ and $d$ are a collection of "real" or "physical" evaluations of a the random variable $X$, as opposed to cdf evaluations. Note that although the probability levels $p$ are uniformly spaced, $u$ and $d$ are generally not. The vectors $u$ and $d$ can then serve as bounds on the monotonic functions $\overline{F}^{-1}$ and $\underline{F}^{-1}$:
 
 \begin{align*}
@@ -181,7 +210,7 @@ The vectors $u$ and $d$ are a collection of "real" or "physical" evaluations of 
   d[i] &\geq \underline{F}^{-1}(p) & p_{i} \in [p_{i}, p_{i+1})
 \end{align*}
 
-That is, in the region $[p_{i}, p_{i+1})$, $u[i]$ is a lower bound on $\overline{F}^{-1}$ and $d[i]$ is an upper bound on $\underline{F}^{-1}$. Note that the definition of the regions $[p_{i}, p_{i+1})$ or $(p_{i}, p_{i+1}]$ doesn't matter, as long as the choice is consistent. In the case that the p-box is a precise distribution and $\overline{F}^{-1}(p) = \underline{F}^{-1}(p)$ gives:  $u[i+1] = d[i]$. Figure \ref{fig:figure2} shows examples of a distribution and a p-box represented this way.
+That is, in the region $[p_{i}, p_{i+1})$, $u[i]$ is a lower bound on $\overline{F}^{-1}$ and $d[i]$ is an upper bound on $\underline{F}^{-1}$. Note that the definition of the regions $[p_{i}, p_{i+1})$ or $(p_{i}, p_{i+1}]$ doesn't matter, as long as the choice is consistent. In the case that the p-box is a precise distribution and $\overline{F}^{-1}(p) = \underline{F}^{-1}(p)$ gives:  $u[i+1] = d[i]$. Figure \ref{fig:figure2} shows examples of a distribution and a p-box with various outer representations.
 
 A minimal p-box structure is as follows:
 
@@ -223,43 +252,67 @@ A minimal p-box structure is as follows:
     return pbox(u, d, m, std^2, "normal")
   end
 
-
 \end{lstlisting}
 
+Other distributional p-boxes are constructed in a similar way. A evaluation of the cdf in terms of this representation is as follows: 
 
-
-\begin{figure*}[htp]
-
-  \centering
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/normal.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/uniform.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/beta.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/gamma.pdf}
-  
-
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/lognormal.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/exponential.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/chisquared.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/cauchy.pdf}
-  
-
-  \caption{Various parametrically constructed p-boxes with interval parameters}
-  \label{fig:figure3}
-  
-\end{figure*}
-
-
-\iffalse
 \begin{lstlisting}[language = Julia]
-  using Distributions
-
-  function discretise(Dist, params)
-
-    i = 
-
+  function cdf(F :: pbox, x :: Real)
+    
+    u = F.u; d = F.d; n = length(u);
+    
+    cdf_u = 1 - sum(x .< u)/n;
+    cdf_d = 1 - sum(x .<= d)/n;
+    
+    return interval(cdf_d, cdf_u)
   end
+
 \end{lstlisting}
-\fi
+
+A horizontal cut (an evaluation of the inverse cdf) and a sample of a p-box can be found as follows: 
+
+\begin{lstlisting}[language = Julia]
+  function cut(F :: pbox, p :: Real)
+
+    u = F.u; d = F.d; n = length(u);
+    ps = range(0, 1, length = n+1);
+
+    ind_u = findlast(ps[1:end-1] .<= p)
+    ind_d = findfirst(ps[2:end] .>= p)
+    
+    return interval(u[ind_u], d[ind_d])
+  end
+
+  # a random sample is a random cut
+  rand(F :: pbox, N :: Int) = cut.(F, rand(N))
+
+\end{lstlisting}
+
+And finally the probability measure, which we call the \textit{mass} for short:
+
+\begin{lstlisting}[language = Julia]
+  function mass(F :: pbox, x :: Interval)
+
+    cdfHi = cdf(F, x.hi)  
+    cdfLo = cdf(F, x.lo)  # returns intervals
+
+    ub = cdfHi.hi - cdfLo.lo
+    lb = max(0, cdfHi.lo - cdfLo.hi)
+
+    return interval(lb, ub)
+  end
+
+\end{lstlisting}
+
+Other available functions on p-boxes which we do not describe here are:
+
+\begin{itemize}
+  \item \textbf{env} or $\cup$: takes the envelope or hull of two p-boxes. A convex set-union of the probability sets
+  \item \textbf{imp} or $\cap$: imposition or intersection of two p-boxes. Set-intersection of probability sets
+  \item \textbf{subseteq} or $\subseteq$: checks if a p-box is a subset or equal to another
+  \item \textbf{in} or $\in$: checks if a distribution is a member of a p-box
+  \item \textbf{mixture}: a stochastic mixture of p-boxes.
+\end{itemize}
 
 \subsection{Where do p-boxes come from?}
 
@@ -276,21 +329,81 @@ In situations where the parametric family of your uncertainty is known, for exam
 %It is well known that a random variables distribution function cannot be 
 
 
-\subsubsection{Operations involving intervals and distributions} %\hfill \break
+\subsubsection{Operations involving intervals and distributions} \hfill \break
 
-\subsubsection{When dependencies between distributions are uknown} %\hfill \break
+An arithmetic operation involving an interval and a precise distribution will produce set of distributions, i.e. a unique distribution for every real number in the interval, whose p-box bounds can be found. The following function performs a binary operation between a p-box and an interval:
+
+\begin{lstlisting}[language = Julia]
+  using MomentArithmetic
+
+  function binary(F :: pbox, X :: Interval, op)
+
+    u_z = op.(Interval.(F.u), X)
+    d_z = op.(Interval.(F.d), X)
+
+    u_z_ = getfield.(u_z, :lo)  # get right edges
+    d_z_ = getfield.(d_z, :hi)  # get left edges
+
+    # for moments
+    F_range = interval(F.u[1], F.d[end])
+    F_moms = Moments(F.m, F.v, F_range);
+    Z_moms = op(F_moms, X);
+
+    return pbox(u_z_, d_z_, Z_moms.mean, 
+    Z_moms.var, F.shape)
+  end
+\end{lstlisting}
+
+How the moment transformations are performed are not described here, however are available in \textit{MomentArithmetic.jl} \cite{ferson2021distribution}. Figure \ref{fig:figure4} shows an example of an operation between a precise distribution and an interval.
+
+
+\begin{figure}[htp]
+
+  \centering
+  \includegraphics[width=0.12\textwidth]{../examples/JuliaCon/fig4/fig4_dist.pdf}
+  \raisebox{8.0mm}{\noindent\Large*}
+  \includegraphics[width=0.12\textwidth]{../examples/JuliaCon/fig4/fig4_in.pdf}
+  \raisebox{9.0mm}{{\Large$\rightarrow$}}
+  \includegraphics[width=0.12\textwidth]{../examples/JuliaCon/fig4/fig4_pbox.pdf}
+  
+
+  \caption{Illustration of a p-box resulting from a binary operation between a distribution and an interval}
+  \label{fig:figure4}
+  
+\end{figure}
+
+
+\subsubsection{When dependencies between distributions are unknown} \hfill \break
+
+In the case where a binary operation is performed between two distributions but whose dependence or correlation is unknown, then a single output distribution also cannot be defined. However a bounding p-box can be computed. This is the original question of Kolmogorov as described in the introduction. We call such operations between p-boxes where the marginals are fixed but no joint information is known \textit{Fréchet} operations, after the mathematician Maurice R. Fréchet, who first discovered how to bound joint distributions with fixed marginals \cite{frechet1935generalisation}. How operations between p-boxes with partial or no dependence information is known is described in section \ref{sec:pboxBinary}. Figure \ref{fig:figure5} illustrates a Fréchet operation between a uniform and a normal distribution.
+
+\begin{figure}[htp]
+
+  \centering
+  \includegraphics[width=0.12\textwidth]{../examples/JuliaCon/fig5/fig5_dist1.pdf}
+  \raisebox{8.0mm}{\noindent\Large+\small$_{\text{Fr{\'e}chet}}$}
+  \includegraphics[width=0.12\textwidth]{../examples/JuliaCon/fig5/fig5_dist2.pdf}
+  \raisebox{9.0mm}{{\Large$\rightarrow$}}
+  \includegraphics[width=0.12\textwidth]{../examples/JuliaCon/fig5/fig5_pbox.pdf}
+  
+
+  \caption{Illustration of a p-box resulting from a Fréchet operation}
+  \label{fig:figure5}
+  
+\end{figure}
+
 
 \subsubsection{Outer approximations of precise distributions} \hfill \break
 
 The outer approximation of precise distributions described in section \ref{sec:outer_approx} also leads naturally to a p-box. All probabilistic quantities of discretised distribution functions will be intervals, which shrink to precise quantities as the discretisation increases.
 
-\subsubsection{Inferential methods where data is limited or bad} \hfill \break
+\subsubsection{Inferential methods when data is limited or bad} \hfill \break
 
 Probability distributions are almost always constructed from data or measurements, or otherwise are assumed as a model or derived from expert opinion. Usually to construct a probability distribution accurately, a large amount of high quality data is required. P-boxes arise naturally when this is not the case, for example if the data are intervals instead of points, or when data is sparse or not reliable and, an exact distribution function is difficult to prescribe.
 
-An example is robust bayesian analysis [reference], where the analyst does not have enough information to reliably establish a single prior and likelihood function, but instead has a collection of priors and likelihoods, leading to a set of posteriors distributions, to which a p-box can be identified.
+An example is robust bayesian analysis, where the analyst does not have enough information to reliably establish a single prior and likelihood function, but instead has a collection of priors and likelihoods, leading to a set of posteriors distributions, to which a p-box can be identified.
 
-
+A method which is growing in popularity are inferential models \cite{martin2015inferential}. These generalise classical inference methods to account for limited statistical knowledge, and gives a statistical inference theory which is non-additive (as opposed to classical probability which is additive). These inference procedures, often based on random sets, give certain validity and performance guarantees. Inferential models can viewed from the perspective of bounding sets of distributions, and is closely linked to possibility theory \cite{liu2020inferential}. A p-box can be prescribed to such structures, leading to structures like confidence boxes or c-boxes \cite{fersoncomputing}, which follow the same arithmetic rules as p-boxes. 
 
 \subsection{Relationship to other ideas}
 
@@ -307,10 +420,12 @@ An example is robust bayesian analysis [reference], where the analyst does not h
 
 
 \section{P-box arithmetic}
+\label{sec:pboxarithmetic}
 
 \subsection{Uniary operations}
 
-
+\subsection{Binary operations}
+\label{sec:pboxBinary}
 
 \section{An uncertain programming language}
 \label{sec:additional_faci}
