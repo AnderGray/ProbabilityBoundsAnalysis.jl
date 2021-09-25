@@ -5,6 +5,8 @@ keywords:
   - Uncertainty
   - Interval Arithmetic
   - Probabilistic Arithmetic
+  - Probability Bounds Analysis
+  - Probability Boxes
 authors:
   - name: Ander Gray
     orcid: 0000-0003-1361-440X
