@@ -101,7 +101,7 @@ All of a p-box's probabilistic quantities are intervals. The cdf of a p-box may 
 \noindent a sample of the p-box may be drawn using the inverse cdfs: 
 
 \begin{equation*}
-  [\underline{F}^{-1}(\alpha), \overline{F}^{-1}(\alpha)]
+  [\overline{F}^{-1}(\alpha), \underline{F}^{-1}(\alpha)]
 \end{equation*}
 
 \noindent where $\alpha \sim U(0,1)$ is a sample from a uniform distribution, and the probability measure\footnote{The probability measure is a function which returns the probability that the random variable is in some set} on some interval $U = [a, b]$ is bounded as follows:
@@ -111,7 +111,7 @@ All of a p-box's probabilistic quantities are intervals. The cdf of a p-box may 
   \overline{\mathbb{P}}(U)  &= \overline{F}(b) - \underline{F}(a) ,
 \end{align*}
 
-where the max operator is required when $\underline{F}(b) < \overline{F}(a)$. Note the same can be achieved by using the standard formula for finding the measure from the cdf, $\mathbb{P}(U) = F(b)- F(a)$, and using interval arithmetic.
+where the max operator is required when $\underline{F}(b) < \overline{F}(a)$. Note the same can nearly be achieved by using the precise formula for the probability measure, $\mathbb{P}(U) = F(b)- F(a)$, and using interval arithmetic.
 
 
 P-boxes generalise precise distributions and intervals in the following way. A distribution is a p-box with a precise cdf and moments, i.e. when: 
@@ -347,7 +347,7 @@ In situations where the parametric family of the uncertainty is known, for examp
 
 It is well known that generally a random variables distribution function cannot be uniquely determined solely from its moment information, even with an infinite number of moments, unless some assumptions are made about the family (i.e. it's normal). In probability theory this is known as the \textit{moment problem}. However, in these situations it is possible to define a p-box which bounds all random variables with the known properties, without loss of generality or making unwarranted assumptions.
 
-These p-boxes are constructed using the Chebyshev (mean and variance), Markov (mean and one bound) and Cantelli (mean and range) inequalities from probability theory. These inequalities allow for the cdf to be bounded from various range and moment information. For example, the Chebyshev inequality can be used to find p-box bounds from the random variables mean and variance:
+These p-boxes are constructed using the Chebyshev (mean and variance) \cite{chebyshev1874valeurs}, Markov (mean and one bound) \cite{markoff1900question} and Cantelli (mean and range) inequalities from probability theory. These inequalities allow for the cdf to be bounded from various range and moment information. For example, the Chebyshev inequality can be used to find p-box bounds from the random variables mean and variance:
 
 \begin{equation*}
   \underline{F}_{X}(x) = \begin{cases} 1 / (1 + (x - \mu_{X})^2 / \sigma^{2}_{X}),& \text{if } \mu_{X}<x \\
@@ -507,9 +507,15 @@ Sklar's theorem has a straightforward imprecise extension \cite{montes2015sklar}
   \overline{F}_{XY}(x,y) &= \overline{C}(\overline{F}_{X}(x), \overline{F}_{Y}(y)).
 \end{align*}
 
-Samples and the probability measure can also be found from a bivariate p-box. Like how a sample of a univariate p-box is an interval, a sample of a bivariate p-box will be an interval box, a two dimensional rectangular set. 
+Samples and the probability measure can also be found from a bivariate p-box. Like how a sample of a univariate p-box is an interval, a sample of a bivariate p-box will be an interval box, i.e. a two dimensional rectangular set. Multiple samples will therefore be a population of interval boxes, which together follow the dependency encoded in $C$. The bottom of Figure \ref{fig:figure7} shows 100 samples of a bivariate p-box, whose marginals are $X \sim \text{Beta}([4,8], 3)$ and $Y \sim \text{N}([0,2], 2)$, and with the Gaussian copula (multivariate normal's copula) with correlation coefficient $\rho_{XY} = -0.8$: $C = \Phi_{-0.8}$. The top of Figure \ref{fig:figure7} shows the cdf bounds. The probability measure from a bivariate p-box in the rectangular set $ U = [x_{1}, x_{2}] \times [y_{1}, y_{2}]$ is\footnote{Which is nearly a straightforward application of interval arithmetic to the precise calculation $F(x_{2}, y_{2}) - F(x_{1}, y_{2}) - F(x_{2}, y_{1}) + F(x_{1}, y_{1})$}: 
 
-A minimal structure and cdf of a bivariate p-box is
+\begin{align*}
+  \underline{\mathbb{P}}(U) &= \text{max}(0, \underline{F}(x_{2}, y_{2}) - \overline{F}(x_{1}, y_{2}) - \overline{F}(x_{2}, y_{1}) + \underline{F}(x_{1}, y_{1})) ,\\ 
+  \overline{\mathbb{P}}(U)  &= \text{min}(1, \overline{F}(x_{2}, y_{2}) - \underline{F}(x_{1}, y_{2}) - \underline{F}(x_{2}, y_{1}) + \overline{F}(x_{1}, y_{1}) ).
+\end{align*}
+
+
+A minimal structure, cdf, random sample and probability measure of a bivariate p-box is:
 
 \begin{lstlisting}[language = Julia]
   using BivariateCopulas
@@ -523,7 +529,7 @@ A minimal structure and cdf of a bivariate p-box is
 
   end
 
-  function cdf(F :: BivPbox, x, y)
+  function cdf(F :: BivPbox, x :: Real, y :: Real)
 
     cdf_X = cdf(F.X, x)   # returns interval
     cdf_Y = cdf(F.Y, y)
@@ -543,7 +549,36 @@ A minimal structure and cdf of a bivariate p-box is
 
     return IntervalBox.(X_samps, Y_samps)
   end
+
+  function mass(F :: BivPbox, box :: IntervalBox)
+
+    x = box.v[1]; y = box.v[2];  # gets intervals
+
+    F_1 = cdf(F, x.lo, y.lo)
+    F_2 = cdf(F, x.hi, y.lo)
+    F_3 = cdf(F, x.lo, y.hi)
+    F_4 = cdf(F, x.hi, y.hi)
+
+    # using intervals
+    mass = F_4 - F_3 - F_2 + F_1;
+
+    return max(0, min(1, mass))
+  end
 \end{lstlisting}
+
+\begin{figure}[htp]
+
+  
+  \includegraphics[width=0.5\textwidth]{../examples/JuliaCon/fig7/biv_cdf.pdf} 
+  
+  \includegraphics[width=0.5\textwidth]{../examples/JuliaCon/fig7/samples.pdf}
+  
+
+  \caption{Cdf bounds of a bivariate p-box (top) with $X \sim \text{Beta}([4,8], 3)$, $Y \sim \text{N}([0,2], 2)$, and $\rho_{XY} = -0.8$, and 100 samples (bottom)}
+  \label{fig:figure7}
+  
+\end{figure}
+
 
 \section{P-box arithmetic}
 \label{sec:pboxarithmetic}
