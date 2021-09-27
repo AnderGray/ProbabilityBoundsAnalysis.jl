@@ -8,13 +8,18 @@ c = normal(interval(-1,1), 1)    # mean = [-1, 1] var = 1
 
 fontsize = 24
 
-plot(a, fontsize = fontsize)
+fig = figure("fig1",figsize=(8,8))
+plot(a, fontsize = fontsize, name = "fig1")
 PyPlot.xlabel("X", fontsize = fontsize)
 savefig("fig1_dist.pdf")
-plot(b, fontsize = fontsize)
+
+fig = figure("fig2",figsize=(8,8))
+plot(b, fontsize = fontsize, name = "fig2")
 PyPlot.xlabel("X", fontsize = fontsize)
 PyPlot.xlim([-2, 2])
 savefig("fig1_interval.pdf")
-plot(c, fontsize = fontsize)
+
+fig = figure("fig3",figsize=(8,8))
+plot(c, fontsize = fontsize, name = "fig3")
 PyPlot.xlabel("X", fontsize = fontsize)
 savefig("fig1_pbox.pdf")

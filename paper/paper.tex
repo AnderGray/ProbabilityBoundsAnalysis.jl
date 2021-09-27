@@ -20,7 +20,7 @@
 
 \begin{abstract}
 
-Probability bounds analysis combines interval arithmetic with probability theory, and provides a representation of sets of distributions in structures called probability boxes (p-boxes), which generalise both distribution functions and intervals. P-boxes generally return interval bounds on all probabilistic quantities, for example samples, cdfs, and probability measures are all intervals. This framework also allows for the comprehensive propagation of probabilities through calculations in a rigorous way, in a similar fashion that interval arithmetic does for sets. As such, ProbabilityBoundsAnalysis.jl gives a rigorous arithmetic of random variables, where both marginal (univariate) and dependency information can be known, partially known or missing completely. We describe the main theoretical elements of probability bounds analysis, and describe a minimal implementation of the method and it's main algorithms in Julia.
+Probability bounds analysis combines interval arithmetic with probability theory, and provides a representation of sets of distributions in structures called probability boxes (p-boxes), which generalise both distribution functions and intervals. P-boxes generally return interval bounds on all probabilistic quantities, for example samples, cdfs, and probability measures are all intervals. This framework also allows for the comprehensive propagation of probabilities through calculations in a rigorous way, in a similar fashion that interval arithmetic does for sets. As such, ProbabilityBoundsAnalysis.jl gives a rigorous arithmetic of random variables, where both marginal (univariate) distributions and dependency information can be known, partially known or missing completely. We describe the main theoretical elements of probability bounds analysis, and provide a simplified implementation of the method in code snippets which can be readily evaluated in the Julia command terminal.
 
 \end{abstract}
 
@@ -256,6 +256,22 @@ A minimal p-box structure is as follows:
 
 Other distributional p-boxes are constructed in a similar way. A evaluation of the cdf in terms of this representation is as follows: 
 
+
+\begin{figure*}[htp]
+
+  \centering
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig6/fig6_pbox1.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig6/fig6_pbox2.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig6/fig6_pbox3.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig6/fig6_pbox4.pdf}
+  
+
+  \caption{Examples of distribution-free p-boxes, constructed from various range and moment constrains}
+  \label{fig:figure6}
+  
+\end{figure*}
+
+
 \begin{lstlisting}[language = Julia]
   function cdf(F :: pbox, x :: Real)
     
@@ -272,6 +288,8 @@ Other distributional p-boxes are constructed in a similar way. A evaluation of t
 A horizontal cut (an evaluation of the inverse cdf) and a sample of a p-box can be found as follows: 
 
 \begin{lstlisting}[language = Julia]
+  import Base: rand
+
   function cut(F :: pbox, p :: Real)
 
     u = F.u; d = F.d; n = length(u);
@@ -284,7 +302,7 @@ A horizontal cut (an evaluation of the inverse cdf) and a sample of a p-box can 
   end
 
   # a random sample is a random cut
-  rand(F :: pbox, N :: Int) = cut.(F, rand(N))
+  rand(F :: pbox, N :: Int) = cut.([F], rand(N))
 
 \end{lstlisting}
 
@@ -321,13 +339,37 @@ In this section we discuss some situations where p-boxes arise naturally.
 
 \subsubsection{Partial distributional information} \hfill \break
 
-In situations where the parametric family of your uncertainty is known, for example it is known that $X$ is normally distributed $X \sim N(\mu_{X}, \sigma_{X}^{2})$ or that $Y$ is a uniform $Y \sim U(a_{Y},b_{Y})$, but the precise parameters to these functions are unknown, then p-boxes are a natural representation for such uncertainty. In the case that bounds are known on parameters, then bounds on the cdf can be found using the interval parameters and the inverse cdf of the parametric family. Figure \ref{fig:figure3} shows a variety of p-boxes constructed this way.
+In situations where the parametric family of the uncertainty is known, for example it is known that $X$ is normally distributed $X \sim N(\mu_{X}, \sigma_{X}^{2})$ or that $Y$ is a uniform $Y \sim U(a_{Y},b_{Y})$, but the precise parameters to these functions are unknown, then p-boxes are a natural representation. In the case that bounds are known on parameters, then bounds on the cdf can be found using the interval parameters and the inverse cdf of the parametric family. Figure \ref{fig:figure3} shows a variety of p-boxes constructed this way.
 
 
-\subsubsection{Partial moment information} %\hfill \break
+\subsubsection{Missing family but partial moment information} \hfill \break
 \label{section:Moments}
-%It is well known that a random variables distribution function cannot be 
 
+It is well known that generally a random variables distribution function cannot be uniquely determined solely from its moment information, even with an infinite number of moments, unless some assumptions are made about the family (i.e. it's normal). In probability theory this is known as the \textit{moment problem}. However, in these situations it is possible to define a p-box which bounds all random variables with the known properties, without loss of generality or making unwarranted assumptions.
+
+These p-boxes are constructed using the Chebyshev (mean and variance), Markov (mean and one bound) and Cantelli (mean and range) inequalities from probability theory. These inequalities allow for the cdf to be bounded from various range and moment information. For example, the Chebyshev inequality can be used to find p-box bounds from the random variables mean and variance:
+
+\begin{equation*}
+  \underline{F}_{X}(x) = \begin{cases} 1 / (1 + (x - \mu_{X})^2 / \sigma^{2}_{X}),& \text{if } \mu_{X}<x \\
+    1,& \text{if } x\leq \mu_{X} \end{cases}
+\end{equation*}
+
+\begin{equation*}
+  \overline{F}_{X}(x)  = \begin{cases} 1 / (1 + \sigma^{2}_{X}/(x - \mu_{X})^2),& \text{if } x<\mu_{X} \\
+  1,& \text{if } \mu_{X}\leq x \end{cases}
+\end{equation*}
+
+A list of available distribution-free constructors are:
+
+\begin{itemize}
+  \item \textbf{MeanVar (or MeanStd)}: using Chebyshev
+  \item \textbf{MeanMin}: using Markov
+  \item \textbf{MeanMax}: using Markov
+  \item \textbf{MeanMinMax}: using Cantelli
+  \item \textbf{MinMaxMeanVar (or MinMaxMeanStd)}: using a mix of inequalities
+\end{itemize}
+
+All distribution-free constructors may also take interval moments parameters.
 
 \subsubsection{Operations involving intervals and distributions} \hfill \break
 
@@ -395,22 +437,23 @@ In the case where a binary operation is performed between two distributions but 
 
 \subsubsection{Outer approximations of precise distributions} \hfill \break
 
-The outer approximation of precise distributions described in section \ref{sec:outer_approx} also leads naturally to a p-box. All probabilistic quantities of discretised distribution functions will be intervals, which shrink to precise quantities as the discretisation increases.
+Outer approximations of precise distributions described in section \ref{sec:outer_approx} also lead naturally to a p-box. All probabilistic quantities of discretised distribution functions will be intervals, which shrink to precise quantities as the discretisation increases. In that sense, both distributions functions and p-boxes are p-boxes in ProbabilityBoundsAnalysis.jl.
 
 \subsubsection{Inferential methods when data is limited or bad} \hfill \break
 
-Probability distributions are almost always constructed from data or measurements, or otherwise are assumed as a model or derived from expert opinion. Usually to construct a probability distribution accurately, a large amount of high quality data is required. P-boxes arise naturally when this is not the case, for example if the data are intervals instead of points, or when data is sparse or not reliable and, an exact distribution function is difficult to prescribe.
+Probability distributions are almost always constructed from data or measurements, or otherwise are assumed as a model or derived from expert opinion. Usually to construct a probability distribution accurately, a large amount of high quality data is required. P-boxes arise naturally when this is not the case, for example if the data are intervals instead of points, or when data is sparse or not reliable, and an exact distribution function is difficult to prescribe.
 
 An example is robust bayesian analysis, where the analyst does not have enough information to reliably establish a single prior and likelihood function, but instead has a collection of priors and likelihoods, leading to a set of posteriors distributions, to which a p-box can be identified.
 
 A method which is growing in popularity are inferential models \cite{martin2015inferential}. These generalise classical inference methods to account for limited statistical knowledge, and gives a statistical inference theory which is non-additive (as opposed to classical probability which is additive). These inference procedures, often based on random sets, give certain validity and performance guarantees. Inferential models can viewed from the perspective of bounding sets of distributions, and is closely linked to possibility theory \cite{liu2020inferential}. A p-box can be prescribed to such structures, leading to structures like confidence boxes or c-boxes \cite{fersoncomputing}, which follow the same arithmetic rules as p-boxes. 
 
+\iffalse
 \subsection{Relationship to other ideas}
 
 \subsubsection{Random set theory}
 
 \subsubsection{Possibility theory}
-
+\fi
 
 %\section{Operations on p-boxes}
 
@@ -418,9 +461,94 @@ A method which is growing in popularity are inferential models \cite{martin2015i
 
 \subsection{Bivariate p-boxes}
 
+P-boxes have been extended to higher dimensions \cite{montes2015sklar}, however like with precise probabilities, when considering multivariate p-boxes the dependence information (like correlation) must be accounted for. Considering complex dependencies amongst p-boxes is important, as they play a key role in binary operations. That is, the result of an operation between two p-boxes not only depends on the input p-boxes, but also how the inputs are correlated.
+
+Covariance, and subsequently the pearson correlation coefficient, is insufficient to fully determine the dependence between two random variables. Like for the univariate moments, a single multivariate distribution cannot be prescribed for a given value of the covariance without making distributional assumptions (like normality). A more descriptive (and general) model for dependence is required to exactly specify a multivariate distribution.
+
+Copulas \cite{nelsen2007introduction} provide a solution to this problem. A copula is a multivariate cdf with uniform marginals on the interval $[0, 1]$. Essentially a copula is a multivariate distribution which has all marginal (univariate) information stripped away, leaving only the dependency. All dependence information can therefore be encoded in a copula exactly and completely separately from its marginals. Often multivariate problems in probability can be reduced to an analysis of copulas.
+
+A bivariate copula (2-copula) $C$ is any function $C:[0,1]^2 \rightarrow [0,  1]$ with the following properties:
+
+\begin{enumerate}
+  \item Grounded: $C(0,v) = C(u,0) = 0$,
+  \item Uniform margins: $C(u,1) = u; \;C(1,v) = v$,
+  \item 2-increasing: \\ $C(u_{2},v_{2}) - C_{}(u_{2}, v_{1}) - C(u_{1}, v_{2}) + C(u_{1}, v_{1}) \ge 0$\\ for all $0 \le u_{1} \le u_{2} \le 1$ and $0 \le v_{1} \le v_{2} \le 1$.
+\end{enumerate}
+
+Three important two copulas are:
+
+\begin{align*}
+  W(u,v) &= \mathrm{max}( u + v-1,0),  \\
+  \Pi(u,v) &= uv, \\
+  %\mathcal{P}(u,v) &= uv \\
+  %\Pi(u,v) &= uv\\
+  %\mu(u,v) &= uv \\
+  %C_{\pi}(u,v) &=uv\\
+  M(u,v) &= \mathrm{min}(u,v),
+\end{align*}
+where the $\Pi$ encodes stochastic independence, $M$ encodes maximally positive correlation, and $W$ encodes maximally negative correlation. Moreover, $W$ and $M$ are bounds on all 2-copulas: $W(u,v) \leq C(u,v) \leq M(u,v)$. A bivariate cdf $F_{XY}$ can be constructed from two marginal cdfs $F_{X}$ and $F_{Y}$ and copula $C$ using Sklar's theorem:
+
+\begin{equation*}
+  F_{XY}(x,y) = C(F_{X}(x), F_{Y}(y)) ,
+\end{equation*}
+
+where the constructed bivariate distribution will follow the dependence encoded in the copula and have the prescribed marginals. Sklar's theorem also works in reverse, where the dependence can be extracted from a multivariate distribution: 
+
+\begin{equation*}
+  C(u,v) = F_{XY}(F^{-1}_{X}(u), F^{-1}_{Y}(v)) .
+\end{equation*}
+
+Copulas also give a very convenient way to sample from $F_{XY}$ in a generalisation of inverse transform sampling, where first the copula is sampled $(u,v) \sim C$, and then transformed through the inverses of the marginals $(F^{-1}_{X}(u), F^{-1}_{Y}(v))$.
+
+Sklar's theorem has a straightforward imprecise extension \cite{montes2015sklar}, where the two bivariate bounds of a p-box $[\underline{F}_{XY}(x,y), \overline{F}_{XY}(x,y)]$ can expanded in terms of two marginal p-boxes and bounds on a copula $[\underline{C}(u,v), \overline{C}(u,v)]$: 
+
+\begin{align*}
+  \underline{F}_{XY}(x,y) &= \underline{C}(\underline{F}_{X}(x), \underline{F}_{Y}(y)), \\ 
+  \overline{F}_{XY}(x,y) &= \overline{C}(\overline{F}_{X}(x), \overline{F}_{Y}(y)).
+\end{align*}
+
+Samples and the probability measure can also be found from a bivariate p-box. Like how a sample of a univariate p-box is an interval, a sample of a bivariate p-box will be an interval box, a two dimensional rectangular set. 
+
+A minimal structure and cdf of a bivariate p-box is
+
+\begin{lstlisting}[language = Julia]
+  using BivariateCopulas
+  using BivariateCopulas: sample
+
+  struct BivPbox{T <: Real}
+
+    X :: pbox{T}  # 1st marginal
+    Y :: pbox{T}  # 2nd marginal
+    C :: copula   # copula
+
+  end
+
+  function cdf(F :: BivPbox, x, y)
+
+    cdf_X = cdf(F.X, x)   # returns interval
+    cdf_Y = cdf(F.Y, y)
+
+    F_cdf_lo = F.C(cdf_X.lo, cdf_Y.lo)
+    F_cdf_hi = F.C(cdf_X.hi, cdf_Y.hi)
+
+    return interval(F_cdf_lo, F_cdf_hi)
+  end
+
+  function rand(F :: BivPbox, N :: Int)
+
+    C_samps = sample(F.C, N)
+
+    X_samps = cut.([F.X], C_samps[:, 1])
+    Y_samps = cut.([F.Y], C_samps[:, 2])
+
+    return IntervalBox.(X_samps, Y_samps)
+  end
+\end{lstlisting}
 
 \section{P-box arithmetic}
 \label{sec:pboxarithmetic}
+
+
 
 \subsection{Uniary operations}
 

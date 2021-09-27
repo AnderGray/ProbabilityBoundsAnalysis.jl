@@ -14,7 +14,7 @@ plot(a, fontsize = fontsize, name = "fig1")
 PyPlot.xlabel("X", fontsize = fontsize)
 savefig("fig2_pbox1.pdf")
 
-ProbabilityBoundsAnalysis.setSteps(5)
+ProbabilityBoundsAnalysis.setSteps(4)
 a = normal(0, 1)                # mean = 0, var = 1
 
 fig = figure("fig2",figsize=(8,8))
