@@ -4,8 +4,8 @@ using IntervalArithmetic
 struct pbox{T <: Real}
     u :: Vector{T}    # left discrete inverse
     d :: Vector{T}    # right discrete inverse
-    m :: Interval{T}  # interval mean
-    v :: Interval{T}  # interval variance
+    m :: Union{Interval{T}, Missing}  # interval mean
+    v :: Union{Interval{T}, Missing}  # interval variance
     shape :: String   # shape
 end
 
@@ -21,14 +21,31 @@ function normal(m :: Interval, std :: Interval)
     ps_d = ps[2:end]
 
     u1 = quantile.(Normal(m.lo, std.lo), ps_u)
-    d1 = quantile.(Normal(m.hi, std.lo), ps_d)
-
     u2 = quantile.(Normal(m.lo, std.hi), ps_u)
+    u3 = quantile.(Normal(m.lo, std.hi), ps_u)
+    u4 = quantile.(Normal(m.hi, std.hi), ps_u)
+
+    d1 = quantile.(Normal(m.lo, std.lo), ps_d)
+    d2 = quantile.(Normal(m.lo, std.hi), ps_d)
+    d3 = quantile.(Normal(m.hi, std.lo), ps_d)
+    d4 = quantile.(Normal(m.hi, std.hi), ps_d)
+
+    u = min.(u1, u2, u3, u4)
+    d = max.(d1, d2, d3, d4)
+
+    return pbox(u, d, m, std^2, "normal")
+end
+
+function normal(m :: Interval, std :: Interval)
+    ps = range(0, 1, length = steps+1)
+    ps_u = ps[1:end-1]; ps_d = ps[2:end]
+    u1 = quantile.(Normal(m.lo, std.lo), ps_u);
+    d1 = quantile.(Normal(m.hi, std.lo), ps_d)
+    u2 = quantile.(Normal(m.lo, std.hi), ps_u);
     d2 = quantile.(Normal(m.hi, std.hi), ps_d)
 
-    u = min(u1, u2)
-    d = max(d1, d2)
-
+    u = min.(u1, u2);
+    d = max.(d1, d2)
     return pbox(u, d, m, std^2, "normal")
 end
 
@@ -122,6 +139,155 @@ function rand(F :: BivPbox, N :: Int)
     return IntervalBox.(X_samps, Y_samps)
 
 end
+
+function mass(F :: BivPbox, box :: IntervalBox)
+
+    x = box.v[1]; y = box.v[2];  # gets intervals
+
+    F_1 = cdf(F, x.lo, y.lo)
+    F_2 = cdf(F, x.hi, y.lo)
+    F_3 = cdf(F, x.lo, y.hi)
+    F_4 = cdf(F, x.hi, y.hi)
+
+    # using intervals
+    mass = F_4 - F_3 - F_2 + F_1;
+
+    return max(0, min(1, mass))
+end
+
+function mass(F :: BivPbox, box :: IntervalBox)
+
+x = box.v[1]; y = box.v[2];  # gets intervals
+
+F_1 = cdf(F, x.lo, y.lo)
+F_2 = cdf(F, x.hi, y.lo)
+F_3 = cdf(F, x.lo, y.hi)
+F_4 = cdf(F, x.hi, y.hi)
+
+# using intervals
+mass = F_4 - F_3 - F_2 + F_1;
+
+return max(0, min(1, mass))
+end
+
+function split(F :: pbox)
+
+    n = length(F.u)
+
+    focal_el = interval.(F.u, F.d)
+    masses   = ones(n) ./n
+
+    return focal_el, masses
+  end
+
+function makepbox(focal_el :: Vector{Interval{Float64}})
+
+    x_lo = getfield.(focal_el, :lo);
+    x_hi = getfield.(focal_el, :hi);
+
+    u = sort(x_lo)
+    d = sort(x_hi)
+
+    return pbox(u, d, missing, missing, "")
+end
+
+
+function makepbox( x :: Vector{Interval{T}}, w :: Vector{<:Real}, numel = steps) where T <: Real
+
+    ws = w ./sum(w);
+
+    lefts = getfield.(x, :lo)
+    rights = getfield.(x, :hi)
+
+    ls = sortperm(lefts)
+    rs = sortperm(rights)
+
+    lefts = lefts[ls]
+    rights = rights[rs]
+
+    wL = ws[ls]
+    wR = ws[rs]
+
+    su = lefts; su = [su[1]; su]
+    pu = [0; cumsum(wL)]
+
+    sd = rights; sd = [sd; sd[end]]
+    pd = [cumsum(wR); 1]
+
+    u, d = Float64[], Float64[]
+    j = length(pu);
+
+    ps = range(0, 1, length = numel+1)
+    iis = ps[1:end-1]
+    jjs = ps[2:end]
+
+    for p in reverse(iis)
+        while true
+            if pu[j] <= p
+                break
+            end
+            j = j - 1
+        end
+        u = [su[j]; u]
+    end
+
+    j = 1
+
+    for p in jjs
+        while true
+            if  p <= pd[j]
+                break
+            end
+            j = j + 1
+        end
+        d = [d; sd[j]]
+    end
+
+    return pbox(u, d, missing, missing, "")
+
+
+end
+
+function unary(F :: pbox, op)
+
+    focal_el, _ = split(F)
+    fe_z = op.(focal_el)
+
+    return makepbox(fe_z)
+end
+
+function split(F :: BivPbox)
+
+    X = F.X; Y = F.Y; C = F.C
+
+    nx = length(X.u); ny = length(Y.u);
+
+    px = range(0, 1, length = nx + 1);
+    py = range(0, 1, length = ny + 1);
+
+    f_el_X = interval.(X.u, X.d)
+    f_el_Y = interval.(Y.u, Y.d)
+
+    masses = C(px[2:end], py[2:end]) - C(px[1:end-1], py[2:end]) - C(px[2:end], py[1:end-1]) + C(px[1:end-1], py[1:end-1])
+
+    f_XY   = [IntervalBox(x,y) for x in f_el_X, y in f_el_Y];
+
+    return f_XY[:], masses[:]
+  end
+
+
+  function sigma(F :: BivPbox, op)
+
+    # Convert pbox to a belief function
+    fe, masses = split(F)
+
+    # Perform operation on focal elements
+    # with interval arithmetic
+    fe_z = [op(f.v[1],f.v[2]) for f in fe]
+
+    # Convert back to p-box
+    return makepbox(fe_z, masses)
+  end
 
 using PyPlot
 
