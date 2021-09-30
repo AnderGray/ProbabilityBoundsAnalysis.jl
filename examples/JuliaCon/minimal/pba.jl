@@ -1,6 +1,17 @@
 
 using IntervalArithmetic
+using Distributions
+using MomentArithmetic
+using PyPlot
 
+import Base:rand
+
+using BivariateCopulas
+using BivariateCopulas: sample
+
+###
+#   Section 2.1
+###
 struct pbox{T <: Real}
     u :: Vector{T}    # left discrete inverse
     d :: Vector{T}    # right discrete inverse
@@ -9,11 +20,7 @@ struct pbox{T <: Real}
     shape :: String   # shape
 end
 
-
-using Distributions
-const steps = 200
-
-function normal(m :: Interval, std :: Interval)
+function normal(m :: Interval, std :: Interval, steps = 200)
 
     ps = range(0, 1, length = steps+1)
 
@@ -37,6 +44,7 @@ function normal(m :: Interval, std :: Interval)
 end
 
 function normal(m :: Interval, std :: Interval)
+
     ps = range(0, 1, length = steps+1)
     ps_u = ps[1:end-1]; ps_d = ps[2:end]
     u1 = quantile.(Normal(m.lo, std.lo), ps_u);
@@ -58,8 +66,6 @@ function cdf(F :: pbox, x :: Real)
 
     return interval(cdf_d, cdf_u)
 end
-
-import Base:rand
 
 function cut(F :: pbox, p :: Real)
 
@@ -86,9 +92,9 @@ function mass(F :: pbox, x :: Interval)
     return interval(lb, ub)
 end
 
-
-using MomentArithmetic
-
+###
+#   Section 2.2.3
+###
 function binary(F :: pbox, X :: Interval, op)
 
   u_z = op.(Interval.(F.u), X)
@@ -106,9 +112,9 @@ function binary(F :: pbox, X :: Interval, op)
   Z_moms.var, F.shape)
 end
 
-using BivariateCopulas
-using BivariateCopulas: sample
-
+###
+#   Section 2.3
+###
 struct BivPbox{T <: Real}
 
   X :: pbox{T}  # 1st marginal
@@ -140,6 +146,7 @@ function rand(F :: BivPbox, N :: Int)
 
 end
 
+
 function mass(F :: BivPbox, box :: IntervalBox)
 
     x = box.v[1]; y = box.v[2];  # gets intervals
@@ -155,21 +162,9 @@ function mass(F :: BivPbox, box :: IntervalBox)
     return max(0, min(1, mass))
 end
 
-function mass(F :: BivPbox, box :: IntervalBox)
-
-x = box.v[1]; y = box.v[2];  # gets intervals
-
-F_1 = cdf(F, x.lo, y.lo)
-F_2 = cdf(F, x.hi, y.lo)
-F_3 = cdf(F, x.lo, y.hi)
-F_4 = cdf(F, x.hi, y.hi)
-
-# using intervals
-mass = F_4 - F_3 - F_2 + F_1;
-
-return max(0, min(1, mass))
-end
-
+###
+#   Section 3.1
+###
 function split(F :: pbox)
 
     n = length(F.u)
@@ -178,7 +173,7 @@ function split(F :: pbox)
     masses   = ones(n) ./n
 
     return focal_el, masses
-  end
+end
 
 function makepbox(focal_el :: Vector{Interval{Float64}})
 
@@ -244,8 +239,6 @@ function makepbox( x :: Vector{Interval{T}}, w :: Vector{<:Real}, numel = steps)
     end
 
     return pbox(u, d, missing, missing, "")
-
-
 end
 
 function unary(F :: pbox, op)
@@ -256,6 +249,9 @@ function unary(F :: pbox, op)
     return makepbox(fe_z)
 end
 
+###
+#   Section 3.2
+###
 function split(F :: BivPbox)
 
     X = F.X; Y = F.Y; C = F.C
@@ -289,7 +285,6 @@ function split(F :: BivPbox)
     return makepbox(fe_z, masses)
   end
 
-using PyPlot
 
 function plot(s ::pbox, fill = true; name = missing, col = missing, heading = missing, plotting = true, save = false, alpha = 0.2, fontsize = 12)
 
