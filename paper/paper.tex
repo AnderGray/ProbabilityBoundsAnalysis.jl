@@ -72,6 +72,34 @@ Computations with probabilities are usually performed by Monte-Carlo style simul
   
 \end{figure*}
 
+\iffalse
+\subsection{Automatic uncertainty in a programming language: why Julia?}
+
+The long term goal of probability bounds analysis is to create a fully uncertain programming language, where any computer variable may be represented as an interval, distribution, p-box or other imprecise quantity. Such a framework would allow for uncertain extensions of deterministic functions to be computed in an automatic, rigorous and tight fashion. Those with little knowledge of probability theory can add uncertainty to their computations with minimal effort. Stochastic calculations often require many years of training to implement and interpret correctly, and are usually not rigorous and are famously computationally expensive. \texttt{ProbabilityBoundsAnalysis.jl} provides the type structure for distribution functions and p-boxes which is rigorous, and has many of the base operations required for an uncertain programming language, which are rigorous and computationally effient. In this section we argue why Julia is an ideal target language for such an uncertainty language.
+
+
+\subsubsection{Multiple dispatch} \hfill \break
+
+Multiple dispatch allows Julia packages with completely different functionalities to work together with minimal effort. One of the great successes of \texttt{IntervalArithmetic.jl} is that it allows for intervals to be propagated through nearly any Julia function, including those from different packages.
+
+\subsubsection{Parametric typing} \hfill \break
+
+Parametric typing allows one to create very generic data types, parametrised on other types. This is 
+
+For example, an uncertain
+
+an interval of type Int64 (\texttt(Interval{Int64})) can be made and destiguised of t
+
+\subsubsection{Metaprogramming} \hfill \break
+
+Blah blah blah 
+
+\subsubsection{Native parallelisation} \hfill \break
+
+Blah blah blah 
+
+%, and discuss some of the remaining theoretical tasks required to make such a goal a reality. 
+\fi
 \section{Probability Boxes}
 \label{sec:pboxes}
 
@@ -91,6 +119,20 @@ A real-valued random variable is characterised by its distribution function $F$,
   \end{enumerate}
 
 \noindent That is, a random variable is a member of a p-box if its cdf $F$ falls within the cdf bounds of the p-box $F(x) \in [\underline{F}(x), \overline{F}(x)]$ for all $x$, its moments are inside the interval moments of the p-box, and it belongs to a family of distribution functions (e.g. normal, uniform) considered by the p-box. Some of the constraints may be missing. For example, if the distribution family is unknown then the set is defined solely from the cdf and moment bounds. Such p-boxes are sometimes called non-parametric, since its members do not belong to any particular class of distribution. Some constraints may also be inferred from others. For example, the interval moments may be bounded from the cdf bounds, and cdf may be bounded from moment information (explored further in section \ref{section:Moments}). Figure\footnote{Scripts for all figures can be found in /examples/JuliaCon} \ref{fig:figure1} shows an example of a distribution function, interval and a p-box. The grey shaded region in the interval and p-box bounds a (potentially infinite) collection of probability distributions.
+
+
+\begin{figure*}[htp]
+
+  \centering
+  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox2.pdf}\hfill
+  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox1.pdf}\hfill
+  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox3.pdf}
+  
+  \caption{Various outer representations of distribution functions, left $4$ steps and centre $25$ steps, and a p-box (right) with 10 steps}
+  \label{fig:figure2}
+  
+\end{figure*}
+
 
 All of a p-box's probabilistic quantities are intervals. The cdf of a p-box may be found by: 
 
@@ -135,18 +177,6 @@ P-boxes generalise precise distributions and intervals in the following way. A d
    \epsilon_k(x) = \begin{cases} 0 &\text{when } x < k \\ 1 &\text{when } x \geq k \end{cases}
 \end{equation*}
 
-
-\begin{figure*}[htp]
-
-  \centering
-  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox2.pdf}\hfill
-  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox1.pdf}\hfill
-  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox3.pdf}
-  
-  \caption{Various outer representations of distribution functions, left $4$ steps and centre $25$ steps, and a p-box (right) with 10 steps}
-  \label{fig:figure2}
-  
-\end{figure*}
 
 
 Moreover, theoretical bounds on the mean and variance of an interval can be found:
