@@ -4,6 +4,7 @@
 \usepackage{caption}
 \usepackage{csquotes}
 \usepackage{amsmath}
+\usepackage{xcolor}
 %\bibliographystyle{juliacon}
 
 \usepackage[labelformat=simple]{subfig}
@@ -20,7 +21,7 @@
 
 \begin{abstract}
 
-Probability bounds analysis combines interval arithmetic with probability theory, and provides a representation of sets of distributions in structures called probability boxes (p-boxes), which generalise both distribution functions and intervals. P-boxes generally return interval bounds on all probabilistic quantities, for example samples, cdfs, and probability measures are all intervals. This framework also allows for the comprehensive propagation of probabilities through calculations in a rigorous way, in a similar fashion that interval arithmetic does for sets. As such, ProbabilityBoundsAnalysis.jl gives a rigorous arithmetic of random variables, where both marginal (univariate) distributions and dependency information can be known, partially known or missing completely. We describe the main theoretical elements of probability bounds analysis, and provide a simplified implementation of the method in code snippets which can be readily evaluated in the Julia command terminal.
+Probability bounds analysis combines interval arithmetic with probability theory, and provides a representation of sets of distributions in structures called probability boxes (p-boxes). These which generalise both distribution functions and intervals. P-boxes generally return interval bounds on all probabilistic quantities, for example samples, cdfs, and probability measures are all intervals. This framework also allows for the comprehensive propagation of probabilities through calculations in a rigorous way, in a similar fashion that interval arithmetic does for sets. As such, \texttt{ProbabilityBoundsAnalysis.jl} gives a rigorous arithmetic of random variables, where both marginal (univariate) distributions and dependency information can be known, partially known or missing completely. We describe the main theoretical elements of probability bounds analysis, and provide a simplified implementation of the method in code snippets which can be readily evaluated in the Julia command terminal.
 
 \end{abstract}
 
@@ -36,13 +37,13 @@ An arithmetic of probability distributions has held a long interest among mathem
   and generalised by others.
 \end{displayquote}
 
-\noindent Indeed it was Kolmogorov who originally asked about the result of an operation between two random variables without knowing their joint distribution. This was answered for the sum by Makarov \cite{makarov1982estimates}, who showed the result was a set of distributions and was able to provide bounds on this function. Sklar, Schweizer and Frank generalised this result to other (positive) binary operations \cite{frank1987best,schweizer2011probabilistic}. In this pursuit they created copulas, a general way to encode probabilistic dependence independently from marginals, and a now essential object used in probabilistic modelling. In his seminal dissertation \cite{williamson1989probabilistic}, Williamson described an algorithm for efficiently performing these arithmetic operations, which can give guaranteed bounds on probability distributions in terms of an upper and lower cdf. He called his method \textit{Probabilistic Arithmetic} and his sets of distributions \textit{Dependency Bounds}. Since then the method has been generalised \cite{ferson2015constructing,ferson1996whereof,ferson2004arithmetic} to most of the base binary and unary operations that would be present in a programming language. Probability boxes (p-boxes) are the name now given to these structures, and Probability Bounds Analysis (PBA) the name of the method.
+\noindent Indeed it was Kolmogorov who originally asked about the result of an operation between two random variables without knowing their joint distribution. This was answered for the sum by Makarov \cite{makarov1982estimates}, who showed the result was a set of distributions and was able to provide bounds on this function. Sklar, Schweizer and Frank generalised this result to other (positive) binary operations \cite{frank1987best,schweizer2011probabilistic}. In this pursuit they created copulas, a general way to encode probabilistic dependence independently from marginals. These are now an essential object used in probabilistic modelling. In his dissertation \cite{williamson1989probabilistic}, Williamson described an algorithm for efficiently performing these arithmetic operations, which can give guaranteed bounds on probability distributions in terms of an upper and lower cdf. He called his method \textit{Probabilistic Arithmetic} and his sets of distributions \textit{Dependency Bounds}. Since then the method has been generalised \cite{ferson2015constructing,ferson1996whereof,ferson2004arithmetic} to most of the base binary and unary operations that would be present in a programming language. Probability boxes (p-boxes) are the name now given to these structures
 
-The goal of PBA can be stated as \textbf{to compute guaranteed bounds on functions of random variables given only partial knowledge of the input probability distributions and their dependencies}. That is to compute with partial knowledge about the input joint distribution. Ideally all of the available information about random variables should be used, but no more than what actually is available.
+The goal of \texttt{ProbabilityBoundsAnalysis.jl}\footnote{https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl} is to \textbf{compute guaranteed bounds on functions of random variables given only partial knowledge of the input probability distributions and their dependencies}. That is to compute with partial knowledge about the input joint distribution. Ideally, all of the available information about random variables should be used, but no more than what actually is available.
 
-The idea of bounding probability has a very long tradition throughout the history of probability theory. George Boole \cite{boole1854investigation, hailperin1986boole} used the notion of interval bounds on probability. Chebyshev \cite{chebyshev1874valeurs} described bounds on a distribution when only the mean and variance of the variable are known, and Markov \cite{markoff1900question} found bounds on a positive variable when only the mean is known.  Fréchet \cite{frechet1935generalisation} discovered how to bound joint distributions solely from knowing the marginal distributions, without making independence assumptions. Bounding probabilities has continued to the present day, culminating into the modern theory of Imprecise Probabilities \cite{walley1991statistical, klir2013uncertainty, troffaes2014lower, augustin2014introduction}.
+The idea of bounding probability has a long tradition throughout the history of probability theory. George Boole \cite{boole1854investigation, hailperin1986boole} used the notion of interval bounds on probability. Chebyshev \cite{chebyshev1874valeurs} described bounds on a distribution when only the mean and variance of the variable are known, and Markov \cite{markoff1900question} found bounds on a positive variable when only the mean is known.  Fréchet \cite{frechet1935generalisation} discovered how to bound joint distributions solely from knowing the marginal distributions, without making independence assumptions. Bounding probabilities has continued to the present day, culminating into the modern theory of Imprecise Probabilities \cite{walley1991statistical, klir2013uncertainty, troffaes2014lower, augustin2014introduction}.
 
-Imprecise probability is effectively a generalisation of probability theory where uncertainty can be expressed about the probability measure. This is particularly relevant when information is scarce, unreliable, vague, conflicting or imprecise. In such cases defining a unique probability distribution is difficult. P-boxes are one of many ways to describe a set of distributions, others include: Dempster-Shafer structures \cite{dempster2008upper,shafer1976mathematical}, random sets \cite{molchanov2005theory}, possibility distributions \cite{zadeh1978fuzzy,dubois1988possibility, hose2019possibilistic} and lower previsions \cite{troffaes2014lower}. These structures were discovered independently, but are often synonymous and can be translated from one to another, with different degrees of generality. Imprecise probability links all these theories into one. For a comprehensive overview of the theory, and a for a formal description of uncertainty and information in terms of these structures, \cite{klir2013uncertainty} is recommended. In that sense PBA is a part of imprecise probabilities but provides a framework for computing with p-boxes.
+Imprecise probability is effectively a generalisation of probability theory where uncertainty can be expressed about the probability measure. This is particularly relevant when information is scarce, unreliable, vague, conflicting or imprecise. In such cases defining a unique probability distribution is difficult. P-boxes are one of many ways to describe a set of distributions, others include: Dempster-Shafer structures \cite{dempster2008upper,shafer1976mathematical}, random sets \cite{molchanov2005theory}, possibility distributions \cite{zadeh1978fuzzy,dubois1988possibility, hose2019possibilistic} and lower previsions \cite{troffaes2014lower}. These structures were discovered independently, but are often synonymous and can be translated from one to another, with different degrees of generality. Imprecise probability links all these theories into one. For a comprehensive overview of the theory, and a for a formal description of uncertainty and information in terms of these structures, \cite{klir2013uncertainty} is recommended.
 
 
 
@@ -89,7 +90,7 @@ A real-valued random variable is characterised by its distribution function $F$,
   \end{aligned}$
   \end{enumerate}
 
-\noindent That is, a random variable is a member of a p-box if its cdf $F$ falls within the cdf bounds of the p-box $F(x) \in [\underline{F}(x), \overline{F}(x)]$ for all $x$, its moments are inside the interval moments of the p-box, and it belongs to a family of distribution functions (e.g. normal, uniform) considered by the p-box. Some of the constraints may be missing. For example, if the distribution family is unknown then the set is defined solely from the cdf and moment bounds. Such p-boxes are sometimes called non-parametric, since its members do not belong to any particular class of distribution. Some constraints may also be inferred from others. For example, the interval moments may be bounded from the cdf bounds, and cdf may be bounded from moment information (explored further in section \ref{section:Moments}). Figure \ref{fig:figure1} shows an example of a distribution function, interval and a p-box. The grey shaded region in the interval and p-box bounds a (potentially infinite) collection of probability distributions.
+\noindent That is, a random variable is a member of a p-box if its cdf $F$ falls within the cdf bounds of the p-box $F(x) \in [\underline{F}(x), \overline{F}(x)]$ for all $x$, its moments are inside the interval moments of the p-box, and it belongs to a family of distribution functions (e.g. normal, uniform) considered by the p-box. Some of the constraints may be missing. For example, if the distribution family is unknown then the set is defined solely from the cdf and moment bounds. Such p-boxes are sometimes called non-parametric, since its members do not belong to any particular class of distribution. Some constraints may also be inferred from others. For example, the interval moments may be bounded from the cdf bounds, and cdf may be bounded from moment information (explored further in section \ref{section:Moments}). Figure\footnote{Scripts for all figures can be found in /examples/JuliaCon} \ref{fig:figure1} shows an example of a distribution function, interval and a p-box. The grey shaded region in the interval and p-box bounds a (potentially infinite) collection of probability distributions.
 
 All of a p-box's probabilistic quantities are intervals. The cdf of a p-box may be found by: 
 
@@ -148,7 +149,7 @@ P-boxes generalise precise distributions and intervals in the following way. A d
 \end{figure*}
 
 
-Moreover, theoretical bounds on the mean and variance of an interval can be found [CITE SCOTT]:
+Moreover, theoretical bounds on the mean and variance of an interval can be found:
 
 \begin{align*}
   \mu &\in [a, b] \\
@@ -170,9 +171,9 @@ That is, it is not possible to find a distribution whose range is in $[a, b]$ an
 \subsection{Outer representations of p-boxes}
 \label{sec:outer_approx}
 
-An important feature of probability bounds analysis is how distribution functions and p-boxes are represented. Generally, analytical solutions for cdfs are not readily available, for example the normal distribution's cdf can only be found by integrating the probability density, usually with quadrature. However even if the functions were available analytically, when the variables are used in an arithmetic operation the output distribution will not necessarily belong to the same family. Therefore we require a representation of these continuous functions which is not dependent on the distribution family (for example as used in polynomial chaos expansion), and ideally is robust in the sense that it can produce an interval error for the numerical representation. Such a representation of a probability is sometimes called an outer approximation, in the same fashion an interval is an outer approximation of a floating point number, and which contracts to the exact value as more computational resources is used.
+An important feature of probability bounds analysis is how distribution functions and p-boxes are represented. Generally, analytical solutions for cdfs are not readily available, for example the normal distribution's cdf can only be found by integrating the probability density, usually with quadrature. However, even if the functions were available analytically, when the variables are used in an arithmetic operation the output distribution will not necessarily belong to the same family. Therefore, we require a representation of these continuous functions which is not dependent on the distribution family (for example as used in polynomial chaos expansion), and ideally is robust in the sense that it can produce an interval error for the numerical representation. Such a representation of a probability is sometimes called an outer approximation, in the same fashion an interval is an outer approximation of a floating point number, which contracts to the exact value as more computational resources are used.
 
-We follow the representation first introduced by Williamson and Downs \cite{williamson1990probabilistic}, where a discrete upper and lower approximations of distribution functions are constructed using the inverse cdfs. Note that when considering inverse cdfs $\underline{F}^{-1}(p) \geq F^{-1}(p) \geq \overline{F}^{-1}(p)$, for $p \in [0,1]$. An outer approximation using two finite vectors\footnote{We begin vector indexing with $1$ as is done in the Julia language.} $u$ and $d$ of length $N$ is constructed by evaluating the inverses for uniformly spaced probability levels $p_{i} = \frac{i-1}{N}$ for $i = 1, ... , N+1$, e.g. $p_{i} = [0, 0.25, 0.5, 0.75, 1]$ for $N = 4$. The vectors $u$ and $d$ are defined as follows:
+We follow the representation first introduced by Williamson and Downs \cite{williamson1990probabilistic}, where a discrete upper and lower approximations of distribution functions are constructed using the inverse cdfs. Note that when considering inverse cdfs $\underline{F}^{-1}(p) \geq F^{-1}(p) \geq \overline{F}^{-1}(p)$, for $p \in [0,1]$. An outer approximation using two finite vectors\footnote{We begin vector indexing with $1$ as is done in the Julia language.} $u$ and $d$ of length $N$ is constructed by evaluating the inverse cdfs for uniformly spaced probability levels $p_{i} = \frac{i-1}{N}$ for $i = 1, ... , N+1$, e.g. $p_{i} = [0, 0.25, 0.5, 0.75, 1]$ for $N = 4$. The vectors $u$ and $d$ are defined as follows:
 
 \begin{align*}
   u[i] &= \overline{F}^{-1}(p_{i}) \\ 
@@ -211,7 +212,7 @@ The vectors $u$ and $d$ are a collection of "real" or "physical" evaluations of 
 
 That is, in the region $[p_{i}, p_{i+1})$, $u[i]$ is a lower bound on $\overline{F}^{-1}$ and $d[i]$ is an upper bound on $\underline{F}^{-1}$ in $(p_{i}, p_{i+1}]$. In the case that the p-box characterises a precise distribution and $\overline{F}^{-1}(p) = \underline{F}^{-1}(p)$ gives:  $u[i+1] = d[i]$. Figure \ref{fig:figure2} shows examples of a distribution and a p-box with various outer representations.
 
-A minimal p-box structure is as follows:
+A minimal\footnote{The code for the minimal structure can be found in examples/minimal} p-box structure is as follows:
 
 \begin{lstlisting}[language = Julia]
   using IntervalArithmetic
@@ -227,7 +228,27 @@ A minimal p-box structure is as follows:
 
 \noindent where the vectors $u$ and $d$ are the "up" and "down", or the "left" and "right", edges of the p-box\footnote{There can be confusion since $\overline{F}$ is the upper bound on the cdf, but $\overline{F}^{-1}$ is the lower bound on the random variable, i.e. the left edge of the p-box. We therefore $\overline{F}$ the "up" or "left" edge, and $\underline{F}$ the "down" or the "right" edge.}. The intervals $m$ and $v$ are the interval moments, and the $shape$ is a string containing any distribution family information. An example of a normal distribution constructor is as follows:
 
+\begin{lstlisting}[language = Julia]
+  using Distributions
+  const steps = 200
 
+  function normal(m :: Interval, std :: Interval)
+
+    ps = range(0, 1, length = steps+1)
+
+    b1 = quantile.(Normal(m.lo, std.lo), ps)
+    b2 = quantile.(Normal(m.lo, std.hi), ps)
+    b3 = quantile.(Normal(m.lo, std.hi), ps)
+    b4 = quantile.(Normal(m.hi, std.hi), ps)
+
+    u = min.(b1, b2, b3, b4)[1:end-1]
+    d = max.(b1, b2, b3, b4)[2:end]
+
+    return pbox(u, d, m, std^2, "normal")
+  end
+\end{lstlisting}
+
+\iffalse
 \begin{lstlisting}[language = Julia]
   using Distributions
   const steps = 200
@@ -255,7 +276,7 @@ A minimal p-box structure is as follows:
     return pbox(u, d, m, std^2, "normal")
   end
 \end{lstlisting}
-
+\fi
 Other distributional p-boxes are constructed in a similar way. A evaluation of the cdf in terms of this representation is as follows: 
 
 
@@ -398,7 +419,7 @@ An arithmetic operation involving an interval and a precise distribution will pr
   end
 \end{lstlisting}
 
-How the moment transformations are performed are not described here, however are available in \textit{MomentArithmetic.jl}\footnote{https://github.com/AnderGray/MomentArithmetic.jl at time of writing} \cite{ferson2021distribution}. Figure \ref{fig:figure4} shows an example of an operation between a precise distribution and an interval.
+How the moment transformations are performed are not described here, however they are available in \texttt{MomentArithmetic.jl}\footnote{https://github.com/AnderGray/MomentArithmetic.jl} \cite{ferson2021distribution}. Figure \ref{fig:figure4} shows an example of an operation between a precise distribution and an interval.
 
 
 \begin{figure}[htp]
@@ -419,7 +440,7 @@ How the moment transformations are performed are not described here, however are
 
 \subsubsection{When dependencies between distributions are unknown} \hfill \break
 
-In the case where a binary operation is performed between two distributions but whose dependence or correlation is unknown, then a single output distribution also cannot be defined. However a bounding p-box can be computed. This is the original question of Kolmogorov as described in the introduction. We call such operations between p-boxes where the marginals are fixed but no joint information is known \textit{Fréchet} operations, after the mathematician Maurice R. Fréchet, who first discovered how to bound joint distributions with fixed marginals \cite{frechet1935generalisation}. How operations between p-boxes with partial or no dependence information is known is described in section \ref{sec:pboxBinary}. Figure \ref{fig:figure5} illustrates a Fréchet operation between a uniform and a normal distribution.
+In the case where a binary operation is performed between two distributions but whose dependence or correlation is unknown, a single output distribution also cannot be defined. However a bounding p-box can be computed. This is the original question of Kolmogorov as described in the introduction. We call such operations between p-boxes where the marginals are fixed but no joint information is known \textit{Fréchet} operations, after the mathematician Maurice R. Fréchet, who first discovered how to bound joint distributions with fixed marginals \cite{frechet1935generalisation}. How operations between p-boxes with partial or no dependence information is known is described in section \ref{sec:pboxBinary}. Figure \ref{fig:figure5} illustrates a Fréchet operation between a uniform and a normal distribution.
 
 \begin{figure}[htp]
 
@@ -439,15 +460,15 @@ In the case where a binary operation is performed between two distributions but 
 
 \subsubsection{Outer approximations of precise distributions} \hfill \break
 
-Outer approximations of precise distributions described in section \ref{sec:outer_approx} also lead naturally to a p-box. All probabilistic quantities of discretised distribution functions will be intervals, which shrink to precise quantities as the discretisation increases. In that sense, both distributions functions and p-boxes are p-boxes in ProbabilityBoundsAnalysis.jl.
+Outer approximations of precise distributions described in section \ref{sec:outer_approx} also lead naturally to a p-box. All probabilistic quantities of discretised distribution functions will be intervals, which shrink to precise quantities as the discretisation increases. In that sense, both distributions functions and p-boxes are p-boxes in \texttt{ProbabilityBoundsAnalysis.jl}.
 
 \subsubsection{Inferential methods when data is limited or bad} \hfill \break
 
 Probability distributions are almost always constructed from data or measurements, or otherwise are assumed as a model or derived from expert opinion. Usually to construct a probability distribution accurately, a large amount of high quality data is required. P-boxes arise naturally when this is not the case, for example if the data are intervals instead of points, or when data is sparse or not reliable, and an exact distribution function is difficult to prescribe.
 
-An example is robust bayesian analysis, where the analyst does not have enough information to reliably establish a single prior and likelihood function, but instead has a collection of priors and likelihoods, leading to a set of posteriors distributions, to which a p-box can be identified.
+An example is robust Bayesian analysis, where the analyst does not have enough information to reliably establish a single prior and likelihood function, but instead has a collection of priors and likelihoods, leading to a set of posteriors distributions, to which a p-box can be identified.
 
-A method which is growing in popularity are inferential models \cite{martin2015inferential}. These generalise classical inference methods to account for limited statistical knowledge, and gives a statistical inference theory which is non-additive (as opposed to classical probability which is additive). These inference procedures, often based on random sets, give certain validity and performance guarantees. Inferential models can viewed from the perspective of bounding sets of distributions, and is closely linked to possibility theory \cite{liu2020inferential}. A p-box can be prescribed to such structures, leading to structures like confidence boxes or c-boxes \cite{fersoncomputing}, which follow the same arithmetic rules as p-boxes. 
+A method which is growing in popularity are inferential models \cite{martin2015inferential}. These generalise classical inference methods to account for limited statistical knowledge, and give a statistical inference theory which is non-additive (as opposed to classical probability which is additive). These inference procedures, often based on random sets, give certain validity and performance guarantees. Inferential models can viewed from the perspective of bounding sets of distributions, and is closely linked to possibility theory \cite{liu2020inferential}. A p-box can be prescribed to such structures, leading to structures like confidence boxes or c-boxes \cite{fersoncomputing}, which follow the same arithmetic rules as p-boxes. 
 
 \iffalse
 \subsection{Relationship to other ideas}
@@ -517,7 +538,7 @@ Samples and the probability measure can also be found from a bivariate p-box. Li
 \end{align*}
 
 
-A minimal structure, cdf, random sample and probability measure of a bivariate p-box is \footnote{https://github.com/AnderGray/BivariateCopulas.jl can be used for 2-copulas}:
+A minimal structure, cdf, random sample and probability measure of a bivariate p-box is \footnote{https://github.com/AnderGray/BivariateCopulas.jl}:
 
 \begin{lstlisting}[language = Julia]
   using BivariateCopulas
@@ -607,7 +628,7 @@ A minimal structure, cdf, random sample and probability measure of a bivariate p
 In this section we will discuss how p-boxes can be propagated through unary and binary operations in a rigorous way.
 
 \subsection{Unary operations}
-Piggybacking off \textit{IntervalArithmetic.jl}\footnote{https://github.com/JuliaIntervals/IntervalArithmetic.jl at time of writing} \cite{david_p_sanders_2021_5519761}, a p-box can be transformed through any unary operation $f: \mathbb{R} \rightarrow \mathbb{R}$ that has  an interval extension, i.e. accepts intervals. For this, we first transform the p-box into a Dempster-Shafer structure \cite{dempster2008upper,shafer1976mathematical}, propagate the structure through the operation with interval arithmetic, and transform it back to a p-box. A Dempster-Shafer structure (also called a belief function) is a finite collection of intervals, called focal elements $X$, with probabilities attached to each interval, called basic mass assignments $m$, which must sum to $1$. An example of a belief function with three focal elements is: $X = \{[0, 2], [0.5, 1.3], [1, 3]\}$ and $m = \{0.25, 0.5, 0.25\}$. Like a p-box, a Dempster-Shafer also bounds a set of probability distributions, using two set based functions called the \textit{belief} and \textit{plausibility}:
+Piggybacking off \texttt{IntervalArithmetic.jl}\footnote{https://github.com/JuliaIntervals/IntervalArithmetic.jl} \cite{david_p_sanders_2021_5519761}, a p-box can be transformed through any unary operation $f: \mathbb{R} \rightarrow \mathbb{R}$ that has  an interval extension, i.e. accepts intervals. For this, we first transform the p-box into a Dempster-Shafer structure \cite{dempster2008upper,shafer1976mathematical}, propagate the structure through the operation with interval arithmetic, and transform it back to a p-box. A Dempster-Shafer structure (also called a belief function) is a finite collection of intervals, called focal elements $X$, with probabilities attached to each interval, called basic mass assignments $m$, which must sum to $1$. An example of a belief function with three focal elements is: $X = \{[0, 2], [0.5, 1.3], [1, 3]\}$ and $m = \{0.25, 0.5, 0.25\}$. Like a p-box, a Dempster-Shafer also bounds a set of probability distributions, using two set based functions called the \textit{belief} and \textit{plausibility}:
 
 \begin{align*}
   \text{bel}(U) &= \sum_{X \subseteq U} m(X),\\ 
@@ -658,7 +679,7 @@ which numerically corresponds to sorting the bounds of the focal elements, accum
   end
 \end{lstlisting}
 
-The general function where the focal elements have non-equal mass is simple, but slightly lengthy and will not be described here. A function to perform a unary operation on a p-box is thus:
+The general function where the focal elements have non-equal mass is simple, but slightly lengthy, and will not be described here. A function to perform a unary operation on a p-box is thus:
 
 \begin{lstlisting}[language = Julia]
   function unary(F :: pbox, op)
@@ -683,6 +704,27 @@ Binary operations on p-boxes are based on \textit{convolutions}, which are opera
 It is well known that the result of above convolution $f_{Z}$ corresponds to the probability density of the sum of two independent random variables with densities $f_{X}$ and $f_{Y}$. P-box arithmetic is based on generalisations of such convolutions specifically designed for computing binary operations on distribution functions, which work with operations other than sum, and for copulas other than independence. These convolutions, which first appeared in the study of Probabilistic Metric Spaces \cite{schweizer2011probabilistic}, can be be used to compute binary operations between two p-boxes when their copula $C$ is precisely known, only it's lower bound is known $\underline{C}$, or even missing completely. Further, Williamson and Downs \cite{williamson1990probabilistic} describe how robust outer approximations of the convolutions can be found, accounting for the representation error of the two input p-boxes, as well as the error from the integration.
 
 \subsubsection{Operations with known $C$} \hfill \break
+
+\begin{figure*}[htp]
+
+  \centering
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig9/fig9_pbox1.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig9/fig9_pbox2.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig9/fig9_pbox3.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig9/fig9_pbox4.pdf}
+  
+
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig9/fig9_pbox5.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig9/fig9_pbox6.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig9/fig9_pbox7.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig9/fig9_pbox8.pdf}
+  
+
+  \caption{Top left shows two initial p-boxes $X, Y \sim U([1,2], 4)$, and others show results of binary operations on these two p-boxes with different dependencies. Each colour represents a different copula. The colour code is $C = \{$ {\color{purple} $W$} (opposite), {\color{green} $\Phi_{-0.5}$ }(correlation -0.5), {\color{red} $\Pi$} (independence), {\color{orange} $\Phi_{0.5}$} (correlation 0.5), {\color{blue} $M$}(perfect) $\}$}
+  \label{fig:figure9}
+  
+\end{figure*}
+
 
 A binary operation between two random variables $X$ and $Y$ with cdfs $F_{X}$ and $F_{Y}$ and copula $C$ can be computed with the following Lebesgue-Stieltjes integral: 
 
@@ -718,7 +760,7 @@ where the integration domain is the set $L\{z\} = \{(x,y)| x,y \in \mathbb{R}, L
   \end{cases}
 \end{eqnarray*}
 
-Williamson and Downs provide an algorithm to compute rigorous bounds on the above convolution, but only under independence (when $C = \Pi$). Around the same time, Yager \cite{yager1986arithmetic} described a similar style convolution on two belief functions under the assumption independence, the algorithm of which is very similar to that of Williamson and Downs. We therefore provide a generalised version of Yager's algorithm where any copula $C$ can be specified. Similar to a unary operation, a binary operation between two p-boxes can be performed by first transforming the bivariate p-box into a two dimensional belief function (which has interval boxes as focal elements), evaluating the operation on the focal elements with interval arithmetic, and transforming the resulting belief function (which will be univariate after the operation) back to a p-box. Converting a bivariate p-box into a 2D belief function is similar to that of the 1D case, however this time the mass assignment $m$ will be determined by the copula $C$. For two univariate focal elements $X$ and $Y$ with probability widths $p_{x} = [p_{x1}, p_{x2}]$ and $p_{y} = [p_{y1}, p_{y2}]$ (i.e. their vertical width in the left Figure \ref{fig:figure2}, with their 1D mass assignment being $p_{x2} - p_{x1}$), the 2D mass assignment on the interval box $X \times Y$ will be: 
+Williamson and Downs provide an algorithm to compute rigorous bounds on the above convolution, but only under independence (when $C = \Pi$). Around the same time, Yager \cite{yager1986arithmetic} described a similar style convolution on two belief functions under the assumption independence, which is very similar to that of Williamson and Downs'. We therefore provide a generalised version of Yager's algorithm where any copula $C$ can be specified. Similar to a unary operation, a binary operation between two p-boxes can be performed by first transforming the bivariate p-box into a two dimensional belief function (which has interval boxes as focal elements), evaluating the operation on the focal elements with interval arithmetic, and transforming the resulting belief function (which will be univariate after the operation) back to a p-box. Converting a bivariate p-box into a 2D belief function is similar to that of the 1D case, however this time the mass assignment $m$ will be determined by the copula $C$. For two univariate focal elements $X$ and $Y$ with probability widths $p_{x} = [p_{x1}, p_{x2}]$ and $p_{y} = [p_{y1}, p_{y2}]$ (i.e. their vertical width in Figure \ref{fig:figure2}, with their 1D mass assignment being $p_{x2} - p_{x1}$), the 2D mass assignment of the interval box $X \times Y$ will be: 
 
 \begin{equation*}
   C(p_{x2}, p_{y2}) - C(p_{x1}, p_{y2}) - C(p_{x2}, p_{y1}) + C(p_{x1}, p_{y1})
@@ -739,13 +781,13 @@ The following function converts a bivariate p-box into a 2D belief function:
     f_el_X = interval.(X.u, X.d);
     f_el_Y = interval.(Y.u, Y.d);
     
-    masses = C(px[2:end], py[2:end]) 
-            - C(px[1:end-1], py[2:end]) 
-            - C(px[2:end], py[1:end-1]) 
-            + C(px[1:end-1], py[1:end-1]);
+    masses = C(px[2:end],   py[2:end]) 
+           - C(px[1:end-1], py[2:end]) 
+           - C(px[2:end],   py[1:end-1]) 
+           + C(px[1:end-1], py[1:end-1]);
 
     f_XY   = [IntervalBox(x,y) for x in f_el_X, 
-                              y in f_el_Y];
+                                   y in f_el_Y];
 
     return f_XY[:], masses[:]
   end
@@ -772,9 +814,39 @@ A robust $\sigma$ convolution is simply thus:
   end
 \end{lstlisting}
 
-Again the general function for converting a belief function with non-equal masses is required. The 3rd argument \textit{num\_steps} is the desired discretisation of the output p-box, in a condensation step. The interval operation in the $\sigma$ convolution performs the operation on all combinations of focal elements, so for example if each p-box has 200 steps, the resulting p-box will have $200 \times 200 = 40,000$ steps, which must be reduced in an outer approximation. Again, the general algorithm is simple but lengthy and will be omitted.
+The above $\sigma$ convolution will work for any two input p-boxes, with any copula $C$, and binary operation $op$ which has an interval extension. Again the general function for converting a belief function with non-equal masses is required. The 3rd argument \textit{num\_steps} is the desired discretisation of the output p-box, in a condensation step. The interval operation in the $\sigma$ convolution performs the operation on all combinations of focal elements, so for example if each p-box has 200 steps, the resulting p-box will have $200 \times 200 = 40,000$ steps, which must be reduced in an outer approximation. Again, the general algorithm is simple but lengthy and will be omitted. Figure \ref{fig:figure9} shows examples of $\sigma$ convolutions for different operators and copulas.
 
 \subsubsection{Operations with lower bound $\underline{C}$} \hfill \break
+
+\textit{ProbabilityBoundsAnalysis.jl} also allows for binary operations to be performed between p-boxes when only the lower bound of the copula is known $\underline{C}$. That is, uncertainty can be placed on the dependence of two distributions, as well as the marginals. The resulting p-box of the binary operation will bound all distributions with copulas $C$ which are pointwise greater than the specified copula $\underline{C} \leq C$. These operations are based on two more convolutions from Probabilistic Metric Spaces \cite{schweizer2011probabilistic}. For a non-decreasing binary operator $L: \mathbb{R}^+\times \mathbb{R}^+ \to \mathbb{R}^+$, two random variables $X$ and $Y$ with distribution functions $F_X$ and $F_Y$, and with copula lower bound $\underline{C}$:
+
+\begin{equation*}\label{taupbox}
+  \tau_{\underline{C}_{XY},L}(z) = \sup_{L(x,y)=z} [\underline{C}(F_{X}(x), F_Y(y))],
+\end{equation*}
+\begin{equation*}\label{rhopbox}
+  \rho_{\underline{C}_{XY},L}(z) = \inf_{L(x,y)=z} [\underline{C}^d(F_{X}(x), F_Y(y))],
+\end{equation*}
+
+where $C^d$ is the copula dual of $C$, $C^d(u,v) = u + v - C(u,v)$. The $\tau$ and $\rho$ convolutions each compute a cdf bound which together characterise the resulting p-box: $[\underline{F}_{Z}(z), \overline{F}_{Z}(z)] = [\tau(z), \rho(z)]$. The p-box resulting from a $\tau$ and $\rho$ convolution will bound all $\sigma$ convolutions which have copula $C$ which is greater than $\underline{C}$. For example, setting $\underline{C} = W$ (the lower bound on all copulas) will propagate all copulas, which is complete uncertainty about the dependence, i.e. a \textit{Fréchet} operation. Setting $\underline{C} = \Pi$ will propagate copulas more positive than independence, otherwise known as \textit{positive quadrant dependence} \cite{nelsen2007introduction}. Setting $\underline{C} = M$ (the upper bound on all copulas) will only propagate $M$, and will be equal to a $\sigma$ convolution. 
+
+The $\tau$ and $\rho$ convolutions can be efficiently computed in terms of the inverse representation using in \textit{ProbabilityBoundsAnalysis}: 
+
+\begin{equation*}\label{taupbox2}
+  \tau^{-1}_{\underline{C}_{XY},L}(p) = \sup_{\underline{C}(u,v) = p} [L(F^{-1}_{X}(u), F^{-1}_Y(v))],
+\end{equation*}
+\begin{equation*}\label{rhopbox2}
+  \rho^{-1}_{\underline{C}_{XY},L}(p) = \inf_{\underline{C}^{d}(u,v) = p} [L(F^{-1}_{X}(u), F^{-1}_Y(v))],
+\end{equation*}
+
+where the operation $L$ is performed on the $u$ and $d$ vectors of the p-boxes, and $\sup_{\underline{C}(u,v) = p}$ and $\inf_{\underline{C}^{d}(u,v) = p}$ is solved for each probability level.
+
+Note that $L$ must be non-decreasing function (for example $+$ or $\times$), but may be extended to non-increasing functions (for example $-$ or $\div$) by first transforming one of the variables, and performing a non-decreasing operation. For example, $X - Y$ can be evaluated with sum: $X + (-Y)$. Note however, the copula $C_{XY}$ must also be transformed to $C_{X,-Y}$. This transformation however is quite simple \cite{nelsen2007introduction}: 
+
+\begin{equation*}\label{rotation}
+  C_{X, -Y}(u,v) = u - C_{XY}(u, 1 - v).
+\end{equation*}
+
+Note that when using the above copula transformation, the bound on $\underline{C}_{XY}$ will be flipped to $\overline{C}_{X, -Y}$, and $\tau_{M, -}$ and $\rho_{M,-}$ give the \textit{Fréchet} convolution.
 
 \iffalse
 \section{An uncertain programming language}
@@ -784,6 +856,9 @@ The long term goal of such a framework is to create a fully uncertain programmin
 \fi
 
 \section*{Acknowledgements}
+We would like to thank our friends and colleagues at the Risk Institute who have supported \texttt{ProbabilityBoundsAnalysis.jl} from its birth, and through their contributions and discussions have made this software possible: Marco De Angelis, Nick Gray, Alex Wimbush and Dominic Calleja. We also thank Dominic and Marco's detailed review of this paper.
+
+We are also specially grateful to the researchers at JuliaReach and JuliaIntervals, who through their interest, contributions, discussions and suggestions have greatly improved the software: Marcello Forets, Christian Schilling, Luis Benet and David P. Sanders.
 
 The authors would like to thank the support of this work from the Engineering Physical Sciences Research Council (EPSRC) iCase studentship award. This research is funded by the EPSRC with grant number EP/R006768/1, which is acknowledged for its funding and support. This work has been carried out within the frame- work of the EUROfusion Consortium and has received funding from the Euratom research and training programme 2014–2018 and 2019–2020 under grant agreement number 633053. The views and opinions expressed herein do not necessarily reflect those of the European Commission.
 
