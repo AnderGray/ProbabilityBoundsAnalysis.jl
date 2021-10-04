@@ -1,10 +1,8 @@
 title: "ProbabilityBoundsAnalysis.jl:\\\\ Arithmetic with sets of distributions"
 keywords:
   - Julia
-  - Probability
   - Uncertainty
   - Interval Arithmetic
-  - Probabilistic Arithmetic
   - Probability Bounds Analysis
   - Probability Boxes
 authors:

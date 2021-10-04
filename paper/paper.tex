@@ -63,34 +63,50 @@ Computations with probabilities are usually performed by Monte-Carlo style simul
   
 \end{figure*}
 
-\iffalse
+
 \subsection{Automatic uncertainty in a programming language: why Julia?}
 
-The long term goal of probability bounds analysis is to create a fully uncertain programming language, where any computer variable may be represented as an interval, distribution, p-box or other imprecise quantity. Such a framework would allow for uncertain extensions of deterministic functions to be computed in an automatic, rigorous and tight fashion. Those with little knowledge of probability theory can add uncertainty to their computations with minimal effort. Stochastic calculations often require many years of training to implement and interpret correctly, and are usually not rigorous and are famously computationally expensive. \texttt{ProbabilityBoundsAnalysis.jl} provides the type structure for distribution functions and p-boxes which is rigorous, and has many of the base operations required for an uncertain programming language, which are rigorous and computationally effient. In this section we argue why Julia is an ideal target language for such an uncertainty language.
+The long term goal of probability bounds analysis is to create a fully uncertain programming language, where any computer variable may be represented as an interval, distribution, p-box or other imprecise quantity. Such a framework would allow for uncertain extensions of deterministic functions to be computed in an automatic, rigorous and tight fashion. Those with little knowledge of probability theory could add uncertainty to their computations with minimal effort. Stochastic calculations often require many years of training to implement and interpret correctly, and are usually not rigorous and are famously computationally expensive. \texttt{ProbabilityBoundsAnalysis.jl} provides the arithmetic basis for such a framework. In this section we give some arguments why Julia \cite{bezanson2017julia} is an ideal target language for such an uncertainty language.
 
 
 \subsubsection{Multiple dispatch} \hfill \break
 
-Multiple dispatch allows Julia packages with completely different functionalities to work together with minimal effort. One of the great successes of \texttt{IntervalArithmetic.jl} is that it allows for intervals to be propagated through nearly any Julia function, including those from different packages.
+Multiple dispatch allows Julia packages with completely different functionalities to work together with minimal effort. One of the great successes of \texttt{IntervalArithmetic.jl} is that it allows for intervals to be propagated through nearly any Julia function, including those from different packages. The same paradigm allows \texttt{ProbabilityBoundsAnalysis.jl} to propagate distributions and p-boxes through general Julia functions.
 
 \subsubsection{Parametric typing} \hfill \break
 
-Parametric typing allows one to create very generic data types, parametrised on other types. This is 
-
-For example, an uncertain
-
-an interval of type Int64 (\texttt(Interval{Int64})) can be made and destiguised of t
+Parametric typing allows one to create very generic data types, parametrised on other types. For example, an uncertain type of \texttt{Int64} (corresponding to an uncertain collection of finitely many numbers) could be distinguished to an uncertain type of \texttt{Float64} (an uncertain collection of reals). This is important because the behaviour and distribution of an uncertain collection of integers is different to that of real numbers. Parametric typing could generally be used to create an uncertain version of any Julia type, including custom types from other packages.
 
 \subsubsection{Metaprogramming} \hfill \break
 
-Blah blah blah 
+An uncertain programming language would require \textit{source-to-source} transformations at times. For example, one way to evaluate a programs control-flow (\texttt{if-else} conditions) with uncertain inputs is to unravel the control flow, and to evaluate each possible conditional branch uniquely, and then combine the output. For example consider following function
 
-\subsubsection{Native parallelisation} \hfill \break
+\begin{lstlisting}[language = Julia]
+  function unc_flow(x)
+    if x < 0 
+      return x - 1
+    else 
+      return x
+    end
+  end
+\end{lstlisting}
 
-Blah blah blah 
+An interval evaluation of the function $\text{unc\_flow}([-1,1])$ would be the union of the output of the different branches, the interval union $[-2, -1) \cup [0, 1]$. For a language like Python, this would require an uncertainty pre-compiler (like that proposed in \cite{gray2019computing}) whereby the python code is first transformed using a pre-compiler, and then evaluated in Python. In Julia, this can be handled natively with its metaprogramming capabilities.
 
 %, and discuss some of the remaining theoretical tasks required to make such a goal a reality. 
-\fi
+
+\begin{figure*}[htp]
+
+  \centering
+  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox2.pdf}\hfill
+  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox1.pdf}\hfill
+  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox3.pdf}
+  
+  \caption{Various outer representations of distribution functions, left $4$ steps and centre $25$ steps, and a p-box (right) with 10 steps}
+  \label{fig:figure2}
+  
+\end{figure*}
+
 \section{Probability Boxes}
 \label{sec:pboxes}
 
@@ -111,18 +127,6 @@ A real-valued random variable is characterised by its distribution function $F$,
 
 \noindent That is, a random variable is a member of a p-box if its cdf $F$ falls within the cdf bounds of the p-box $F(x) \in [\underline{F}(x), \overline{F}(x)]$ for all $x$, its moments are inside the interval moments of the p-box, and it belongs to a family of distribution functions (e.g. normal, uniform) considered by the p-box. Some of the constraints may be missing. For example, if the distribution family is unknown then the set is defined solely from the cdf and moment bounds. Such p-boxes are sometimes called non-parametric, since its members do not belong to any particular class of distribution. Some constraints may also be inferred from others. For example, the interval moments may be bounded from the cdf bounds, and cdf may be bounded from moment information (explored further in section \ref{section:Moments}). Figure\footnote{Scripts for all figures can be found in /examples/JuliaCon.} \ref{fig:figure1} shows an example of a distribution function, interval and a p-box. The grey shaded region in the interval and p-box bounds an infinite collection of probability distributions.
 
-
-\begin{figure*}[htp]
-
-  \centering
-  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox2.pdf}\hfill
-  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox1.pdf}\hfill
-  \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox3.pdf}
-  
-  \caption{Various outer representations of distribution functions, left $4$ steps and centre $25$ steps, and a p-box (right) with 10 steps}
-  \label{fig:figure2}
-  
-\end{figure*}
 
 
 Real-valued statistics and features of distributions typically become intervals for p-boxes. The cdf of a p-box is: 
@@ -145,6 +149,26 @@ Real-valued statistics and features of distributions typically become intervals 
 \end{align*}
 
 where the max operator is required when $\underline{F}(b) < \overline{F}(a)$. Note the same can nearly be achieved by using the precise formula for the probability measure, $\mathbb{P}(U) = F(b)- F(a)$, and using interval arithmetic.
+
+\begin{figure*}[htp]
+
+  \centering
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/normal.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/uniform.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/beta.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/gamma.pdf}
+  
+
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/lognormal.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/exponential.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/chisquared.pdf}\hfill
+  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/cauchy.pdf}
+  
+
+  \caption{Various parametrically constructed p-boxes with interval parameters}
+  \label{fig:figure3}
+  
+\end{figure*}
 
 
 P-boxes generalise precise distributions and intervals in the following way. A distribution is a p-box with a precise cdf and moments, i.e. when: 
@@ -198,29 +222,6 @@ We follow the representation first introduced by Williamson and Downs \cite{will
   u[i] &= \overline{F}^{-1}(p_{i}) \\ 
   d[i] &= \underline{F}^{-1}(p_{i+1}) & \text{for } i = 1, ..., N
 \end{align*}
-
-
-
-\begin{figure*}[htp]
-
-  \centering
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/normal.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/uniform.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/beta.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/gamma.pdf}
-  
-
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/lognormal.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/exponential.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/chisquared.pdf}\hfill
-  \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/cauchy.pdf}
-  
-
-  \caption{Various parametrically constructed p-boxes with interval parameters}
-  \label{fig:figure3}
-  
-\end{figure*}
-
 
 The vectors $u$ and $d$ are a collection of "real" or "physical" evaluations of a the random variable $X$, as opposed to cdf evaluations. Although the probability levels $p$ are uniformly spaced, $u$ and $d$ are generally not. The vectors $u$ and $d$ can then serve as bounds on the monotonic functions $\overline{F}^{-1}$ and $\underline{F}^{-1}$:
 
@@ -876,7 +877,7 @@ The long term goal of such a framework is to create a fully uncertain programmin
 \fi
 
 \section*{Acknowledgements}
-We would like to thank our friends and colleagues at the Risk Institute who have supported \texttt{ProbabilityBoundsAnalysis.jl} from its birth, and through their contributions and discussions have made this software possible: Marco De Angelis, Nick Gray, Alex Wimbush and Dominic Calleja. We also thank Dominic and Liam Henry's (Clarus Financial Technology, Belfast) detailed review of this paper.
+We would like to thank our friends and colleagues at the Risk Institute who have supported \texttt{ProbabilityBoundsAnalysis.jl} from its birth, and through their contributions and discussions have made this software possible: Marco De Angelis, Nick Gray, Alex Wimbush and Dominic Calleja. We also thank Dominic, Marco, and Liam Henry's (Clarus Financial Technology, Belfast) detailed review of this paper.
 
 We are also specially grateful to the researchers at JuliaReach and JuliaIntervals, who through their interest, contributions, discussions and suggestions have greatly improved the software: Marcello Forets, Christian Schilling, Luis Benet and David P. Sanders.
 
