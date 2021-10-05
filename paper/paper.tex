@@ -28,7 +28,7 @@ Probability bounds analysis combines interval arithmetic with probability theory
 \section{Introduction}
 \label{sec:intro}
 
-An arithmetic of probability distributions has long held interest among mathematicians and scientists. Indeed it was Kolmogorov who originally asked about the result of an operation between two random variables without knowing their joint distribution. This was answered for the sum by Makarov \cite{makarov1982estimates}, who showed the result was a set of distributions and was able to provide bounds on this function. Sklar, Schweizer and Frank generalised this result to other positive binary operations \cite{frank1987best,schweizer2011probabilistic}. In this pursuit they created copulas, a general way to encode probabilistic dependence independently from marginals. These are now an essential object used in probabilistic modelling. In his dissertation \cite{williamson1989probabilistic}, Williamson described an algorithm for efficiently performing these arithmetic operations, which can give guaranteed bounds on probability distributions in terms of an upper and lower cumulative distribution function (cdf). He called his method \textit{probabilistic arithmetic} and his sets of distributions \textit{dependency bounds}. Since then the method has been generalised \cite{ferson2015constructing,ferson1996whereof,ferson2004arithmetic} to most of the base binary and unary operations that would be present in a programming language. Probability boxes (p-boxes) are the name now given to these structures
+An arithmetic of probability distributions has long held interest among mathematicians and scientists. Indeed it was Kolmogorov who originally asked about the result of an operation between two random variables without knowing their joint distribution. This was answered for the sum by Makarov \cite{makarov1982estimates}, who showed the result was a set of distributions and was able to provide bounds on this function. Sklar, Schweizer and Frank generalised this result to other positive binary operations \cite{frank1987best,schweizer2011probabilistic}. In this pursuit they created copulas, a general way to encode probabilistic dependence independently from marginals. These are now an essential object used in probabilistic modelling. In his dissertation \cite{williamson1989probabilistic}, Williamson described an algorithm for efficiently performing these arithmetic operations, which can give guaranteed bounds on probability distributions in terms of an upper and lower cumulative distribution function (cdf). He called his method \textit{probabilistic arithmetic} and his sets of distributions \textit{dependency bounds}. Since then the method has been generalised \cite{ferson2015constructing,ferson1996whereof,ferson2004arithmetic} to most of the base binary and unary operations that would be present in a programming language. Probability boxes (p-boxes) are the name now given to these structures.
 
 The goal of \texttt{ProbabilityBoundsAnalysis.jl}\footnote{https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl} is to \textbf{compute guaranteed bounds on functions of random variables given only partial knowledge of the input probability distributions and their dependencies}. That is, to compute with partial knowledge about the input joint distribution. Ideally, all of the available information about random variables should be used, but without making any extra assumptions beyond what are justified by what is known.
 
@@ -71,7 +71,7 @@ The long term goal of probability bounds analysis is to create a fully uncertain
 
 \subsubsection{Multiple dispatch} \hfill \break
 
-Multiple dispatch allows Julia packages with completely different functionalities to work together with minimal effort. One of the great successes of \texttt{IntervalArithmetic.jl} is that it allows for intervals to be propagated through nearly any Julia function, including those from different packages. The same paradigm allows \texttt{ProbabilityBoundsAnalysis.jl} to propagate distributions and p-boxes through general Julia functions.
+Multiple dispatch allows Julia packages with completely different functionalities to work together often little extra effort. One of the great successes of \texttt{IntervalArithmetic.jl} is that it allows for intervals to be propagated through nearly any Julia function, including those from different packages. The same paradigm allows \texttt{ProbabilityBoundsAnalysis.jl} to propagate distributions and p-boxes through general Julia functions.
 
 \subsubsection{Parametric typing} \hfill \break
 
@@ -79,7 +79,7 @@ Parametric typing allows one to create very generic data types, parametrised on 
 
 \subsubsection{Metaprogramming} \hfill \break
 
-An uncertain programming language would require \textit{source-to-source} transformations at times. For example, one way to evaluate a programs control-flow (\texttt{if-else} conditions) with uncertain inputs is to unravel the control flow, and to evaluate each possible conditional branch uniquely, and then combine the output. For example consider following function
+An uncertain programming language would require \textit{source-to-source} transformations at times. For example, one way to evaluate a programs control-flow (\texttt{if-else} conditions) with uncertain inputs is to use metaprogramming. The programs control flow could be unraveled, and with each possible conditional branch evaluated for the possible instance of the variable, and then combined as an output. For example consider following function
 
 \begin{lstlisting}[language = Julia]
   function unc_flow(x)
@@ -91,7 +91,7 @@ An uncertain programming language would require \textit{source-to-source} transf
   end
 \end{lstlisting}
 
-An interval evaluation of the function $\text{unc\_flow}([-1,1])$ would be the union of the output of the different branches, the interval union $[-2, -1) \cup [0, 1]$. For a language like Python, this would require an uncertainty pre-compiler (like that proposed in \cite{gray2019computing}) whereby the python code is first transformed using a pre-compiler, and then evaluated in Python. In Julia, this can be handled natively with its metaprogramming capabilities.
+An interval evaluation of the function $\text{unc\_flow}([-1,1])$ would be the union of the output of the different branches, the interval union $[-2, -1) \cup [0, 1]$. For a language like Python, this would require an uncertainty pre-compiler (like that proposed in \cite{gray2019computing}) whereby the python code is first parsed using a separate program, and then evaluated in Python. In Julia, this can be handled natively with its metaprogramming capabilities.
 
 %, and discuss some of the remaining theoretical tasks required to make such a goal a reality. 
 
@@ -106,6 +106,13 @@ An interval evaluation of the function $\text{unc\_flow}([-1,1])$ would be the u
   \label{fig:figure2}
   
 \end{figure*}
+
+\iffalse
+\subsubsection{Parallelism and performance} \hfill \break
+
+Ultimately, high performant engineering and physics codes are written in 
+
+\fi
 
 \section{Probability Boxes}
 \label{sec:pboxes}
@@ -850,7 +857,7 @@ The above $\sigma$ convolution will work for any two input p-boxes, with any cop
 
 where $C^d$ is the copula dual of $C$, $C^d(u,v) = u + v - C(u,v)$. The $\tau$ and $\rho$ convolutions each compute a cdf bound which together characterise the resulting p-box: $[\underline{F}_{Z}(z), \overline{F}_{Z}(z)] = [\tau(z), \rho(z)]$. The p-box resulting from a $\tau$ and $\rho$ convolution will bound all $\sigma$ convolutions which have copula $C$ which is greater than $\underline{C}$. For example, setting $\underline{C} = W$ (the lower bound on all copulas) will propagate all copulas, which is complete uncertainty about the dependence, i.e. a \textit{Fréchet} operation. Setting $\underline{C} = \Pi$ will propagate copulas more positive than independence, otherwise known as \textit{positive quadrant dependence} \cite{nelsen2007introduction}. Setting $\underline{C} = M$ (the upper bound on all copulas) will only propagate $M$, and will be equal to a $\sigma$ convolution. 
 
-The $\tau$ and $\rho$ convolutions can be efficiently computed in terms of the inverse representation using in \textit{ProbabilityBoundsAnalysis}: 
+The $\tau$ and $\rho$ convolutions can be efficiently computed in terms of the inverse representation using in \texttt{ProbabilityBoundsAnalysis.jl}: 
 
 \begin{equation*}\label{taupbox2}
   \tau^{-1}_{\underline{C}_{XY},L}(p) = \sup_{\underline{C}(u,v) = p} [L(F^{-1}_{X}(u), F^{-1}_Y(v))],
