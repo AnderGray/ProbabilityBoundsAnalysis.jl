@@ -79,7 +79,7 @@ Parametric typing allows one to create very generic data types, parametrised on 
 
 \subsubsection{Metaprogramming} \hfill \break
 
-An uncertain programming language would require \textit{source-to-source} transformations at times. For example, one way to evaluate a programs control-flow (\texttt{if-else} conditions) with uncertain inputs is to use metaprogramming. The programs control flow could be unraveled, and with each possible conditional branch evaluated for the possible instance of the variable, and then combined as an output. For example consider following function
+An uncertain programming language would require \textit{source-to-source} transformations at times. For example, one way to evaluate a programs control-flow (\texttt{if-else} conditions) with uncertain inputs is to use metaprogramming. The programs control flow could be unraveled, and with each possible conditional branch evaluated for the possible instance of the variable, and then combined as an output. For example consider the following function
 
 \begin{lstlisting}[language = Julia]
   function unc_flow(x)
@@ -760,7 +760,7 @@ A binary operation between two random variables $X$ and $Y$ with cdfs $F_{X}$ an
   \sigma_{C,L}(z) = \int_{L\{z\}}dC(F_{X}(x),F_{Y}(y)) ,
 \end{equation*}
 
-where the integration domain is the set $L\{z\} = \{(x,y)| x,y \in \mathbb{R}, L(x,y) < x\}$ (the set of all $x$ and $y$ for which $L(x,y) < z$), and where $L$ is some binary operation (e.g. $L(x,y) = x+y$). The above $\sigma_{C,L}$ convolution is written for precise distributions, however can be extended for p-boxes by performing the convolution with some combination of the p-boxes bounds in the style of interval arithmetic:
+where the integration domain is the set $L\{z\} = \{(x,y)| x,y \in \mathbb{R}, L(x,y) < z\}$ (the set of all $x$ and $y$ for which $L(x,y) < z$), and where $L$ is some binary operation (e.g. $L(x,y) = x+y$). The above $\sigma_{C,L}$ convolution is written for precise distributions, however can be extended for p-boxes by performing the convolution with some combination of the p-boxes bounds in the style of interval arithmetic:
 
 
 \begin{eqnarray*}
