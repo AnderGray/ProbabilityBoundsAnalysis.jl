@@ -68,14 +68,16 @@ mutable struct pbox <: AbstractPbox
     bounded :: Array{Bool,1}            # Is it bounded?
 
     function pbox(u::Union{Missing, Array{<:Real}, Real} = missing, d=u; shape = "", name = "", ml= missing, mh = missing,
-        vl = missing, vh = missing, interpolation = "linear", bounded = [false, false])
+        vl = missing, vh = missing, bounded = [false, false])
 
-        steps = ProbabilityBoundsAnalysis.steps;                  # Reading global varaibles costly, creating local for multiple use
 
         if (ismissing(u) && ismissing(d))
             u = -∞;
             d = ∞;
         end
+
+        steps = length(u);
+        if length(u) != length(d);throw(ArgumentError("Lengths of d and u vectors don't match"));end
 
         if (typeof(u) == pbox)
             p = u;
@@ -93,11 +95,6 @@ mutable struct pbox <: AbstractPbox
 
             if (typeof(u)<:AbstractInterval) u = u.lo; end
             if (typeof(d)<:AbstractInterval) d = d.hi; end
-
-            # Should we always be interpolating? What if we convolve 2 pboxes of different steps and ProbabilityBoundsAnalysis.steps is larger
-            # The resulting pbox should have the smaller of the 3
-            if (length(u) != steps) u = Interpolate(u,interpolation,true);end
-            if (length(d) != steps) d = Interpolate(d,interpolation,false);end
 
             p = new(u,d,steps,"",-∞,∞,0,∞,"", bounded);
         end
@@ -188,7 +185,7 @@ function mass(s :: pbox, lo :: Real, hi :: Real)
     cdfLo = cdf(s, lo)
 
     ub = min(1, right(cdfHi) - left(cdfLo))
-    lb = max(0, right(cdfHi) - right(cdfLo))
+    lb = max(0, left(cdfHi) - right(cdfLo))
 
     return interval(lb, ub)
 
@@ -245,14 +242,14 @@ end
 
 Constructs a pbox from an array of intervals with equal mass. Left and right bounds are sorted to construct cdf bounds.
 """
-function pbox( x :: Array{Interval{T}, 1}, bounded :: Vector{Bool} = [true, true]) where T <: Real
+function pbox( x :: Array{Interval{T}, 1}, bounded :: Vector{Bool} = [true, true]; steps = defaultSteps) where T <: Real
 
     us = left.(x);  ds = right.(x)
     us = sort(us);  ds = sort(ds)
 
     numel = length(us)
 
-    n = ProbabilityBoundsAnalysis.steps;
+    n = steps;
 
     uNew = zeros(n);    dNew = zeros(n);
 
@@ -291,7 +288,7 @@ end
 
 Constructs a pbox from a matrix of 2nd order samples [Nouter x Ninner]
 """
-function pbox( x :: Array{T, 2}, bounded :: Vector{Bool} = [true, true]) where T <: Real
+function pbox( x :: Array{T, 2}, bounded :: Vector{Bool} = [true, true]; steps = defaultSteps) where T <: Real
 
     x = sort(x, dims = 2);
 
@@ -302,7 +299,7 @@ function pbox( x :: Array{T, 2}, bounded :: Vector{Bool} = [true, true]) where T
     us = sort(us', dims=1)
     ds = sort(ds', dims=1)
 
-    n = ProbabilityBoundsAnalysis.steps;
+    n = steps;
 
     uNew = zeros(n);    dNew = zeros(n);
 
@@ -631,13 +628,20 @@ function Interpolate(x::Union{Array{<:Real},Real}, interpolation::String = "line
 
 end
 
-function linearInterpolation( V::Union{Array{<:Real},Real} )
+function reshape(x :: pbox; steps = defaultSteps)
 
-    steps = ProbabilityBoundsAnalysis.steps;
+    u = linearInterpolation(x.u, steps = steps);
+    d = linearInterpolation(x.d, steps = steps);
+
+    return pbox(u, d, ml = x.ml, mh = x.mh, vl = x.vl, vh = x.vh,  shape = x.shape, name = x.name, bounded = x.bounded)
+end
+
+function linearInterpolation( V::Union{Array{<:Real},Real}; steps = defaultSteps)
+
 
     m = length(V) - 1;
     if (m == 0) return ([V for i=1:steps]);end
-    if (ProbabilityBoundsAnalysis.steps == 1) return [min(V), max(V)];end
+    if (steps == 1) return [min(V), max(V)];end
 
     d = 1/m;
     n = Int(round(d * steps * 20));

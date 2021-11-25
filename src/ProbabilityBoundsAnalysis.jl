@@ -76,7 +76,8 @@ global varDisagreementMessage = "Disagreement between theoretical and observed v
 
 ## Setter methods for globals
 
-setSteps(t :: Int64) = (global steps = t)
+#setSteps(t :: Int64) = (global steps = t)
+defaultSteps = 200
 setBOt(t :: Float64) = (global bOt = t)
 setTOp(t:: Float64) = (global tOp = t)
 setVerbose(t:: Int) = (global verbose = t)
