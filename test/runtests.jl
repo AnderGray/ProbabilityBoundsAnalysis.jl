@@ -5,7 +5,7 @@
 #
 ######
 
-using Test, ProbabilityBoundsAnalysis
+using Test, ProbabilityBoundsAnalysis, IntervalArithmetic, Distributions
 
 include("pbox/pbox.jl")
 include("pbox/distributions.jl")
