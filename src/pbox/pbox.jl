@@ -188,7 +188,7 @@ function mass(s :: pbox, lo :: Real, hi :: Real)
     cdfLo = cdf(s, lo)
 
     ub = min(1, right(cdfHi) - left(cdfLo))
-    lb = max(0, right(cdfHi) - right(cdfLo))
+    lb = max(0, left(cdfHi) - right(cdfLo))
 
     return interval(lb, ub)
 
