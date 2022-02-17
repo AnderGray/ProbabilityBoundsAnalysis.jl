@@ -1,6 +1,4 @@
-include("../src/pba.jl");
-using Main.pba;
-
+using ProbabilityBoundsAnalysis
 
 a = normal(interval(0,1),1);
 b = normal(interval(-1,1),1);
