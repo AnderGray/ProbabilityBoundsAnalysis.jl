@@ -182,7 +182,7 @@ function __init__()
             art3d = PyObject(PyPlot.art3D)
             mpl = pyimport("matplotlib")
             using3D()
-            include("pbox/plot_recipes.jl")
+            include("pbox/plots.jl")
         end
     end
 end
