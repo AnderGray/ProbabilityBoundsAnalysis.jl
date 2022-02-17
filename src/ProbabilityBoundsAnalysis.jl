@@ -39,11 +39,9 @@ __precompile__(true)
 module ProbabilityBoundsAnalysis
 
 using Base: Float64
-using Reexport, Distributions, Interpolations, PyCall, Distributed, PyPlot
+using Distributions, Interpolations, PyCall, Distributed, Requires
 
-@reexport using IntervalArithmetic, Distributed, Statistics, LinearAlgebra
-
-#using PyPlot
+using IntervalArithmetic, Distributed, Statistics, LinearAlgebra
 
 import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
 
@@ -56,8 +54,6 @@ import Base: show, -,
 import IntervalArithmetic: intersect, issubset
 
 import Statistics: mean, var, std
-
-import PyPlot: plot, scatter
 
 import Distributions: cdf #Normal, Beta, Uniform
 
@@ -167,16 +163,28 @@ export
 
 
 include("pbox/pbox.jl")
-#include("pbox/dependency.jl")
 include("pbox/copulas.jl")
 include("pbox/NormalDistribution.jl")
 include("pbox/arithmetic.jl")
 include("pbox/MomentTransformations.jl")
 include("pbox/distributions.jl")
 include("pbox/special.jl")
-include("pbox/plot_recipes.jl")
-include("intervalStatistics/IntervalStatistics.jl")
 
+function __init__()
 
+    @require PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee" begin
+        @require PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0" begin
+
+            using PyPlot, PyCall
+            import PyPlot: plot, scatter
+
+            pyimport_conda("mpl_toolkits.mplot3d", "mpl_toolkits")
+            art3d = PyObject(PyPlot.art3D)
+            mpl = pyimport("matplotlib")
+            using3D()
+            include("pbox/plot_recipes.jl")
+        end
+    end
+end
 
 end # module ProbabilityBoundsAnalysis
