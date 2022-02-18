@@ -61,7 +61,7 @@ jobs:
           julia --project=docs -e '
             using Documenter: doctest
             using ProbabilityBoundsAnalysis
-            DocMeta.setdocmeta!(ProbabilityBoundsAnalysis, :DocTestSetup, :(using ProbabilityBoundsAnalysis); recursive=true)
+            DocMeta.setdocmeta!(ProbabilityBoundsAnalysis, :DocTestSetup, :(using ProbabilityBoundsAnalysis, IntervalArithmetic, Random; Random.seed!(31415)); recursive=true)
             doctest(ProbabilityBoundsAnalysis)' # change MYPACKAGE to the name of your package
       - run: julia --project=docs docs/make.jl
         env:
