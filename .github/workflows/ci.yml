@@ -62,7 +62,7 @@ jobs:
             using Documenter
             using ProbabilityBoundsAnalysis
             DocMeta.setdocmeta!(ProbabilityBoundsAnalysis, :DocTestSetup, :(using ProbabilityBoundsAnalysis, IntervalArithmetic, Random; Random.seed!(31415)); recursive=true)
-            doctest(ProbabilityBoundsAnalysis)' # change MYPACKAGE to the name of your package
+            doctest(ProbabilityBoundsAnalysis, manual = false)' 
       - run: julia --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

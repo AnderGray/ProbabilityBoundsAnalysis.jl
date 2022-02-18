@@ -3,6 +3,8 @@
 
 using ProbabilityBoundsAnalysis, IntervalArithmetic, Documenter
 
+DocMeta.setdocmeta!(ProbabilityBoundsAnalysis, :DocTestSetup, :(using ProbabilityBoundsAnalysis, IntervalArithmetic, Random; Random.seed!(31415)); recursive=true)
+
 makedocs(
     modules = [ProbabilityBoundsAnalysis],
     format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
