@@ -7,36 +7,35 @@
 
 
 @testset "Arithmetic" begin
-    
+
     mean1 = 2;  mean2 = 2;
     sigma1 = 4;  sigma2 = 4;
 
     a = N(mean1, sigma1); b = N(mean2, sigma2);
 
     sig(sig1, sig2, cor) = sqrt(sig1^2 + sig2^2 + 2*cor*sig1*sig2)
-    meanOut = mean1 + mean2;    
+    meanOut = mean1 + mean2;
 
     Nsamples = 5000; Ncdf = 5000;
 
     @testset "Independent" begin
 
-        c = a + b;
-        d = conv(a,b,op = +,corr = 0);
-        e = convIndep(a,b, op = +)
+        c = conv(a,b,op = +,corr = 0);
+        d = convIndep(a,b, op = +)
 
-        sigma = sig(sigma1,sigma2,0)
+        sigma = sig(sigma1, sigma2, 0)
         correct = Normal(meanOut, sigma)
 
         #@test e.shape == d.shape == "normal"
 
-        @test all(c.u .== d.u .== e.u)
-        @test all(c.d .== d.d .== e.d)
+        @test all(c.u .== d.u)
+        @test all(c.d .== d.d)
 
-        @test mean(d) == mean(e)
+        @test mean(c) == mean(d)
+        @test var(c) == var(d)
         @test mean(correct) ∈ mean(d)
-        @test var(d) == var(e)
         @test 32 ∈ var(d)
-        
+
         @test all(map(!,c.bounded))
 
 
@@ -44,7 +43,7 @@
         pbaSamps = cut.(d,Urand);
         DistSamp = quantile.(correct,Urand);
 
-        @test all(DistSamp .∈ pbaSamps)  
+        @test all(DistSamp .∈ pbaSamps)
 
     end
 
@@ -72,14 +71,14 @@
         Urand = rand(Nsamples,1);
         pbaSamps = cut.(d,Urand);
         DistSamp = quantile.(correct,Urand);
-        
-        @test all(DistSamp .∈ pbaSamps)  
+
+        @test all(DistSamp .∈ pbaSamps)
 
         cdfPoints = range(d.u[1], stop = d.d[end], length = Ncdf);
         pbaCdf = cdf.(d,cdfPoints);
         DistCdf = cdf.(correct,cdfPoints);
 
-        @test all(DistCdf .∈ pbaCdf)  
+        @test all(DistCdf .∈ pbaCdf)
 
     end
 
@@ -107,14 +106,14 @@
         Urand = rand(Nsamples,1);
         pbaSamps = cut.(d,Urand);
         DistSamp = quantile.(correct,Urand);
-        
-        @test all(DistSamp .∈ pbaSamps)  
+
+        @test all(DistSamp .∈ pbaSamps)
 
         cdfPoints = range(d.u[1], stop = d.d[end], length = Ncdf);
         pbaCdf = cdf.(d,cdfPoints);
         DistCdf = cdf.(correct,cdfPoints);
 
-        @test all(DistCdf .∈ pbaCdf)  
+        @test all(DistCdf .∈ pbaCdf)
 
     end
 
@@ -143,14 +142,14 @@
         Urand = rand(Nsamples,1);
         pbaSamps = cut.(d,Urand);
         DistSamp = quantile.(correct,Urand);
-        
-        @test all(DistSamp .∈ pbaSamps)  
+
+        @test all(DistSamp .∈ pbaSamps)
 
         cdfPoints = range(d.u[1], stop = d.d[end], length = Ncdf);
         pbaCdf = cdf.(d,cdfPoints);
         DistCdf = cdf.(correct,cdfPoints);
 
-        @test all(DistCdf .∈ pbaCdf)  
+        @test all(DistCdf .∈ pbaCdf)
     end
 
 
@@ -168,7 +167,7 @@
         @test var(d) == var(e)
 
         @test all(map(!,d.bounded))
-        
+
     end
 
     ###
