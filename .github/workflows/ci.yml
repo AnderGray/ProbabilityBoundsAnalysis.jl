@@ -12,7 +12,6 @@ jobs:
         version:
           - '1.5'
           - '1.6'
-          - 'nightly'
           
         os:
           - ubuntu-latest
@@ -61,7 +60,7 @@ jobs:
           julia --project=docs -e '
             using Documenter
             using ProbabilityBoundsAnalysis
-            DocMeta.setdocmeta!(ProbabilityBoundsAnalysis, :DocTestSetup, :(using ProbabilityBoundsAnalysis, IntervalArithmetic, Random; Random.seed!(MersenneTwister(), 31415)); recursive=true)
+            DocMeta.setdocmeta!(ProbabilityBoundsAnalysis, :DocTestSetup, :(using ProbabilityBoundsAnalysis, IntervalArithmetic, Random; Random.seed!(31415)); recursive=true)
             doctest(ProbabilityBoundsAnalysis, manual = false)' 
       - run: julia --project=docs docs/make.jl
         env:
