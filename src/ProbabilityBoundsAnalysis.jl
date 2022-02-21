@@ -39,7 +39,7 @@ __precompile__(true)
 module ProbabilityBoundsAnalysis
 
 using Base: Float64
-using Distributions, Interpolations, PyCall, Distributed, Requires
+using Distributions, Interpolations, Distributed, Requires
 
 using IntervalArithmetic, Distributed, Statistics, LinearAlgebra
 

@@ -1,7 +1,9 @@
 #julia -e 'using LiveServer; serve(dir="./build")'
 #julia make.jl
 
-using Documenter, ProbabilityBoundsAnalysis
+using ProbabilityBoundsAnalysis, IntervalArithmetic, Documenter
+
+DocMeta.setdocmeta!(ProbabilityBoundsAnalysis, :DocTestSetup, :(using ProbabilityBoundsAnalysis, IntervalArithmetic, Random; Random.seed!(31415)); recursive=true)
 
 makedocs(
     modules = [ProbabilityBoundsAnalysis],

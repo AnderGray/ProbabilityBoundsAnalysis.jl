@@ -30,12 +30,12 @@ Envelope. Returns the union of pboxes. Any number of pboxes may be input
 
 # Examples
 ```jldoctest
-julia> a = U(0,1)
+julia> a = U(0,1);
 
-julia> b = U(1,2)
+julia> b = U(1,2);
 
 julia> c = env(a, b)
-Pbox: 	  ~ uniform ( range=[0.0,2.0], mean=[0.5,1.5], var=0.08333333333333333)
+Pbox: 	  ~ uniform ( range=[0.0, 2.0], mean=[0.5, 1.5], var=0.083333)
 ```
 See also: [`imp`](@ref), [`makepbox`](@ref)
 """
@@ -79,12 +79,12 @@ Imprint. Returns the intersection of pboxes. Any number of pboxes may be input
 
 # Examples
 ```jldoctest
-julia> a = U(interval(0, 1), 2)
+julia> a = U(interval(0, 1), 2);
 
-julia> b = U(1, 2)
+julia> b = U(1, 2);
 
 julia> c = imp(a, b)
-Pbox: 	  ~  ( range=[1.0,2.0], mean=1.5, var=0.08333333333333333)
+Pbox: 	  ~  ( range=[1.0, 2.0], mean=1.5, var=0.083333)
 ```
 See also: [`env`](@ref), [`makepbox`](@ref)
 """
@@ -229,7 +229,7 @@ Uniform shaped pbox. Parameters can be Real or Intervals.
 # Examples
 ```jldoctest
 julia> a = uniform(interval(0, 1), interval(1,2))
-Pbox: 	  ~ uniform ( range=[0.0, 2.0], mean=[1.0, 1.5], var=[0.083333, 0.33333])
+Pbox: 	  ~ uniform ( range=[0.0, 2.0], mean=[0.5, 1.5], var=[0.0, 0.33333])
 ```
 See also: [`normal`](@ref), [`beta`](@ref), [`meanMinMax`](@ref), [`plot`](@ref)
 """
@@ -758,12 +758,12 @@ returns n number of random intervals from pbox x
 julia> a = N(0,1);
 
 julia> rand(a,5)
-5-element Array{Interval{Float64},1}:
-  [0.59776, 0.612813]
-  [0.453762, 0.467699]
- [-0.426149, -0.412463]
- [-0.358459, -0.345125]
- [-0.612813, -0.59776]
+5-element Vector{Interval{Float64}}:
+  [0.538836, 0.553385]
+ [-0.331854, -0.318639]
+  [0.125661, 0.138305]
+ [-1.40508, -1.3722]
+ [-0.31864, -0.30548]
 ```
 See also: [`cut`](@ref), [`cdf`](@ref), [`mass`](@ref)
 """

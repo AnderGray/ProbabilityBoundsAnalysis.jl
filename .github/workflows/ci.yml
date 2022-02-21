@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
-          version: '1'
+          version: '1.6'
       - run: |
           julia --project=docs -e '
             using Pkg
@@ -59,9 +59,10 @@ jobs:
             Pkg.instantiate()'
       - run: |
           julia --project=docs -e '
-            using Documenter: doctest
-            using MYPACKAGE
-            doctest(MYPACKAGE)' # change MYPACKAGE to the name of your package
+            using Documenter
+            using ProbabilityBoundsAnalysis
+            DocMeta.setdocmeta!(ProbabilityBoundsAnalysis, :DocTestSetup, :(using ProbabilityBoundsAnalysis, IntervalArithmetic, Random; Random.seed!(31415)); recursive=true)
+            doctest(ProbabilityBoundsAnalysis, manual = false)' 
       - run: julia --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
