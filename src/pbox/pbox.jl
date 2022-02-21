@@ -455,7 +455,7 @@ function checkMoments( x :: pbox)
       # use the observed mean
       x.ml = left(b)
       x.mh = right(b)
-      if (1<ProbabilityBoundsAnalysis.verbose) println(ProbabilityBoundsAnalysis.meanDisagreementMessage);end
+      if (1<ProbabilityBoundsAnalysis.verbose) println("Disagreement between theoretical and observed mean\n");end
   end
 
   a = var(x);
@@ -467,7 +467,7 @@ function checkMoments( x :: pbox)
     # use the observed mean
     x.vl = left(b)
     x.vh = right(b)
-    if (1<ProbabilityBoundsAnalysis.verbose) println(ProbabilityBoundsAnalysis.varDisagreementMessage);end
+    if (1<ProbabilityBoundsAnalysis.verbose) println("Disagreement between theoretical and observed variance\n");end
 end
 
     return x;

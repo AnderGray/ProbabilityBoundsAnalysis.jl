@@ -67,8 +67,6 @@ global steps = 200              # discretization levels of probability
 global bOt = 0.001              # smallest quamtile to use if left tail is unbounded
 global tOp = 0.999              # largest quamtile to use if right tail is unbounded
 global verbose = 2              # how much warning messaging is wanted
-global meanDisagreementMessage = "Disagreement between theoretical and observed mean\n"
-global varDisagreementMessage = "Disagreement between theoretical and observed variance\n"
 
 ## Setter methods for globals
 
@@ -76,8 +74,6 @@ setSteps(t :: Int64) = (global steps = t)
 setBOt(t :: Float64) = (global bOt = t)
 setTOp(t:: Float64) = (global tOp = t)
 setVerbose(t:: Int) = (global verbose = t)
-setMeanDisagreementMessage(t :: String) = (global meanDisagreementMessage = t)
-setVarDisagreementMessage(t :: String) = (global varDisagreementMessage = t)
 
 
 function showGlobals()
@@ -85,8 +81,6 @@ function showGlobals()
     println("\nShowing global variables:\n")
     println("Steps: $steps      ||  bOt: $bOt             ||  tOp: $tOp")
     println("verbose: $verbose\n")
-    print("meanDisagreementMessage: $meanDisagreementMessage")
-    print("varDisagreementMessage:  $varDisagreementMessage")
 
 end
 
