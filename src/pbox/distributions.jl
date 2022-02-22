@@ -8,7 +8,7 @@
 #                                           Author: Ander Gray
 #                                           Email:  ander.gray@liverpool.ac.uk
 #
-#   Port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
+#   About 50% of this file is a port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
