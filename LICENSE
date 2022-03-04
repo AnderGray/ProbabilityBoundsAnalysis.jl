@@ -5,6 +5,15 @@
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
+
+                    ProbabilityBoundsAnalysis.jl
+  
+    Note that about 50% of the source code is a Julia port of pba.r. The 
+  origional code may be found at: https://github.com/ScottFerson/pba.r
+  The orgional licence (GPL-3.0) can be found at: 
+  https://github.com/ScottFerson/pba.r/blob/master/LICENSE
+                            
+                            
                             Preamble
 
   The GNU General Public License is a free, copyleft license for

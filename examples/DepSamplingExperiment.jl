@@ -11,7 +11,7 @@
 #   For hints as to why this happens view section covariance alegra in: https://en.wikipedia.org/wiki/Algebra_of_random_variables
 ######
 
-include("../src/pbox/dependency.jl")
+using ProbabilityBoundsAnalysis
 
 #   Define Marginals and copula
 a = W(Beta(4,2),Beta(4,2));

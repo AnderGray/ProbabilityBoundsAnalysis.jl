@@ -14,7 +14,7 @@
     min = 1; max = 2; name = "test";
     shape = "testShape";
 
-    n = ProbabilityBoundsAnalysis.steps;
+    n = parametersPBA.steps;
 
     x = pbox(min, max, name = name, shape = shape);
 

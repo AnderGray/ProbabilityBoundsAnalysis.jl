@@ -2,7 +2,7 @@
 #   Examples of the tau rho convolutions
 ####
 
-#include("../../src/pbaDebug.jl")
+using ProbabilityBoundsAnalysis, PyPlot
 
 x = U(0,1);
 y = U(0,1);
@@ -17,13 +17,11 @@ for i = 1:length(Cors)
     Cop = GauCopula(Cors[i])
 
     if Cors[i] == -1; Cop = W();
-elseif Cors[i] == 1; Cop = M(); 
-else Cop = GauCopula(Cors[i]); end
+    elseif Cors[i] == 1; Cop = M();
+    else Cop = GauCopula(Cors[i]); end
 
-    
     Fret1 = tauRho(x, y,Cop, op);
 
     plot(Fret1, name = "same", col = colors[i], alpha = 0.1)
     if i == length(Cors); savefig("SumUnif.png");end
 end
-

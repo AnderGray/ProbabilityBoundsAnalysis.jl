@@ -10,3 +10,4 @@ using Test, ProbabilityBoundsAnalysis, IntervalArithmetic, Distributions, Docume
 include("pbox/pbox.jl")
 include("pbox/distributions.jl")
 include("pbox/arithmetic.jl")
+include("pbox/parameter_change.jl")

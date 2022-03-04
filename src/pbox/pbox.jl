@@ -8,7 +8,7 @@
 #                                           Author: Ander Gray
 #                                           Email:  ander.gray@liverpool.ac.uk
 #
-#   Port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
+#   About 50% of this file is a port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
@@ -70,7 +70,7 @@ mutable struct pbox <: AbstractPbox
     function pbox(u::Union{Missing, Array{<:Real}, Real} = missing, d=u; shape = "", name = "", ml= missing, mh = missing,
         vl = missing, vh = missing, interpolation = "linear", bounded = [false, false])
 
-        steps = ProbabilityBoundsAnalysis.steps;                  # Reading global varaibles costly, creating local for multiple use
+        steps = parametersPBA.steps;                  # Reading global varaibles costly, creating local for multiple use
 
         if (ismissing(u) && ismissing(d))
             u = -∞;
@@ -253,7 +253,7 @@ function pbox( x :: Array{Interval{T}, 1}, bounded :: Vector{Bool} = [true, true
 
     numel = length(us)
 
-    n = ProbabilityBoundsAnalysis.steps;
+    n = parametersPBA.steps;
 
     uNew = zeros(n);    dNew = zeros(n);
 
@@ -303,7 +303,7 @@ function pbox( x :: Array{T, 2}, bounded :: Vector{Bool} = [true, true]) where T
     us = sort(us', dims=1)
     ds = sort(ds', dims=1)
 
-    n = ProbabilityBoundsAnalysis.steps;
+    n = parametersPBA.steps;
 
     uNew = zeros(n);    dNew = zeros(n);
 
@@ -455,7 +455,7 @@ function checkMoments( x :: pbox)
       # use the observed mean
       x.ml = left(b)
       x.mh = right(b)
-      if (1<ProbabilityBoundsAnalysis.verbose) println(ProbabilityBoundsAnalysis.meanDisagreementMessage);end
+      if (1<parametersPBA.verbose) println("Disagreement between theoretical and observed mean\n");end
   end
 
   a = var(x);
@@ -467,7 +467,7 @@ function checkMoments( x :: pbox)
     # use the observed mean
     x.vl = left(b)
     x.vh = right(b)
-    if (1<ProbabilityBoundsAnalysis.verbose) println(ProbabilityBoundsAnalysis.varDisagreementMessage);end
+    if (1<parametersPBA.verbose) println("Disagreement between theoretical and observed variance\n");end
 end
 
     return x;
@@ -634,11 +634,11 @@ end
 
 function linearInterpolation( V::Union{Array{<:Real},Real} )
 
-    steps = ProbabilityBoundsAnalysis.steps;
+    steps = parametersPBA.steps;
 
     m = length(V) - 1;
     if (m == 0) return ([V for i=1:steps]);end
-    if (ProbabilityBoundsAnalysis.steps == 1) return [min(V), max(V)];end
+    if (parametersPBA.steps == 1) return [min(V), max(V)];end
 
     d = 1/m;
     n = Int(round(d * steps * 20));

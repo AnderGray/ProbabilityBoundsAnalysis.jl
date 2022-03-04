@@ -251,7 +251,7 @@ function conditionalX(C :: AbstractCopula, xVal :: Real)
 
     Nsx, Nsy = size(C.cdfU)
 
-    n = ProbabilityBoundsAnalysis.steps
+    n = parametersPBA.steps
 
     yGridU = ProbabilityBoundsAnalysis.ii();
     yGridD = ProbabilityBoundsAnalysis.jj();
@@ -373,7 +373,7 @@ spearLB(x, y, τ) = x - spearUB(x, 1 - y, - τ)
 
 function M()
 
-    n = ProbabilityBoundsAnalysis.steps
+    n = parametersPBA.steps
 
     x = range(0, 1, length = n);
     cdf = [perf(xs,ys) for xs in x, ys in x]
@@ -383,7 +383,7 @@ end
 
 function W()
 
-    n = ProbabilityBoundsAnalysis.steps
+    n = parametersPBA.steps
 
     x = range(0,1,length = n);
     cdf = [opp(xs,ys) for xs in x, ys in x]
@@ -393,7 +393,7 @@ end
 
 function πCop()
 
-    n = ProbabilityBoundsAnalysis.steps
+    n = parametersPBA.steps
 
     x = range(0,1,length = n);
     cdf = [indep(xs, ys) for xs in x, ys in x]
@@ -419,7 +419,7 @@ function Frank(s = 1)                       #   s is real; inf for perfect, 0 fo
         return copula(C.cdfU, family = "Frank",  param = Inf)
     end
 
-    n = ProbabilityBoundsAnalysis.steps
+    n = parametersPBA.steps
     x = range(0, 1, length = n);
     cdf = [F(xs, ys, s) for xs in x, ys in x];
 
@@ -456,7 +456,7 @@ function Clayton(t = 0)                     #   t>-1; -1 for opposite, 0 for ind
         return copula(C.cdfU, family = "Clayton" , param = Inf)
     end
 
-    n = ProbabilityBoundsAnalysis.steps
+    n = parametersPBA.steps
     x = range(0,stop=1,length = n);
     cdf = [Cla(xs,ys, t) for xs in x, ys in x];
 
@@ -484,7 +484,7 @@ function GauCopula(r = 0)     #   -1 <= r <=1 ; -1 for opposite, 1 for indep and
     if r == -1; C = W(); return copula(C.cdfU, family = "Gaussian", param =  -1); end
     if r == 1; C = M(); return copula(C.cdfU, family = "Gaussian", param = 1); end
 
-    n = ProbabilityBoundsAnalysis.steps
+    n = parametersPBA.steps
     x = range(0,stop = 1,length = n);
 
     cdf = [Gau(xs, ys ,r) for xs in x, ys in x];
@@ -506,7 +506,7 @@ end
 
 function Frechet()
 
-    n = ProbabilityBoundsAnalysis.steps
+    n = parametersPBA.steps
     x = range(0,stop = 1,length = n);
 
     cdfU = [perf(xs,ys) for xs in x, ys in x]
@@ -518,7 +518,7 @@ end
 
 function τCopula( τ = 0 )   # Imprecise copula from kendal tau
 
-    n = ProbabilityBoundsAnalysis.steps
+    n = parametersPBA.steps
     x = range(0,stop = 1,length = n);
 
     cdfU = [kenUB(xs,ys,τ) for xs in x, ys in x]
@@ -532,7 +532,7 @@ KendalCopula(τ = 0) = τCopula(τ)
 
 function ρCopula( ρ = 0 ) # Imprecise copula from Spearman rho
 
-    n = ProbabilityBoundsAnalysis.steps
+    n = parametersPBA.steps
     x = range(0,stop = 1,length = n);
 
     cdfU = [spearUB(xs,ys,ρ) for xs in x, ys in x]
@@ -743,7 +743,7 @@ function conditionalX(J :: bivpbox, xVal :: Real)
     uIndex = findfirst(xVal .< yGridU);
     dIndex = findfirst(xVal .< yGridD);
 
-    mass = 1/ProbabilityBoundsAnalysis.steps
+    mass = 1/parametersPBA.steps
     densityU = mass/(yGridU[uIndex] - yGridU[uIndex-1])
     densityD = mass/(yGridD[dIndex] - yGridD[dIndex-1])
 

@@ -8,7 +8,7 @@
 #                                           Author: Ander Gray
 #                                           Email:  ander.gray@liverpool.ac.uk
 #
-#   Port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
+#   About 50% of the source code is a port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
@@ -63,37 +63,37 @@ abstract type AbstractPbox <: Real end
 
 ## Global Variables (we may want to avoid these)
 
-global steps = 200              # discretization levels of probability
-global bOt = 0.001              # smallest quamtile to use if left tail is unbounded
-global tOp = 0.999              # largest quamtile to use if right tail is unbounded
-global verbose = 2              # how much warning messaging is wanted
-global meanDisagreementMessage = "Disagreement between theoretical and observed mean\n"
-global varDisagreementMessage = "Disagreement between theoretical and observed variance\n"
+mutable struct PboxParameters
 
+    steps :: Int64              # discretization levels of probability
+    bOt :: Float64              # smallest quamtile to use if left tail is unbounded
+    tOp :: Float64              # largest quamtile to use if right tail is unbounded
+    verbose :: Int64            # how much warning messaging is wanted
+
+    PboxParameters() = new(200, 0.001, 0.999, 2)
+end
 ## Setter methods for globals
 
-setSteps(t :: Int64) = (global steps = t)
-setBOt(t :: Float64) = (global bOt = t)
-setTOp(t:: Float64) = (global tOp = t)
-setVerbose(t:: Int) = (global verbose = t)
-setMeanDisagreementMessage(t :: String) = (global meanDisagreementMessage = t)
-setVarDisagreementMessage(t :: String) = (global varDisagreementMessage = t)
+const parametersPBA = PboxParameters()
+
+setSteps(t :: Int64) = parametersPBA.steps = t
+setBOt(t :: Float64) = parametersPBA.bOt = t
+setTOp(t:: Float64) = parametersPBA.tOp = t
+setVerbose(t:: Int) = parametersPBA.verbose = t
 
 
-function showGlobals()
+function show_parameters()
 
-    println("\nShowing global variables:\n")
-    println("Steps: $steps      ||  bOt: $bOt             ||  tOp: $tOp")
-    println("verbose: $verbose\n")
-    print("meanDisagreementMessage: $meanDisagreementMessage")
-    print("varDisagreementMessage:  $varDisagreementMessage")
+    println("\nShowing parameters:\n")
+    println("Steps: $(parametersPBA.steps)      ||  bOt: $(parametersPBA.bOt)             ||  tOp: $(parametersPBA.tOp)")
+    println("verbose: $(parametersPBA.verbose)\n")
 
 end
 
 
 export
     # Constructors
-    Interval, interval, AbstractInterval, AbstractPbox, pbox, makepbox,
+    Interval, interval, AbstractInterval, AbstractPbox, pbox, makepbox, parametersPBA,
 
     # Parametric
     normal, gaussian, N,

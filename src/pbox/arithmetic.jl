@@ -8,7 +8,7 @@
 #                                           Author: Ander Gray
 #                                           Email:  ander.gray@liverpool.ac.uk
 #
-#   Port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
+#   About 50% of this file is a port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 #
 ######
@@ -55,7 +55,7 @@ function convIndep(x::pbox, y::pbox; op = +)
 
     m = x.n;
     p = y.n;
-    n = min(ProbabilityBoundsAnalysis.steps, m*p);
+    n = min(parametersPBA.steps, m*p);
     L = m * p / n;
     c = zeros(m*p);
     Zu = ones(n);
@@ -167,13 +167,13 @@ function convFrechet(x::pbox, y::pbox; op = +)
     x = makepbox(x);
     y = makepbox(y);
 
-    zu = zeros(ProbabilityBoundsAnalysis.steps);
-    zd = zeros(ProbabilityBoundsAnalysis.steps);
+    zu = zeros(parametersPBA.steps);
+    zd = zeros(parametersPBA.steps);
 
-    for i = 1:ProbabilityBoundsAnalysis.steps
+    for i = 1:parametersPBA.steps
 
-        j = i:ProbabilityBoundsAnalysis.steps;
-        k = ProbabilityBoundsAnalysis.steps:-1:i;
+        j = i:parametersPBA.steps;
+        k = parametersPBA.steps:-1:i;
         zd[i] = minimum(map(op, x.d[j],y.d[k]));
 
         j = 1:i;
@@ -257,7 +257,7 @@ function calcSigmaBoundLeft(x, y , op,  C, bounded)
 
     xs = x[1:end-1]; ys = y[1:end-1];
 
-    Ns = ProbabilityBoundsAnalysis.steps
+    Ns = parametersPBA.steps
 
     zs = zeros(Ns-1, Ns-1)    # cart prod
     z  = zeros(Ns)            # output vector
@@ -299,7 +299,7 @@ function calcSigmaBoundRight(x, y , op,  C, bounded)
     xs = x[2:end]; ys = y[2:end];
 
 
-    Ns = ProbabilityBoundsAnalysis.steps
+    Ns = parametersPBA.steps
 
     zs = zeros(Ns-1, Ns-1)    # cart prod
     z  = zeros(Ns)            # output vector
@@ -343,7 +343,7 @@ function sigmaOld(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
     x = makepbox(x);
     y = makepbox(y);
 
-    Ns = ProbabilityBoundsAnalysis.steps
+    Ns = parametersPBA.steps
 
     zus = [map(op, ux, uy) for ux in x.u[1:end-1], uy in y.u[1:end-1]]        # Carteesian products
     zds = [map(op, dx, dy) for dx in x.d[2:end], dy in y.d[2:end]]
@@ -433,7 +433,7 @@ function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
     x = makepbox(x);
     y = makepbox(y);
 
-    Ns = ProbabilityBoundsAnalysis.steps
+    Ns = parametersPBA.steps
 
     zd = zeros(Ns);
     zu = zeros(Ns);
@@ -493,7 +493,7 @@ function tauRhoOld2(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
     x = makepbox(x);
     y = makepbox(y);
 
-    Ns = ProbabilityBoundsAnalysis.steps
+    Ns = parametersPBA.steps
 
     zd = zeros(Ns);
     zu = zeros(Ns);
@@ -537,7 +537,7 @@ function tauRhoNew(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
     x = makepbox(x);
     y = makepbox(y);
 
-    Ns = ProbabilityBoundsAnalysis.steps
+    Ns = parametersPBA.steps
 
     zd = zeros(Ns);
     zu = zeros(Ns);
@@ -604,7 +604,7 @@ function tauRho2(x::Real, y::Real, C:: AbstractCopula, op = +)
     x = makepbox(x);
     y = makepbox(y);
 
-    Ns = ProbabilityBoundsAnalysis.steps
+    Ns = parametersPBA.steps
 
     zd = zeros(Ns);
     zu = zeros(Ns);
@@ -1106,7 +1106,7 @@ function copulaUnary(x :: pbox, op)
     #CopU[end,:].= CopU[:,end] .=  CopD[end,:] .= CopD[:,end] .= collect(xRange);
     return copula(CopU,CopD), Fz
 end
-	
+
 # return the range of a univariate p-box
 function Base.range(p::pbox)
     return interval(p.u[1], p.d[end])

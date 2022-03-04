@@ -8,17 +8,17 @@
 #                                           Author: Ander Gray
 #                                           Email:  ander.gray@liverpool.ac.uk
 #
-#   Port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
+#   About 50% of this file is a port of R code pba.r by Scott Ferson and Jason O'Rawe, Applied Biomathematics
 #   Origional code available at: https://github.com/ScottFerson/pba.r
 ######
 
 
 #ii()    = range(0, stop = (ProbabilityBoundsAnalysis.steps-1)/ProbabilityBoundsAnalysis.steps, length = ProbabilityBoundsAnalysis.steps)
 
-ii()    = [        0; collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps)];
-iii()   = [  ProbabilityBoundsAnalysis.bOt; collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps)];
-jj()    = [           collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps); 1 ];
-jjj()   = [           collect((1:(ProbabilityBoundsAnalysis.steps-1)) / ProbabilityBoundsAnalysis.steps); ProbabilityBoundsAnalysis.tOp ];
+ii()    = [        0; collect((1:(parametersPBA.steps-1)) / parametersPBA.steps)];
+iii()   = [  parametersPBA.bOt; collect((1:(parametersPBA.steps-1)) / parametersPBA.steps)];
+jj()    = [           collect((1:(parametersPBA.steps-1)) / parametersPBA.steps); 1 ];
+jjj()   = [           collect((1:(parametersPBA.steps-1)) / parametersPBA.steps); parametersPBA.tOp ];
 
 ##
 # Should be able to env an array of p-boxes.
@@ -732,8 +732,8 @@ function cut(x, p :: Real; tight :: Bool = true)
 
     if (p<0 || p>1) throw(ArgumentError("Second argument must be a probability between zero and one")); end
 
-    if (p < ProbabilityBoundsAnalysis.bOt && !x.bounded[1]); return interval(-∞, x.d[1]);end
-    if (p > ProbabilityBoundsAnalysis.tOp && !x.bounded[2]); return interval(x.u[end], ∞);end
+    if (p < parametersPBA.bOt && !x.bounded[1]); return interval(-∞, x.d[1]);end
+    if (p > parametersPBA.tOp && !x.bounded[2]); return interval(x.u[end], ∞);end
 
     long = x.n;
     if (tight) return (interval(x.u[Int(min.(long,(mod(p*long, 1)==0)+ceil(p*x.n)))], x.d[ Int(max.(1,ceil(p*x.n)))])) end
