@@ -1,7 +1,7 @@
 name = "ProbabilityBoundsAnalysis"
 uuid = "cd73f0b2-6f06-11ea-242f-83a09de6a7cf"
 authors = ["Ander Gray <ander.gray@liverpool.ac.uk>"]
-version = "0.2.6"
+version = "0.2.7"
 
 [deps]
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
