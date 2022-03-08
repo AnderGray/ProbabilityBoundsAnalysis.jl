@@ -64,4 +64,39 @@
 
     end
 
+    @testset "p-box comparisons" begin
+
+        a1 = U(0, 1);
+        a2 = U(1, 2);
+        a3 = U(2, 3);
+        a4 = U(0.5, 1.5);
+
+        @test a1 <= a2
+        @test 1 ∈ (a1 < a2)
+        @test 0 ∈ (a2 <= a1)
+
+        @test ~(a1 >= a3)
+        @test ~(a1 > a3)
+
+        @test interval(0.5, 1) ⊆ (a1 < a4)
+        @test interval(0.5, 1) ⊆ (a4 > a1)
+
+        @test interval(0, 0.5) ⊆ (a1 > a4)
+        @test interval(0, 0.5) ⊆ (a4 < a1)
+
+        @test <(a1, a4, corr = 1)
+        @test >(a4, a1, corr = 1)
+
+        @test <=(a1, a4, corr = 1)
+        @test >=(a4, a1, corr = 1)
+
+        @test 0.75 ∈ <(a1, a4, corr = -1)
+        @test 0.75 ∈ >(a4, a1, corr = -1)
+
+        @test 0.875 ∈ <(a1, a4, corr = 0)
+        @test 0.875 ∈ >(a4, a1, corr = 0)
+
+
+    end
+
 end

@@ -10,6 +10,9 @@
 #
 ######
 
+###
+#   Scalar and p-box comparisons
+###
 
 function <(x::pbox, y::Real)
     if x.d[end] < y; return true; end
@@ -40,15 +43,9 @@ end
 <=(x::Real, y::pbox) = y >= x
 >=(x::Real, y::pbox) = y <= x
 
-function <(x::pbox, y::pbox; corr = interval(-1,1))
-    z = conv(x, y, op = -, corr = corr)
-    return cdf(z, 0)
-end
-
-<=(x::pbox, y::pbox; corr = interval(-1,1)) = <(x::pbox, y::pbox, corr = corr)
->(x::pbox, y::pbox; corr = corr) = <(y, x, corr = corr)
->=(x::pbox, y::pbox; corr = corr) = <(y, x, corr = corr)
-
+###
+#   Interval and p-box comparisons
+###
 
 function <(x::pbox, y::Interval{T}) where T
     if x.d[end] < y.lo; return true; end
@@ -70,3 +67,44 @@ function >=(x::pbox, y::Interval{T}) where T
     z = y - x
     return cdf(z, 0)
 end
+
+###
+#   p-box and p-box comparisons
+###
+
+function <(x::pbox, y::pbox; corr = interval(-1,1))
+
+    if x.d[end] < y.u[1]; return true; end
+    if y.d[end] < x.u[1]; return false; end
+
+    z = conv(x, y, op = -, corr = corr)
+
+    val = cdf(z, 0);
+
+    if val == 1; return true; end
+    if val == 1..1; return true; end
+    if val == 0; return false; end
+    if val == 0..0; return false; end
+
+    return val
+end
+
+function <=(x::pbox, y::pbox; corr = interval(-1,1))
+
+    if x.d[end] <= y.u[1]; return true; end
+    if y.d[end] <= x.u[1]; return false; end
+
+    z = conv(x, y, op = -, corr = corr)
+
+    val = cdf(z, 0);
+
+    if val == 1; return true; end
+    if val == 1..1; return true; end
+    if val == 0; return false; end
+    if val == 0..0; return false; end
+
+    return val
+end
+
+>(x::pbox, y::pbox; corr = interval(-1,1)) = <(y, x, corr = corr)
+>=(x::pbox, y::pbox; corr = interval(-1,1)) = <(y, x, corr = corr)
