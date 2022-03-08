@@ -701,6 +701,32 @@ function reciprocate(x)
     return 1/x;
 end
 
+###
+#   Shift and multi for p-boxes and intervals
+###
+
+function shift(x :: pbox, ss :: Interval)
+    if (x.shape) ∈ (["uniform","normal","cauchy","triangular","skew-normal"]) s = x.shape; else s = ""; end
+
+    fes = interval.(x.u, x.d);
+    outs = fes .+ ss;
+
+    return pbox(left.(outs), right.(outs), shape=s, name="", bounded = x.bounded)
+end
+
+function mult(x::pbox, m :: Interval)
+   if (x.shape) ∈ (["uniform","normal","cauchy","triangular","skew-normal"]) s = x.shape; else s = ""; end
+   if ((x.shape) ∈ (["exponential","lognormal"]) && 0 <= x.u[1]) s = x.shape; else s = ""; end
+   if (m < 0) return negate(mult(x,abs(m))) end
+
+   fes = interval.(x.u, x.d);
+   outs = fes .* m;
+
+   return pbox(left.(outs), right.(outs), shape=s, name="", bounded = x.bounded)
+end
+
+
+
 function intUnivariate(x :: pbox, op, bounded = [false, false])
     Ints = interval.(x.u,x.d)
     yInts = op.(Ints)
@@ -746,22 +772,6 @@ defaultCorr = interval(-1, 1);
 *(x::AbstractPbox, y::AbstractPbox) = conv(x,y, op = *, corr = defaultCorr); # if(x==y) return x^2; ????
 /(x::AbstractPbox, y::AbstractPbox) = conv(x,y, op =/, corr = defaultCorr); # if(x==y) return 0;   ????
 
-###
-#   Conv of pboxes and intervals
-###
-
-# Probably will only need shift for + and - with reals
-+(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, op = +, corr = defaultCorr);
-+(x :: AbstractInterval, y :: AbstractPbox) = y + x;
-
--(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, op =  -, corr = defaultCorr);
--(x :: AbstractInterval, y :: AbstractPbox) = -y + x;
-
-*(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, op =  *, corr = defaultCorr);
-*(x :: AbstractInterval, y :: AbstractPbox) = y * x;
-
-/(x :: AbstractPbox, y :: AbstractInterval) = conv(x, y, op = /, corr = defaultCorr);
-/(x :: AbstractInterval, y :: AbstractPbox) = reciprocate(y) * x;
 
 ###
 #   Conv of pboxes and reals
@@ -779,7 +789,6 @@ defaultCorr = interval(-1, 1);
 
 /(x :: AbstractPbox, y :: Real) = mult(x,1/y);
 /(x :: Real, y :: AbstractPbox) = reciprocate(y) * x;
-
 
 
 ##################################################################################
