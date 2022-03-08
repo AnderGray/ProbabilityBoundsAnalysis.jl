@@ -16,22 +16,22 @@
 
         using PyPlot
 
-        @test plot(a, plotting = false) == nothing
+        @test @isdefined plot(a, plotting = false)
 
-        @test plot(a, name = "same", plotting = false) == nothing
-        @test plot(a, col = "red", plotting = false) == nothing
-        @test plot(a, alpha = 0.5, plotting = false) == nothing
-        @test plot(a, fontsize = 20, plotting = false) == nothing
-        @test plot(a, false, plotting = false) == nothing
+        @test @isdefined plot(a, name = "same", plotting = false)
+        @test @isdefined plot(a, col = "red", plotting = false)
+        @test @isdefined plot(a, alpha = 0.5, plotting = false)
+        @test @isdefined plot(a, fontsize = 20, plotting = false)
+        @test @isdefined plot(a, false, plotting = false)
 
         b = interval(2, 3)
 
-        @test plot(b, plotting = false) == nothing
-        @test plot(b, name = "same", plotting = false) == nothing
-        @test plot(b, col = "red", plotting = false) == nothing
-        @test plot(b, alpha = 0.5, plotting = false) == nothing
-        @test plot(b, fontsize = 20, plotting = false) == nothing
-        @test plot(b, false, plotting = false) == nothing
+        @test @isdefined plot(b, plotting = false)
+        @test @isdefined plot(b, name = "same", plotting = false)
+        @test @isdefined plot(b, col = "red", plotting = false)
+        @test @isdefined plot(b, alpha = 0.5, plotting = false)
+        @test @isdefined plot(b, fontsize = 20, plotting = false)
+        @test @isdefined plot(b, false, plotting = false)
 
     end
 
@@ -41,23 +41,20 @@
 
         PyPlot.ioff()
 
-        @test plot(a) == nothing
-        @test plot(a, name = "same") == nothing
-        @test plot(a, fontsize = 18, alpha = 0.7) == nothing
-        @test plotStep(a) == nothing
+        @test @isdefined plot(a)
+        @test @isdefined plot(a, name = "same")
+        @test @isdefined plot(a, fontsize = 18, alpha = 0.7)
+        @test @isdefined plotStep(a)
 
         b = N(0,1)
 
         j1 = bivpbox(b, b, a);
 
-        @test plot(j1) == nothing
+        @test @isdefined plot(j1)
 
         samps = ProbabilityBoundsAnalysis.sample(j1, 10)
 
-        using PyCall
-        out = scatter(samps)
-        @test  @isdefined out
-
+        @test @isdefined scatter(samps)
     end
 
     PyPlot.ion()
