@@ -23,4 +23,6 @@
     ProbabilityBoundsAnalysis.setVerbose(newVerbose)
     @test ProbabilityBoundsAnalysis.parametersPBA.verbose== newVerbose
 
+    @test typeof(ProbabilityBoundsAnalysis.show_parameters()) == Nothing
+
 end
