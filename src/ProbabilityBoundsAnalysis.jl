@@ -179,8 +179,8 @@ function __init__()
     @require PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee" begin
         @require PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0" begin
 
-            using PyPlot, PyCall
-            import PyPlot: plot, scatter
+            using .PyPlot, .PyCall
+            import .PyPlot: plot, scatter
 
             pyimport_conda("mpl_toolkits.mplot3d", "mpl_toolkits")
             art3d = PyObject(PyPlot.art3D)
