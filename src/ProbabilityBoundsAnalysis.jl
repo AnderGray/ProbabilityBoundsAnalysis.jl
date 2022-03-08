@@ -47,7 +47,7 @@ import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
 
 import Base: show, -,
     +, *, /, //,
-    <, >, ⊆, ^, intersect, issubset,
+    <, >, ⊆, ^, intersect, issubset, <=, >=,
     rand, sin, cos, tan, sinh, cosh, tanh, asin, acos, atan, exp, log, Threads.@spawn,
     Threads.@threads
 
@@ -134,6 +134,9 @@ export
     # Arithmetic, uniary
     negate, reciprocate, complement, shift,
 
+    # Comparisons
+    <, >, <=, >=,
+
     # Univariate functions
     sin, cos, tan, sinh, cosh, tanh, asin, acos, atan,
     exp, log, ^,
@@ -166,6 +169,7 @@ include("pbox/pbox.jl")
 include("pbox/copulas.jl")
 include("pbox/NormalDistribution.jl")
 include("pbox/arithmetic.jl")
+include("pbox/comparisons.jl")
 include("pbox/MomentTransformations.jl")
 include("pbox/distributions.jl")
 include("pbox/special.jl")
