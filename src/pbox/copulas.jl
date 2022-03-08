@@ -641,6 +641,26 @@ function CholeskyGaussian(N = 1, correlation = 0)
     return hcat(u[:,1],u[:,2])
 end
 
+###
+#   Swap variables
+###
+
+function swap(C :: copula)
+
+    cdfD_ = C.cdfD;
+    cdfU_ = C.cdfU;
+
+    is,js = size(cdfD_);
+
+    cdfD_new = zeros(size(cdfD_));
+    cdfU_new = zeros(size(cdfU_));
+
+    [cdfD_new[i,j] = cdfD_[j,i] for i = 1:is, j =1:js];
+    [cdfU_new[i,j] = cdfU_[j,i] for i = 1:is, j =1:js];
+
+    return copula(cdfD_new, cdfU_new)
+
+end
 
 ###
 #   Copula rotations. Rotates the mass by 90° (makes M -> W), 180° or 270°
