@@ -58,6 +58,10 @@
     x = makepbox.(interval.(0,1:3))
     @test all(isinterval.(x))
 
+    x = normal(0,1)
+
+    @test x(0) == cdf(x, 0)
+
 
 end
 
