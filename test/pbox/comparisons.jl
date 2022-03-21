@@ -101,7 +101,7 @@
 
     @testset "Subset checks" begin
 
-        x1 = U(0, 1)
+        x1 = U(0, 2)
         x2 = U(-1..0, 1..2)
 
         @test x1 ⊆ x2
@@ -114,6 +114,12 @@
 
         @test x4 ⊂ x2
         @test x4 ⊆ x2
+
+        x5 = U(-1, 3)
+
+        @test ~(x5 ⊂ x2)
+        @test ~(x5 ⊆ x2)
+
     end
 
 end

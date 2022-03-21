@@ -43,7 +43,7 @@ using Distributions, Interpolations, Distributed, Requires
 
 using IntervalArithmetic, Distributed, Statistics, LinearAlgebra
 
-import IntervalArithmetic: Interval, interval, AbstractInterval, isequal
+import IntervalArithmetic: Interval, interval, AbstractInterval, isequal, ⊂
 
 import Base: show, -,
     +, *, /, //,
@@ -135,7 +135,7 @@ export
     negate, reciprocate, complement, shift,
 
     # Comparisons
-    <, >, <=, >=,
+    <, >, <=, >=, ⊆, ⊂,
 
     # Univariate functions
     sin, cos, tan, sinh, cosh, tanh, asin, acos, atan,

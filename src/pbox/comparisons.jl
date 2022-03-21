@@ -112,8 +112,8 @@ end
 
 function ⊂(x::pbox, y::pbox)
 
-    if ~all(x.d .< y.d); return false; end
-    if ~all(x.u .> y.u); return false; end
+    if any(x.d .>= y.d); return false; end
+    if any(x.u .<= y.u); return false; end
 
     if ~(mean(x) ⊂ mean(y))
         @warn "not a subset due to means"
