@@ -149,7 +149,7 @@ export
 
     # Checks
     ispbox, isinterval, isscalar, isvacuous, isequal,
-    straddles, straddlingzero,
+    straddles, straddlingzero, touching, no_nesting,
 
     # Sampling and cdf
     rand, cut, cdf,
