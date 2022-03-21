@@ -191,14 +191,14 @@ end
 
     pb = pbox(samps)
 
+    pb_vec = Vector{pbox}(undef, Noutter)
     for i = 1:Noutter
-
         edf = zeros(1, Ninner);
         edf[1,:] = samps[i,:];
-        this_pb = pbox(edf)
-
-        @test this_pb ⊆ pb
+        pb_vec[i] = pbox(edf)
     end
+
+    @test all(pb_vec .⊆ pb)
 
 end
 
