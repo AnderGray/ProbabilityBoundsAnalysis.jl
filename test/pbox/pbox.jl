@@ -59,7 +59,6 @@
     @test all(isinterval.(x))
 
     x = normal(0,1)
-
     @test x(0) == cdf(x, 0)
 
 
@@ -77,6 +76,77 @@ end
     pb = pbox(mince(x, 10))
     m = mass(pb, 1.14, 100.0)
     @test m.lo ≈ 0.295 && m.hi ≈ 0.395
+end
+
+@testset "Pbox from interval data" begin
+
+    ##
+    # Checks if belief and plausibility from
+    # DSS is the same (or larger than) the p-box
+    ##
+    function test_measure(Fe, masses, U)
+        ids_lo = Fe .⊆ U
+        ids_hi = .~isempty.(Fe .∩ U)
+
+        P = interval(sum(masses[ids_lo]) , sum(masses[ids_hi]))
+        pb = mixture(Fe, masses)
+
+        P1_p = mass(pb, U)
+
+        return P ⊆ P1_p
+    end
+
+    U1 = interval(0.5, 1.7)
+    U2 = interval(1.5, 2)
+    U3 = interval(1.7, 2)
+
+    x1 = interval(1, 2)
+    x2 = interval(1.5, 2.5)
+
+    Fe1 = [x1, x2]
+
+    # Check for different masses
+    masses1 = [0.5, 0.5]
+    masses2 = [0.3, 0.7]
+    masses3 = [0.7, 0.3]
+    masses4 = [0, 1]
+
+    @test test_measure(Fe1, masses1, U1)
+    @test test_measure(Fe1, masses1, U2)
+    @test test_measure(Fe1, masses1, U3)
+
+    @test test_measure(Fe1, masses2, U1)
+    @test test_measure(Fe1, masses2, U2)
+    @test test_measure(Fe1, masses2, U3)
+
+    @test test_measure(Fe1, masses3, U1)
+    @test test_measure(Fe1, masses3, U2)
+    @test test_measure(Fe1, masses3, U3)
+
+    @test test_measure(Fe1, masses4, U1)
+    @test test_measure(Fe1, masses4, U2)
+    @test test_measure(Fe1, masses4, U3)
+
+    x3 = interval(0, 0.6)
+    x4 = interval(0, 3)
+    x5 = interval(2.3, 2.4)
+    x6 = interval(1.5, 2)
+
+    Fe2 = [x1, x2, x3, x4, x5, x6]
+
+    masses1 = ones(length(Fe2)) ./length(Fe2)
+    masses2 = [1, 2, 3, 4, 5, 6]
+    masses2 = masses2 ./sum(masses2)
+
+    @test test_measure(Fe2, masses1, U1)
+    @test test_measure(Fe2, masses1, U2)
+    @test test_measure(Fe2, masses1, U3)
+
+    @test test_measure(Fe2, masses2, U1)
+    @test test_measure(Fe2, masses2, U2)
+    @test test_measure(Fe2, masses2, U3)
+
+
 end
 
 ##
