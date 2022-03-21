@@ -72,11 +72,34 @@ end
 
 @testset "Pbox mass" begin
     # univariate pbox
+
     x = interval(1.12, 1.15)
     pb = pbox(mince(x, 10))
     m = mass(pb, 1.14, 100.0)
+
     @test m.lo ≈ 0.295 && m.hi ≈ 0.395
+
+    @test 0 ∈ mass(pb, interval(0, 1))
+    @test 1 ∈ mass(pb, interval(0, 2))
+
+    @test ~isempty(mass(pb, 0, 1.3) ∩ cdf(pb, 1.3))
+    @test ~isempty(mass(pb, 1.3, 100) ∩ (1-cdf(pb, 1.3)))
+
+    x1 = pbox(0, 1)
+    @test mass(x1, 0.2, 0.8) == 0 .. 1
+    @test mass(x1, -1, 0.8) == 0 .. 1
+    @test mass(x1, 0.8, 2) == 0 .. 1
+    @test 1 ∈ mass(x1, -1, 2)
+    @test 0 ∈ mass(x1, -10, -2)
+
+    @test mass(x1, 0.2, 0.8) == 0 .. 1
+    @test mass(x1, -1, 0.8) == 0 .. 1
+    @test mass(x1, 0.8, 2) == 0 .. 1
+    @test 1 ∈ mass(x1, -1, 2)
+    @test 0 ∈ mass(x1, -10, -2)
+
 end
+
 
 @testset "Pbox from interval data" begin
 
@@ -146,6 +169,14 @@ end
     @test test_measure(Fe2, masses2, U2)
     @test test_measure(Fe2, masses2, U3)
 
+
+    pb_mix = mixture(Fe2, masses2)
+    pb_ = pbox(Fe2, masses2)
+
+    @test pb_mix.d == pb_.d
+    @test pb_mix.u == pb_.u
+    @test mean(pb_mix) == mean(pb_)
+    @test var(pb_mix) == var(pb_)
 
 end
 

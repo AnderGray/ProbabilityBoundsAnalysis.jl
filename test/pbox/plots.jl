@@ -79,7 +79,7 @@
 
         @test @isdefined plj_2
 
-        samps_precise = rand(100)
+        samps_precise = rand(100, 2)
         plj_3  = scatter(samps_precise)
 
         @test @isdefined plj_3
