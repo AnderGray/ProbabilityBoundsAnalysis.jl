@@ -180,6 +180,28 @@ end
 
 end
 
+@testset "p-box from 2nd order Monte Carlo" begin
+
+    Noutter = 500;
+    Ninner = 1000;
+
+    samps = zeros(Noutter, Ninner)
+
+    [samps[i,:] = randn(Ninner) for i = 1:Noutter]
+
+    pb = pbox(samps)
+
+    for i = 1:Noutter
+
+        edf = zeros(1, Ninner);
+        edf[1,:] = samps[i,:];
+        this_pb = pbox(edf)
+
+        @test this_pb ⊆ pb
+    end
+
+end
+
 ##
 # pbox functions, cdf, mean, checkmoments...
 ##
