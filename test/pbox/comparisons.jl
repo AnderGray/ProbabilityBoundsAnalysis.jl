@@ -99,4 +99,21 @@
 
     end
 
+    @testset "Subset checks" begin
+
+        x1 = U(0, 1)
+        x2 = U(-1..0, 1..2)
+
+        @test x1 ⊆ x2
+        @test ~(x1 ⊂ x2)
+
+        x3 = U(-0.5, 1.5)
+        @test x3 ⊂ x2
+
+        x4 = U(-0.9 .. -0.5, 1.1..1.7)
+
+        @test x4 ⊂ x2
+        @test x4 ⊆ x2
+    end
+
 end

@@ -108,3 +108,40 @@ end
 
 >(x::pbox, y::pbox; corr = interval(-1,1)) = <(y, x, corr = corr)
 >=(x::pbox, y::pbox; corr = interval(-1,1)) = <(y, x, corr = corr)
+
+
+function ⊂(x::pbox, y::pbox)
+
+    if ~all(x.d .< y.d); return false; end
+    if ~all(x.u .> y.u); return false; end
+
+    if ~(mean(x) ⊂ mean(y))
+        @warn "not a subset due to means"
+        return false
+    end
+
+    if ~(var(x) ⊂ var(y))
+        @warn "not a subset due to variances"
+        return false
+    end
+
+    return true
+end
+
+function ⊆(x::pbox, y::pbox)
+
+    if any(x.d .> y.d); return false; end
+    if any(x.u .< y.u); return false; end
+
+    if ~(mean(x) ⊆ mean(y))
+        @warn "not a subseteq due to means"
+        return false
+    end
+
+    if ~(var(x) ⊆ var(y))
+        @warn "not a subseteq due to variance"
+        return false
+    end
+
+    return true
+end
