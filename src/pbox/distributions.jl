@@ -295,18 +295,6 @@ function envConstFunc1(Dist, i, name, shape, Bounded)
 
 end
 
-function envConstFunc3(Dist, i, j, k,  name, shape, Bounded)
-
-    a = env(
-    Sdist(Dist, left(i),  left(j),  name, shape, Bounded),
-    Sdist(Dist, right(i), right(j), name, shape, Bounded),
-    Sdist(Dist, left(i),  right(j), name, shape, Bounded),
-    Sdist(Dist, right(i), left(j),  name, shape, Bounded));
-
-    return a;
-
-end
-
 ###
 #   The dname function for parametric distributions
 ###

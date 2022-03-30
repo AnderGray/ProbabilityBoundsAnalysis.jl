@@ -133,6 +133,10 @@ using Distributions
         test_dist(lognormal(2,1), ProbabilityBoundsAnalysis.pbaLogNormal(2,1))
         test_dist(lognormal(2..3,1), ProbabilityBoundsAnalysis.pbaLogNormal(2,1))
 
+        x1 = uniform(mean = 0, std = 1..2);
+        @test mean(x1) == 0;
+        @test 1..2 ⊆ std(x1);
+
     end
 
     @testset "Parametric p-boxes - 20 steps" begin
