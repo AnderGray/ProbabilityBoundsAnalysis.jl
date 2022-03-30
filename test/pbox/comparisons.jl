@@ -122,4 +122,36 @@
 
     end
 
+    @testset "equality checks" begin
+
+        x1 = U(0, 2)
+        x2 = U(0, 2)
+
+        x3 = deepcopy(x2)
+        x3.d[end] = Inf
+
+        x4 = deepcopy(x2)
+        x4.u[1] = -Inf
+
+        x5 = deepcopy(x2)
+        x5.shape = ""
+
+        x6 = deepcopy(x2)
+        x6.ml = 0;
+
+        x7 = deepcopy(x2)
+        x7.vl = 0
+
+        x8 = N(0, 1)
+
+        @test x1 == x2
+        @test ~(x3 == x2)
+        @test ~(x4 == x2)
+        @test ~(x5 == x2)
+        @test ~(x6 == x2)
+        @test ~(x7 == x2)
+        @test ~(x8 == x2)
+
+    end
+
 end

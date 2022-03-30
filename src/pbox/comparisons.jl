@@ -145,3 +145,33 @@ function ⊆(x::pbox, y::pbox)
 
     return true
 end
+
+function ==(x::pbox, y::pbox)
+
+    if !(x.u == y.u)
+        @warn "right sides differ"
+        return false
+    end
+
+    if !(x.d == y.d)
+        @warn "left sides differ"
+        return false
+    end
+
+    if !(mean(x) == mean(y))
+        @warn "means differ"
+        return false
+    end
+
+    if !(var(x) == var(y))
+        @warn "variances differ"
+        return false
+    end
+
+    if !(x.shape == y.shape)
+        @warn "shapes differ"
+        return false
+    end
+
+    return true
+end
