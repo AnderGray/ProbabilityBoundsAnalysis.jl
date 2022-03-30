@@ -572,15 +572,6 @@ end
 ###
 #   Ferson Pbox (min - max - mean - var)
 ###
-function fersonEvalEasy(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
-
-    fer = pbox(imp(meanVar(mean,var), imp(meanmin(mean,min),meanmax(mean,max))),
-    ml = left(mean), mh = right(mean), vl = left(var), vh =right(var), bounded = [true, true])
-    fer.shape = "ferson"; fer.name = name;
-
-    return fer
-end
-
 function mmms(minimum :: Real, maximum :: Real, mean :: Real, stddev :: Real; steps = 200)
 
     if iszero(maximum - minimum); return pbox((maximum + minimum)/2); end

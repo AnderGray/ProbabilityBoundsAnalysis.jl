@@ -287,5 +287,29 @@ using Distributions
         @test x9 ⊆ x4
         @test x9 ⊆ x10
 
+        @test Chebyshev(0,1) == meanVar(0,1)
+        @test chebyshev(0,1) == meanVar(0,1)
+        @test cheb(0,1) == MeanVar(0,1)
+        @test cheb(0,1) == meanvar(0,1)
+        @test cheb(0,4) == meanStd(0,2)
+
+        @test Markov(1, 0) == meanMin(1, 0)
+        @test markov(1, 0) == MeanMin(1, 0)
+        @test markov(1, 0) == meanmin(1, 0)
+
+        @test meanMax(0, 1) == MeanMax(0, 1)
+        @test meanmax(0, 1) == MeanMax(0, 1)
+
+        @test Cantelli(0.5, 0, 1) == meanMinMax(0.5, 0, 1)
+        @test cantelli(0.5, 0, 1) == meanminmax(0.5, 0, 1)
+
+        @test mmmv(0, 10, 5, 4) == mmms(0, 10, 5, 2)
+        @test minMaxMeanVar(0, 10, 5, 4) == mmmv(0, 10, 5, 4)
+        @test Ferson(0, 10, 5, 4) == mmmv(0, 10, 5, 4)
+        @test MinMaxMeanVar(0, 10, 5, 4) == mmmv(0, 10, 5, 4)
+        @test ferson(0, 10, 5, 4) == mmmv(0, 10, 5, 4)
+        @test minmaxmeanvar(0, 10, 5, 4) == minMaxMeanVar(0, 10, 5, 4)
+        @test minMaxMeanStd(0, 10, 5, 2) == minMaxMeanVar(0, 10, 5, 4)
+
     end
 end

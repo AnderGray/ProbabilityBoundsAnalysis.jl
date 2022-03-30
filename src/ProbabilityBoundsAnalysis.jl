@@ -47,7 +47,7 @@ import IntervalArithmetic: Interval, interval, AbstractInterval, isequal, ⊂
 
 import Base: show, -,
     +, *, /, //,
-    <, >, ⊆, ^, intersect, issubset, <=, >=,
+    <, >, ⊆, ^, intersect, issubset, <=, >=, ==,
     rand, sin, cos, tan, sinh, cosh, tanh, asin, acos, atan, exp, log, Threads.@spawn,
     Threads.@threads
 
@@ -107,7 +107,7 @@ export
     KN,
 
     # Distribution free
-    meanVar, MeanVar, minvar, meanVar, meanStd,                             # Chebyshev
+    meanVar, MeanVar, meanvar, meanVar, meanStd,                             # Chebyshev
     Chebyshev, chebyshev, cheb,
 
     meanMin, MeanMin, meanmin, meanMax, MeanMax, meanmax,                   # Markov
@@ -135,7 +135,7 @@ export
     negate, reciprocate, complement, shift,
 
     # Comparisons
-    <, >, <=, >=, ⊆, ⊂,
+    <, >, <=, >=, ⊆, ⊂, ==,
 
     # Univariate functions
     sin, cos, tan, sinh, cosh, tanh, asin, acos, atan,
