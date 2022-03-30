@@ -10,13 +10,13 @@ Ngrid = 1000;
 mfunc(x,y) = min(x, y)
 wfunc(x,y) = max(x + y - 1, 0)
 
-@testset "Copula tests" begin
+@testset "Copulas" begin
 
     function test_copula(C, func)
 
         xs = range(0, 1, length = Ngrid)
 
-        @test func(0.4, 0.4) ∈ cdf(a,0.4,0.4)
+        @test func(0.4, 0.4) ∈ cdf(C,0.4,0.4)
         @test func(0.4, 0.4) ∈ C(0.4,0.4)
 
         cdfs = cdf(C, xs, xs)
@@ -87,4 +87,20 @@ wfunc(x,y) = max(x + y - 1, 0)
         test_copula(a, mfunc)
         test_copula(a, wfunc)
     end
+
+    @testset "Gaussian - interval" begin
+
+        a = GauCopula(interval(0,1))
+        test_copula(a, πfunc)
+        test_copula(a, mfunc)
+
+        a = GauCopula(interval(-1,0))
+        test_copula(a, πfunc)
+        test_copula(a, wfunc)
+
+    end
+end
+
+@testset "bivariate p-boxes" begin
+
 end
