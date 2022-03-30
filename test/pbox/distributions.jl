@@ -287,6 +287,10 @@ using Distributions
         @test x9 ⊆ x4
         @test x9 ⊆ x10
 
+        x11 = maxMeanVar(10, 0, 0.9..1)
+        x12 = uniform(mean = 0, std = 1..1)
+        @test x12 ⊆ x11
+
         @test Chebyshev(0,1) == meanVar(0,1)
         @test chebyshev(0,1) == meanVar(0,1)
         @test cheb(0,1) == MeanVar(0,1)
