@@ -100,7 +100,7 @@ export
     U, uniform,
     beta, betaPrime, biweight, cauchy,
     chi, chisq, cosine,epanechnikov, erlang,
-    exponential, fDist, frechet, gamma, ksdist,
+    exponential, fDist, gamma, ksdist,
     laplace, levy, lognormal,
 
     # C-boxes

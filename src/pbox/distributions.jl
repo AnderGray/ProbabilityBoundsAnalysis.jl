@@ -383,9 +383,6 @@ fDist(      ν1,     ν2,     name = "")      = envConstFunc(     FDist,     ν1
 gamma(      α=1,    θ=1,    name = "")      = envConstFunc(     Gamma,      α, θ, name, "gamma",        [true,false])   # http://en.wikipedia.org/wiki/Gamma_distribution
 laplace(    μ=0,    θ=1,    name = "")      = envConstFunc(     Laplace,    μ, θ, name, "laplace",      [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
 levy(       μ=0,    θ=1,    name = "")      = envConstFunc(     Levy,       μ, θ, name, "levy",         [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
-#frechet(    α=1,    θ=1,    name = "")      = envConstFunc(     Frechet,    α, θ, name, "frechet",      [true,false])   # http://en.wikipedia.org/wiki/Fréchet_distribution
-#ksdist(     n,              name = "")      = envConstFunc1(    KSDist,     n,    name, "ksdist",       [true,true])
-#erlang(     α=1,    β=1,    name = "")      = envConstFunc(     Erlang,     α, β, name, "erlang",       [true,false])   # http://en.wikipedia.org/wiki/Erlang_distribution
 
 function pbaLogNormal(m, std)
     γ = 1+std^2/m^2

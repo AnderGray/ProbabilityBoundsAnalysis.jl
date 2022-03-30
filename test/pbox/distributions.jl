@@ -121,9 +121,6 @@ using Distributions
         test_dist(fDist(2, 3), FDist(2, 3))
         test_dist(fDist(2..3, 3), FDist(2, 3))
 
-        test_dist(frechet(1, 1), Frechet(1, 1))
-        test_dist(frechet(1..2, 1), Frechet(1, 1))
-
         test_dist(gamma(1, 1), Gamma(1, 1))
         test_dist(gamma(1, 1..2), Gamma(1, 1))
 
@@ -202,9 +199,26 @@ using Distributions
     end
 
 
-    # Distribution Free constructors need alot of test
-    #
+    @testset "c-boxes" begin
+
+        @test_throws ArgumentError KN(-1, 2)
+        @test_throws ArgumentError KN(3, 2)
+
+        @test all(KN(0, 0).d .== 1)
+        @test all(KN(0, 0).u .== 0)
+
+        @test all(KN(0, 1).u .== 0)
+        @test all(KN(1, 1).d .== 1)
+
+        @test all(KN(0, 1..2).u .== 0)
+        @test all(KN(0..1, 1).d .== 1)
+
+    end
+
+    @testset "Distribution-free p-boxes" begin
 
 
+
+    end
 
 end
