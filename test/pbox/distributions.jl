@@ -133,13 +133,6 @@ using Distributions
         test_dist(lognormal(2,1), ProbabilityBoundsAnalysis.pbaLogNormal(2,1))
         test_dist(lognormal(2..3,1), ProbabilityBoundsAnalysis.pbaLogNormal(2,1))
 
-        ### Broken
-        #test_dist(frechet(1, 1), Frechet(1, 1))
-        #test_dist(frechet(1..2, 1), Frechet(1, 1))
-        #test_dist(ksdist(2), KSDist(2))
-
-        #test_dist(erlang(1,1), Erlang(1,1))
-        #test_dist(erlang(1..2,1), Erlang(1,1))
     end
 
     @testset "Parametric p-boxes - 20 steps" begin
@@ -215,10 +208,80 @@ using Distributions
 
     end
 
-    @testset "Distribution-free p-boxes" begin
+    @testset "Moment constraints" begin
+
+        moms = checkMomentsAndRanges(0, 2)
+
+        @test moms[1].lo == 0  # min
+        @test moms[2].hi == 2  # max
+        @test moms[3] == 0..2  # mean
+        @test moms[4] == 0..1  # var
+
+        moms = checkMomentsAndRanges(0, 2, 0.5)
+
+        @test moms[3] == 0.5  # mean
+        @test moms[4] == 0..0.75  # var
+
+        moms = checkMomentsAndRanges(0, 2, 0.5, 0.5)
+
+        @test moms[3] == 0.5  # mean
+        @test moms[4] == 0.5  # var
+
+        @test_throws ArgumentError checkMomentsAndRanges(2, 0)
+        @test_throws ArgumentError checkMomentsAndRanges(0, 2, interval(3, 4))
+        @test_throws ArgumentError checkMomentsAndRanges(0, 2, 1, 10)
 
 
+        # checks if mean is reduced
+        @test checkMomentsAndRanges(0, 2, interval(1, 4))[3] == interval(1, 2)
 
+        # checks if var is reduced
+        @test checkMomentsAndRanges(0, 2, 0.5, interval(0.5, 10))[4] == interval(0.5, 0.75)
     end
 
+    @testset "Distribution-free p-boxes" begin
+
+        x1 = meanVar(0, 1)
+        @test mean(x1) == 0
+        @test var(x1) == 1
+
+        x2 = meanVar(-0.5..0.5, 1..2)
+        @test mean(x2) == interval(-0.5, 0.5)
+        @test var(x2) == interval(1..2)
+
+        @test x1 ⊆ x2
+
+        x3 = meanMin(3, 0)
+
+        @test mean(x3) == 3
+        @test x3.u[1] == 0
+
+        x4 = meanMin(interval(2,4), 0..1)
+
+        @test mean(x4) == 2..4
+        @test x4.u[1] == 0
+
+        @test x3 ⊆ x4
+
+        x5 = meanMinMax(3, 0, 5)
+        @test x5 ⊆ x3
+
+        x6 = meanMinMax(2..4, 0, 5)
+        @test x5 ⊆ x6
+        @test x6 ⊆ x4
+
+        x7 = minMeanVar(0, 3, 0.5)
+        @test x7 ⊆ x3
+
+        x8 = minMeanVar(0, 2..4, 0.5..1)
+        @test x7 ⊆ x8
+        @test x8 ⊆ x4
+
+        x9 = minMaxMeanVar(0, 6, 3, 0.5)
+        x10 = meanMax(3, 6)
+        @test x9 ⊆ x8
+        @test x9 ⊆ x4
+        @test x9 ⊆ x10
+
+    end
 end

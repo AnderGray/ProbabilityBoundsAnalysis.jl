@@ -461,7 +461,7 @@ end
 
 Chebyshev(x...) = meanVar(x...);    chebyshev(x...) = meanVar(x...);
 cheb(x...)      = meanVar(x...);    MeanVar(x...)   = meanVar(x...);
-minvar(x...)    = meanVar(x...);
+meanvar(x...)    = meanVar(x...);
 
 meanStd(mean,std, name = "") = meanVar(mean, std^2, name)
 
