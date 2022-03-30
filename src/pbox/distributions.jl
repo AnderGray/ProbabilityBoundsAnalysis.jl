@@ -267,20 +267,6 @@ end
 #   Other Parametric distribution constructors
 ###
 
-#=
-function Sbeta(α, β, name="")
-
-    a = Beta(α, β);
-    m = mean(a); v = var(a);
-
-    return pbox(quantile.(a,ii()), quantile.(a,jj()), shape="beta", name=name, ml=m, mh=m, vl=v, vh=v)
-
-end
-
-beta(α, β, x...) = envConst(Sbeta, α, β, x...)
-=#
-
-
 ###
 #   Constructs a pbox from a parametric distribution. Takes endpoints of given intervals.
 #   Will work for all parametric functions up to 2 parameter. And if pbox is envelope of endpoints
@@ -392,14 +378,14 @@ chi(        k,              name = "")      = envConstFunc1(    Chi,        k,  
 chisq(      k,              name = "")      = envConstFunc1(    Chisq,      k,    name, "chusq",        [true,false])   # http://en.wikipedia.org/wiki/Chi-squared_distribution
 cosine(     α,      β,      name = "")      = envConstFunc(     Cosine,     α, β, name, "cosine",       [true,true])    # http://en.wikipedia.org/wiki/Raised_cosine_distribution
 epanechnikov(α,     β,      name = "")      = envConstFunc(     Epanechnikov, α, β, name, "epanechnikov",[true,true])
-erlang(     α=1,    β=1,    name = "")      = envConstFunc(     Erlang,     α, β, name, "erlang",       [true,false])   # http://en.wikipedia.org/wiki/Erlang_distribution
 exponential(θ=1,            name = "")      = envConstFunc1(    Exponential, θ,   name, "exponential",  [true,false])   # http://en.wikipedia.org/wiki/Exponential_distribution
 fDist(      ν1,     ν2,     name = "")      = envConstFunc(     FDist,     ν1,ν2, name, "fDist",        [true,false])   # http://en.wikipedia.org/wiki/F-distribution
-frechet(    α=1,    θ=1,    name = "")      = envConstFunc(     Frechet,    α, θ, name, "frechet",      [true,false])   # http://en.wikipedia.org/wiki/Fréchet_distribution
 gamma(      α=1,    θ=1,    name = "")      = envConstFunc(     Gamma,      α, θ, name, "gamma",        [true,false])   # http://en.wikipedia.org/wiki/Gamma_distribution
-ksdist(     n,              name = "")      = envConstFunc1(    KSDist,     n,    name, "ksdist",       [true,true])
 laplace(    μ=0,    θ=1,    name = "")      = envConstFunc(     Laplace,    μ, θ, name, "laplace",      [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
 levy(       μ=0,    θ=1,    name = "")      = envConstFunc(     Levy,       μ, θ, name, "levy",         [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
+#frechet(    α=1,    θ=1,    name = "")      = envConstFunc(     Frechet,    α, θ, name, "frechet",      [true,false])   # http://en.wikipedia.org/wiki/Fréchet_distribution
+#ksdist(     n,              name = "")      = envConstFunc1(    KSDist,     n,    name, "ksdist",       [true,true])
+#erlang(     α=1,    β=1,    name = "")      = envConstFunc(     Erlang,     α, β, name, "erlang",       [true,false])   # http://en.wikipedia.org/wiki/Erlang_distribution
 
 function pbaLogNormal(m, std)
     γ = 1+std^2/m^2
@@ -692,24 +678,6 @@ minMaxMeanVar(minimum :: Real, maximum :: Real, mean :: Real, var :: Real; steps
 minMaxMeanStd(minimum :: Real, maximum :: Real, mean :: Real, std :: Real; steps = 200) = mmmv(minimum , maximum , mean, std^2; steps = steps)
 
 
-#=
-function minMaxMeanVar(min = 0, max = 1, mean = 0.5, var = 0.1, name = "")
-
-    min1,max1,mean1,var1 = checkMomentsAndRanges(min,max,mean,var);
-
-    if all(!isa([mean, var], Interval));
-        return fersonEvalEasy(left(min),right(max),mean,var,name);
-    end
-
-    Envelope = env(
-        fersonEvalEasy(left(min1), right(max1), left(mean1), right(var1)),            # pba.r has it like this (left(var) not used?)
-        fersonEvalEasy(left(min1), right(max1), right(mean1), right(var1)),
-    )
-    Envelope.shape = "ferson"; Envelope.name = name;
-    return Envelope
-
-end
-=#
 Ferson(x...)        = minMaxMeanVar(x...);         ferson(x...) = minMaxMeanVar(x...);
 MinMaxMeanVar(x...) = minMaxMeanVar(x...);  minmaxmeanvar(x...) = minMaxMeanVar(x...);
 

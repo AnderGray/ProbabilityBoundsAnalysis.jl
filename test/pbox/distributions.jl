@@ -9,7 +9,35 @@ using Distributions
 
 @testset "Distributions" begin
 
-    Nsamples = 5000; Ncdf = 5000;
+    Nsamples = 1000; Ncdf = 1000;
+
+    function test_dist(x :: pbox, a)
+
+        samps = rand(Nsamples);
+
+        @test length(x.d) == ProbabilityBoundsAnalysis.parametersPBA.steps
+
+        pbaSamples = cut.(x,samps);
+        distSamps  = quantile.(a,samps);
+
+        @test all( distSamps .∈ pbaSamples )
+
+        testVals = range(left(x), stop = right(x),length = Ncdf)
+        cdfPba = cdf.(x, testVals);
+        cdfDis = cdf.(a, testVals);
+
+        @test all( cdfDis .∈ cdfPba)
+
+        EndPoints = rand(Nsamples,2) .* (right(x) .- left(x)) .+ left(x);
+        EndPoints = sort(EndPoints, dims = 2);
+
+        massInts = interval.(EndPoints[:,1], EndPoints[:,2])
+        massPba = mass.(x,massInts)
+        massDis = cdf.(a,EndPoints[:,2]) .- cdf.(a, EndPoints[:,1])
+
+        @test all( massDis .∈ massPba)
+
+    end
 
     @testset "Set based operations" begin
 
@@ -55,113 +83,128 @@ using Distributions
 
     end
 
-    @testset "Normal" begin
+    @testset "Parametric p-boxes - 200 steps" begin
 
-        x = normal(interval(0,1),interval(1,2));
+        test_dist(normal(0,1), Normal(0,1))
+        test_dist(normal(0..1, 1..2), Normal(0,1))
 
-        @test mean(x) == interval(0,1);
-        @test var(x) == interval(1,2)^2;
-        @test x.shape == "normal"
-        @test all( map(!,x.bounded))
+        test_dist(uniform(0, 1), Uniform(0,1))
+        test_dist(uniform(0..0.5, 1..1), Uniform(0,1))
 
-        x = normal(0,1);
-        a = Normal(0,1);
+        test_dist(beta(2,3), Beta(2, 3))
+        test_dist(beta(2..3, 3..4), Beta(2, 3))
 
-        samps = rand(Nsamples);
+        test_dist(betaPrime(2, 3), BetaPrime(2, 3))
+        test_dist(betaPrime(2..3, 3..4), BetaPrime(2, 3))
 
-        pbaSamples = cut.(x,samps);
-        distSamps  = quantile.(a,samps);
+        test_dist(biweight(1,2), Biweight(1, 2))
+        test_dist(biweight(1..2,2..2), Biweight(1, 2))
 
-        @test all( distSamps .∈ pbaSamples )
+        test_dist(cauchy(0, 1), Cauchy(0, 1))
+        test_dist(cauchy(0..0.5, 1), Cauchy(0, 1))
 
-        testVals = range(left(x), stop = right(x),length = Ncdf)
-        cdfPba = cdf.(x, testVals);
-        cdfDis = cdf.(a, testVals);
+        test_dist(chi(1), Chi(1))
+        test_dist(chi(1..2), Chi(1))
 
-        @test all( cdfDis .∈ cdfPba)
+        test_dist(chisq(1), Chisq(1))
+        test_dist(chisq(1..2), Chisq(1))
 
-        EndPoints = rand(Nsamples,2) .* (right(x) .- left(x)) .+ left(x);
-        EndPoints = sort(EndPoints, dims = 2);
+        test_dist(cosine(1,2), Cosine(1,2))
+        test_dist(cosine(1..2,2), Cosine(1,2))
 
-        massInts = interval.(EndPoints[:,1], EndPoints[:,2])
-        massPba = mass.(x,massInts)
-        massDis = cdf.(a,EndPoints[:,2]) .- cdf.(a, EndPoints[:,1])
+        test_dist(epanechnikov(1,2), Epanechnikov(1,2))
+        test_dist(epanechnikov(1..2,2), Epanechnikov(1,2))
 
-        @test all( massDis .∈ massPba)
+        test_dist(exponential(1), Exponential(1))
+        test_dist(exponential(1..2), Exponential(1))
+
+        test_dist(fDist(2, 3), FDist(2, 3))
+        test_dist(fDist(2..3, 3), FDist(2, 3))
+
+        test_dist(frechet(1, 1), Frechet(1, 1))
+        test_dist(frechet(1..2, 1), Frechet(1, 1))
+
+        test_dist(gamma(1, 1), Gamma(1, 1))
+        test_dist(gamma(1, 1..2), Gamma(1, 1))
+
+        test_dist(laplace(0, 1), Laplace(0, 1))
+        test_dist(laplace(0..1, 1), Laplace(0, 1))
+
+        test_dist(levy(0, 1), Levy(0, 1))
+        test_dist(levy(0..1, 1), Levy(0, 1))
+
+        test_dist(lognormal(2,1), ProbabilityBoundsAnalysis.pbaLogNormal(2,1))
+        test_dist(lognormal(2..3,1), ProbabilityBoundsAnalysis.pbaLogNormal(2,1))
+
+        ### Broken
+        #test_dist(frechet(1, 1), Frechet(1, 1))
+        #test_dist(frechet(1..2, 1), Frechet(1, 1))
+        #test_dist(ksdist(2), KSDist(2))
+
+        #test_dist(erlang(1,1), Erlang(1,1))
+        #test_dist(erlang(1..2,1), Erlang(1,1))
+    end
+
+    @testset "Parametric p-boxes - 20 steps" begin
+
+        ProbabilityBoundsAnalysis.setSteps(20)
+
+        test_dist(normal(0,1), Normal(0,1))
+        test_dist(normal(0..1, 1..2), Normal(0,1))
+
+        test_dist(uniform(0, 1), Uniform(0,1))
+        test_dist(uniform(0..0.5, 1..1), Uniform(0,1))
+
+        test_dist(beta(2,3), Beta(2, 3))
+        test_dist(beta(2..3, 3..4), Beta(2, 3))
+
+        test_dist(betaPrime(2, 3), BetaPrime(2, 3))
+        test_dist(betaPrime(2..3, 3..4), BetaPrime(2, 3))
+
+        test_dist(biweight(1,2), Biweight(1, 2))
+        test_dist(biweight(1..2,2..2), Biweight(1, 2))
+
+        test_dist(cauchy(0, 1), Cauchy(0, 1))
+        test_dist(cauchy(0..0.5, 1), Cauchy(0, 1))
+
+        test_dist(chi(1), Chi(1))
+        test_dist(chi(1..2), Chi(1))
+
+        test_dist(chisq(1), Chisq(1))
+        test_dist(chisq(1..2), Chisq(1))
+
+        test_dist(cosine(1,2), Cosine(1,2))
+        test_dist(cosine(1..2,2), Cosine(1,2))
+
+        test_dist(epanechnikov(1,2), Epanechnikov(1,2))
+        test_dist(epanechnikov(1..2,2), Epanechnikov(1,2))
+
+        test_dist(exponential(1), Exponential(1))
+        test_dist(exponential(1..2), Exponential(1))
+
+        test_dist(fDist(2, 3), FDist(2, 3))
+        test_dist(fDist(2..3, 3), FDist(2, 3))
+
+        test_dist(gamma(1, 1), Gamma(1, 1))
+        test_dist(gamma(1, 1..2), Gamma(1, 1))
+
+        test_dist(laplace(0, 1), Laplace(0, 1))
+        test_dist(laplace(0..1, 1), Laplace(0, 1))
+
+        test_dist(levy(0, 1), Levy(0, 1))
+        test_dist(levy(0..1, 1), Levy(0, 1))
+
+        test_dist(lognormal(2,1), ProbabilityBoundsAnalysis.pbaLogNormal(2,1))
+        test_dist(lognormal(2..3,1), ProbabilityBoundsAnalysis.pbaLogNormal(2,1))
+
+        ProbabilityBoundsAnalysis.setSteps(200)
 
     end
 
-    @testset "Uniform" begin
-
-    x = U(interval(0,1),interval(1,2));
-
-    @test x.u[1] == 0;
-    @test x.d[end] == 2;
-    @test x.shape == "uniform"
-    @test all(x.bounded)
-
-    x = uniform(0,1);
-    a = Uniform(0,1);
-
-    samps = rand(Nsamples);
-
-    pbaSamples = cut.(x,samps);
-    distSamps  = quantile.(a,samps);
-
-    @test all( distSamps .∈ pbaSamples )
-
-    testVals = range(left(x), stop = right(x),length = Ncdf)
-    cdfPba = cdf.(x, testVals);
-    cdfDis = cdf.(a, testVals);
-
-    @test all( cdfDis .∈ cdfPba)
-
-    EndPoints = rand(Nsamples,2) .* (right(x) .- left(x)) .+ left(x);
-    EndPoints = sort(EndPoints, dims = 2);
-
-    massInts = interval.(EndPoints[:,1], EndPoints[:,2])
-    massPba = mass.(x,massInts)
-    massDis = cdf.(a,EndPoints[:,2]) .- cdf.(a, EndPoints[:,1])
-
-    @test all( massDis .∈ massPba)
-
-    end
-
-    @testset "Beta" begin
-
-    x = beta(interval(1,3),interval(1,2));
-
-    @test x.shape == "beta"
-
-    x = uniform(0,1);
-    a = Uniform(0,1);
-
-    samps = rand(Nsamples);
-
-    pbaSamples = cut.(x,samps);
-    distSamps  = quantile.(a,samps);
-
-    @test all( distSamps .∈ pbaSamples )
-
-    testVals = range(left(x), stop = right(x),length = Ncdf)
-    cdfPba = cdf.(x, testVals);
-    cdfDis = cdf.(a, testVals);
-
-    @test all( cdfDis .∈ cdfPba)
-
-    EndPoints = rand(Nsamples,2) .* (right(x) .- left(x)) .+ left(x);
-    EndPoints = sort(EndPoints, dims = 2);
-
-    massInts = interval.(EndPoints[:,1], EndPoints[:,2])
-    massPba = mass.(x,massInts)
-    massDis = cdf.(a,EndPoints[:,2]) .- cdf.(a, EndPoints[:,1])
-
-    @test all( massDis .∈ massPba)
-
-    end
 
     # Distribution Free constructors need alot of test
     #
+
 
 
 end
