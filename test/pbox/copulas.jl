@@ -5,7 +5,7 @@
 #
 ######
 
-using ProbabilityBoundsAnalysis: Frechet
+using ProbabilityBoundsAnalysis: Frechet, massD, massU
 
 Ngrid = 1000;
 πfunc(x,y) = x*y
