@@ -404,7 +404,7 @@ Pi() = πCop()
 
 function Frank(s = 1)                       #   s is real; inf for perfect, 0 for indep, -inf for opposite
 
-    if !(s ∈ interval(-Inf,Inf))  && s != -Inf && s != Inf; throw(ArgumentError("coefficient must be ∈ [-Inf, Inf]\n $s ∉ [-Inf, Inf]"));end
+    if !(s ∈ interval(-Inf,Inf)); throw(ArgumentError("coefficient must be ∈ [-Inf, Inf]\n $s ∉ [-Inf, Inf]"));end
 
     if s == -Inf         # Limit should be set earlier
         C = W()
@@ -428,7 +428,7 @@ end
 
 function Frank(s :: Interval)
 
-    if !(s ⊆ interval(-Inf,Inf)); throw(ArgumentError("coefficient must be ⊆ [-Inf, Inf]\n $s ⊄ [-Inf, Inf]"));end
+    if !(s ⊆ interval(-Inf,Inf)) && s != -Inf && s != Inf; throw(ArgumentError("coefficient must be ⊆ [-Inf, Inf]\n $s ⊄ [-Inf, Inf]"));end
 
     lb = Frank(s.lo);
     ub = Frank(s.hi);
@@ -504,17 +504,7 @@ function GauCopula(r :: Interval)
     return copula(envelope.cdfU, envelope.cdfD, family= "Gaussian", param = r)
 end
 
-function Frechet()
-
-    n = parametersPBA.steps
-    x = range(0,stop = 1,length = n);
-
-    cdfU = [perf(xs,ys) for xs in x, ys in x]
-    cdfD = [opp(xs,ys) for xs in x, ys in x]
-
-    return copula(cdfU, cdfD, family = "Frechet");
-end
-
+Frechet() = env(W(), M())
 
 function τCopula( τ = 0 )   # Imprecise copula from kendal tau
 

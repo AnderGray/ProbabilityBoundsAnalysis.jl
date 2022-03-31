@@ -56,8 +56,8 @@ function test_copula(C, func)
     cop_massesD = [massD(C, interval(0, x), interval(0, y)) for x in xs, y in xs]
 
     @test all(real_vals .∈ cop_masses)
-    @test all(real_vals .∈ cop_massesU)
-    @test all(real_vals .∈ cop_massesD)
+    @test all(cop_massesU .⊆ cop_masses)
+    @test all(cop_massesD .⊆ cop_masses)
 end
 
 @testset "Copulas" begin
