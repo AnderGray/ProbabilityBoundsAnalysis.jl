@@ -404,7 +404,7 @@ Pi() = πCop()
 
 function Frank(s = 1)                       #   s is real; inf for perfect, 0 for indep, -inf for opposite
 
-    if !(s ∈ interval(-Inf,Inf)); throw(ArgumentError("coefficient must be ∈ [-Inf, Inf]\n $s ∉ [-Inf, Inf]"));end
+    if !(s ∈ interval(-Inf,Inf))  && s != -Inf && s != Inf; throw(ArgumentError("coefficient must be ∈ [-Inf, Inf]\n $s ∉ [-Inf, Inf]"));end
 
     if s == -Inf         # Limit should be set earlier
         C = W()
@@ -441,7 +441,7 @@ end
 
 function Clayton(t = 0)                     #   t>-1; -1 for opposite, 0 for indep and inf for perfect
 
-    if !(t ∈ interval(-1,Inf)); throw(ArgumentError("coefficient must be ∈ [-1, Inf]\n $t ∉ [-1, Inf]"));end
+    if !(t ∈ interval(-1,Inf)) && t != Inf; throw(ArgumentError("coefficient must be ∈ [-1, Inf]\n $t ∉ [-1, Inf]"));end
 
     if t == 0
         C = πCop()
