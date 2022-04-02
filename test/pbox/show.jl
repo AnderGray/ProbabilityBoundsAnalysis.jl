@@ -27,7 +27,7 @@ end
     @test replstr(x2) == "Copula ~ Gaussian(r = 0)"
 
     x3 = GauCopula(interval(0, 1))
-    @test replstr(x2) == "Imp Copula ~ Gaussian(r = [0, 1])"
+    @test replstr(x3) == "Imp Copula ~ Gaussian(r = [0, 1])"
 
 end
 
