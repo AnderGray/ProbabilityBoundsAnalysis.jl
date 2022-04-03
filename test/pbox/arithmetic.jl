@@ -186,4 +186,40 @@
         end
     end
 
+    @testset "Partially known dependence" begin
+
+        x1 = U(1, 3)
+        x2 = N(10, 1)
+
+        ops = [+, *, min, max];
+
+        Cs = Vector{copula}(undef, 9)
+
+        Cs[1] = M()
+        Cs[5] = πCop()
+        Cs[end] = W()
+
+        corrs = [0.8, 0.5, 0.2, -0.2, -0.5, -0.8]
+        Gs = GauCopula.(corrs)
+
+        Cs[2:4] = Gs[1:3]
+        Cs[6:8] = Gs[4:end]
+
+        for op in ops
+
+            partial = [tauRho(x1, x2, op = op, C = C) for C in Cs]
+            precise = [sigma(x1, x2, op = op, C = C) for C in Cs]
+
+            precise[1] = convPerfect(x1, x2, op = op)
+            precise[end] = convOpposite(x1, x2, op = op)
+
+            for i = 1:length(partial)
+                for j = 1:i
+                    @test imp(precise[j], partial[i]) ⊆ partial[i]
+                    @test partial[j] ⊆ partial[i]
+                end
+            end
+
+        end
+    end
 end
