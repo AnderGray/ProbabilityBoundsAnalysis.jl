@@ -9,7 +9,7 @@ using Distributions
 
 @testset "Distributions" begin
 
-    Nsamples = 1000; Ncdf = 1000;
+    Nsamples = 101; Ncdf = 101;
 
     function test_dist(x :: pbox, a)
 
