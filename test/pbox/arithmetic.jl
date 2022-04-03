@@ -219,7 +219,6 @@
                     @test partial[j] ⊆ partial[i]
                 end
             end
-
         end
     end
 end

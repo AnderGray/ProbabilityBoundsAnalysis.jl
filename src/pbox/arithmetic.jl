@@ -319,7 +319,6 @@ function calcSigmaBoundRight(x, y , op,  C, bounded)
 
 end
 
-
 function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
 
     #if (op == -) return (tauRho(x, negate(y), rotate(C), +));end             # Odd behaviour, negating has no effect if we don't do something to copula
@@ -354,22 +353,17 @@ function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
         downs = findall( cop .>= js[end + 1 - i] );
         ups   = findall( dual .<= is[i] );
 
-
         if !isempty(downs);
             zd[i] = minimum(zds[downs]);
             deleteat!(cop, downs);
             deleteat!(zds, downs);
         else zd[i] = zd[i-1]; end
 
-
         if !isempty(ups);
             zu[i]   = maximum(zus[ups]);
             deleteat!(dual, ups);
             deleteat!(zus, ups);
         else zu[i]   = zu[i-1]; end
-
-
-
     end
 
     bounded = min(x.bounded,y.bounded);
@@ -377,162 +371,7 @@ function tauRho(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
     zd = reverse(zd)
 
     return pbox(zu, zd, bounded = bounded);
-
 end
-
-function tauRhoOld2(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
-
-    #if (op == -) return (tauRho(x, negate(y), rotate(C), +));end             # Odd behaviour, negating has no effect if we don't do something to copula
-    #if (op == /) return (tauRho(x, reciprocate(y), rotate(C), *));end
-    #if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (throw(ArgumentError("Not sure if straddles"))); end; end
-    ## Unsure about the above line. It looks like if it straddles 0, we need to do the naive frechet and the balch prod (?) and impose one on the other
-
-    x = makepbox(x);
-    y = makepbox(y);
-
-    Ns = parametersPBA.steps
-
-    zd = zeros(Ns);
-    zu = zeros(Ns);
-
-    zds = [map(op, dx, dy) for dx in x.d, dy in y.d]        # Carteesian products
-    zus = [map(op, ux, uy) for ux in x.u, uy in y.u]
-
-    is = range(0, stop = 1, length = Ns); js = range(0, stop = 1, length = Ns)
-
-    cop = C.cdfD;
-    dual = [is[i] + js[j] - cop[i,j] for i in 1:Ns, j in 1:Ns]
-
-    downs = findall(cop .== 1); ups = findall(dual .== 0);
-
-    zd[end] = minimum(zds[downs]); zu[1] = maximum(zus[ups])
-
-    for i = 2:Ns
-
-        downs = findall( is[i-1] .< cop .<= is[i]);
-        ups   = findall( js[i-1] .<= dual .<= js[i]);
-
-        zd[i-1] = minimum(zds[downs]);
-        zu[i]   = maximum(zus[ups]);
-
-    end
-
-    bounded = min(x.bounded,y.bounded);
-    return pbox(zu, zd, bounded = bounded);
-end
-
-
-function tauRhoNew(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
-
-    #if (op == -) return (tauRho(x, negate(y), rotate(C), +));end             # Odd behaviour, negating has no effect if we don't do something to copula
-    #if (op == /) return (tauRho(x, reciprocate(y), rotate(C), *));end
-    #if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (throw(ArgumentError("Not sure if straddles"))); end; end
-    ## Unsure about the above line. It looks like if it straddles 0, we need to do the naive frechet and the balch prod (?) and impose one on the other
-
-    x = makepbox(x);
-    y = makepbox(y);
-
-    Ns = parametersPBA.steps
-
-    zd = zeros(Ns);
-    zu = zeros(Ns);
-
-    zds = [map(op, dx, dy) for dx in x.d, dy in y.d]        # Carteesian products
-    zus = [map(op, ux, uy) for ux in x.u, uy in y.u]
-
-    is = range(0, stop = 1, length = Ns); js = range(0, stop = 1, length = Ns)
-
-    #is = reverse(is)
-
-    cop = C.cdfD;
-    dual = [is[i] + js[j] - cop[i,j] for i in 1:Ns, j in 1:Ns]
-
-    cop = cop[:]
-    dual = dual[:]
-
-    zds = zds[:]
-    zus = zus[:]
-
-    downs = findall(cop .== 1); ups = findall(dual .== 0);
-
-    zd[end] = minimum(zds[downs]); zu[1] = maximum(zus[ups])
-
-    deleteat!(cop, downs)
-    deleteat!(dual, ups)
-
-    deleteat!(zds, downs)
-    deleteat!(zus, ups)
-
-
-    for i = 2:Ns
-
-        downs = findall( cop .<= is[i]);
-        ups   = findall( dual .< js[i]);
-
-        if !isempty(downs);
-            zd[i-1] = minimum(zds[downs]);
-            deleteat!(cop, downs);
-            deleteat!(zds, downs);
-        elseif i!=2; zd[i-1] = zd[i-2]; end
-
-        if !isempty(ups);
-            zu[i]   = maximum(zus[ups]);
-            deleteat!(dual, ups);
-            deleteat!(zus, ups);
-        else zu[i]   = zu[i-1]; end
-
-    end
-
-    bounded = min(x.bounded,y.bounded);
-
-    return pbox(zu, zd, bounded = bounded);
-
-end
-
-function tauRho2(x::Real, y::Real, C:: AbstractCopula, op = +)
-
-    #if (op == -) return (tauRho(x,negate(y), C, +));end             # Odd behaviour, negating has no effect if we don't do something to copula
-    #if (op == /) return (tauRho(x,reciprocate(y), C, *));end
-    #if (op == *) if (straddlingzero(x) || straddlingzero(y)) return (throw(ArgumentError("Not sure if straddles"))); end; end
-    ## Unsure about the above line. It looks like if it straddles 0, we need to do the naive frechet and the balch prod (?) and impose one on the other
-
-    x = makepbox(x);
-    y = makepbox(y);
-
-    Ns = parametersPBA.steps
-
-    zd = zeros(Ns);
-    zu = zeros(Ns);
-
-    zds = [map(op, dx, dy) for dx in x.d, dy in reverse(y.d)]        # Carteesian products
-    zus = [map(op, ux, uy) for ux in x.u, uy in reverse(y.u)]
-
-    is = range(0, stop = 1, length = Ns); js = range(0, stop = 1, length = Ns)
-
-    cop = C.cdf;
-    dual = [is[i] + js[j] - cop[i,j] for i in 1:Ns, j in 1:Ns]
-
-    downs = findall(cop .== 1); ups = findall(dual .== 0);
-
-    zd[end] = minimum(zds[downs]); zu[1] = maximum(zus[ups])
-
-    for i = 2:Ns
-
-        downs = findall( is[i-1] .<= cop .<= is[i]);
-        ups   = findall(js[i-1] .<= dual .<= js[i]);
-
-        zd[i-1] = minimum(zds[downs]);
-        zu[i]   = maximum(zus[ups]);
-
-    end
-
-    bounded = min(x.bounded,y.bounded);
-
-    return pbox(zu, zd, bounded=bounded);
-
-end
-
-
 
 ###
 #   Scalars and some univariate functions
