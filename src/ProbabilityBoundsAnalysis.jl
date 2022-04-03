@@ -170,7 +170,6 @@ include("pbox/copulas.jl")
 include("pbox/NormalDistribution.jl")
 include("pbox/arithmetic.jl")
 include("pbox/comparisons.jl")
-include("pbox/MomentTransformations.jl")
 include("pbox/distributions.jl")
 include("pbox/special.jl")
 
