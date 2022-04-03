@@ -119,8 +119,6 @@ function convPerfect(x::pbox, y::pbox; op = +)
         cd = map(op, x.d[:], y.d[:]);
     end
 
-    #cu = map(op, x.u[:],y.u[:]);
-    #cd = map(op, x.d[:],y.d[:]);
     scu = sort(cu);
     scd = sort(cd);
 
@@ -145,8 +143,6 @@ function convOpposite(x::pbox, y::pbox; op = +)
         cd = map(op, x.d[:], y.d[end:-1:1]);
     end
 
-    #cu = map(op, x.u[:], y.u[end:-1:1]);
-    #cd = map(op, x.d[:], y.d[end:-1:1]);
     scu = sort(cu);
     scd = sort(cd);
 
@@ -193,12 +189,6 @@ function convFrechet(x::pbox, y::pbox; op = +)
     vl = 0;
     vh = Inf;
 
-    if (op)∈([+,-])                 # Was commented below, can include onve mom prop is finished
-        #zv = env(xv+yv-2* sqrt(xv*yv), xv+yv+2* sqrt(xv*yv))
-        # vh <- x@v+y@v - 2*sqrt(x@v*y@v)
-        # vl <- x@v+y@v + 2*sqrt(x@v*y@v)
-    end
-
     bounded = min(x.bounded,y.bounded);
     return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, bounded=bounded);
 end
@@ -212,9 +202,6 @@ function sigma(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
 
     #if (op == -) return sigma(x, negate(y), op=+, C = C); end
     #if (op == /) return sigma(x, reciprocate(y), op = *, C = C);end
-
-    #x = makepbox(x);
-    #y = makepbox(y);
 
     xus = x.u; xds = x.d;
     yus = y.u; yds = y.d;
@@ -323,102 +310,12 @@ function calcSigmaBoundRight(x, y , op,  C, bounded)
 
     bounded ? is =  ProbabilityBoundsAnalysis.jj() : is = ProbabilityBoundsAnalysis.jjj()
 
-
     for i = 2:Ns    # Cannot be threaded, because of 2nd line
         these   = findall(is[i-1] .<= cdf .<= is[i]);
         !isempty(these) ? z[i-1] = maximum(zs[these]) : (i != 2 ?  z[i-1] = z[i-2] : continue)
     end
 
     return z
-
-end
-
-
-
-function sigmaOld(x::pbox, y ::pbox; op = +,  C = πCop()::AbstractCopula)
-
-    #if (op == -) return sigma(x, negate(y), op=+, C = C); end
-    #if (op == /) return sigma(x, reciprocate(y), op = *, C = C);end
-
-    x = makepbox(x);
-    y = makepbox(y);
-
-    Ns = parametersPBA.steps
-
-    zus = [map(op, ux, uy) for ux in x.u[1:end-1], uy in y.u[1:end-1]]        # Carteesian products
-    zds = [map(op, dx, dy) for dx in x.d[2:end], dy in y.d[2:end]]
-
-    zd = zeros(Ns);
-    zu = zeros(Ns);
-
-    zd[1] = minimum(zds); zd[end] = maximum(zds);
-    zu[1] = minimum(zus); zu[end] = maximum(zus);
-
-    zus = zus[:];
-    zds = zds[:];
-
-    uMasses = C.cdfU[2:end, 2:end] + C.cdfU[1:end-1, 1:end-1] - C.cdfU[1:end-1, 2:end] - C.cdfU[2:end, 1:end-1]
-    dMasses = C.cdfD[2:end, 2:end] + C.cdfD[1:end-1, 1:end-1] - C.cdfD[1:end-1, 2:end] - C.cdfD[2:end, 1:end-1]
-
-    pU = sortperm(zus)
-    pD = sortperm(zds)
-
-    zus = zus[pU]
-    zds = zds[pD]
-
-    uMasses = uMasses[:][pU]
-    dMasses = dMasses[:][pD]
-
-    #uCdf = zeros(length(uMasses)+1); dCdf = ones(length(dMasses)+1);
-
-    #push!(zus, zu[end])
-    #pushfirst!(zds, zd[1])
-
-    #uCdf[2:end] = cumsum(uMasses);
-    #dCdf[1:end-1] = cumsum(dMasses);
-
-    uCdf = cumsum(uMasses);
-    dCdf = reverse(1 .- cumsum(reverse(dMasses)));
-
-    #is = range(0, stop = 1, length = Ns); #js = range(0, stop = 1, length = Ns)
-
-    bounded = min(x.bounded,y.bounded);
-
-    is = ProbabilityBoundsAnalysis.iii();
-    js = ProbabilityBoundsAnalysis.jjj();
-    if bounded[1]; is = ProbabilityBoundsAnalysis.ii(); end
-    if bounded[2]; js = ProbabilityBoundsAnalysis.jj(); end
-
-    for i = 2:Ns
-
-        ups   = findall(is[i-1] .<= uCdf .<= is[i]);
-        downs = findall(js[i-1] .<= dCdf .<= js[i]);
-
-        if !isempty(ups);   zu[i]   = minimum(zus[ups]);   else zu[i]   = zu[i-1]; end
-        if !isempty(downs); zd[i-1] = maximum(zds[downs]); elseif i!=2; zd[i-1] = zd[i-2]; end
-
-    end
-
-    # Mean tranforms the same as independence
-	ml = -Inf;
-    mh = Inf;
-
-    if (op)∈([+, -, *])
-        ml = map(op, x.ml, y.ml);
-        mh = map(op, x.mh, y.mh);
-    end
-
-    # Variance does not
-    vl = 0;
-    vh = Inf;
-
-    if !(C.cdfU == C.cdfD);
-        z1 = deepcopy(zu);  z2 = deepcopy(zd);
-        zu[2:end]   = min.(z1[2:end], z2[1:end-1]);
-        zd[1:end-1] = max.(z1[2:end], z2[1:end-1]);
-    end
-
-    return pbox(zu, zd, ml = ml, mh = mh, vl = vl, vh = vh, bounded = bounded);
 
 end
 
@@ -521,9 +418,7 @@ function tauRhoOld2(x::pbox, y::pbox; op = +, C = W():: AbstractCopula)
     end
 
     bounded = min(x.bounded,y.bounded);
-
     return pbox(zu, zd, bounded = bounded);
-
 end
 
 
@@ -680,18 +575,6 @@ function reciprocate(x)
         else sh = "";
         end
 
-        #=
-        if (left(x) <= 0 && right(x) >= 0)
-            return NaN
-        else if (left(x)>0)
-            myMean = transformMean(x,reciprocate(), false, true);
-            myVar = transformVar(x,reciprocate(), false, true);
-        else
-            myMean = transformMean(x,reciprocate(), false, false);
-            myVar = transformVar(x,reciprocate(), false, false);
-        end
-        =#
-
         myMean = interval(x.ml, x.mh);
         myVar = interval(x.vl, x.vh);
 
@@ -725,8 +608,6 @@ function mult(x::pbox, m :: Interval)
    return pbox(left.(outs), right.(outs), shape=s, name="", bounded = x.bounded)
 end
 
-
-
 function intUnivariate(x :: pbox, op, bounded = [false, false])
     Ints = interval.(x.u,x.d)
     yInts = op.(Ints)
@@ -736,21 +617,7 @@ function intUnivariate(x :: pbox, op, bounded = [false, false])
 
     return pbox(yu, yd, bounded = bounded)
 end
-#=
-function intUnivariate(x :: pbox, op, bounded = [false, false])
-    Ints = interval.(x.u[1:end-1],x.d[2:end])
-    yInts = op.(Ints)
 
-    xRange = interval(x.u[1], x.d[end])
-
-    yRange = op(xRange)
-
-    yu = sort(left.(yInts))
-    yd = sort(right.(yInts))
-
-    return pbox([yRange.lo; yu], [yd; yRange.hi], bounded = bounded)
-end
-=#
 for op in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan, :exp, :log)
     bounded = [false, false]
     if op ∈ (:sin, :cos); bounded = [true, true]; end

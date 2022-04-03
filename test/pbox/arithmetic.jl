@@ -152,7 +152,6 @@
         @test all(DistCdf .∈ pbaCdf)
     end
 
-
     @testset "Frechet" begin
 
         d = conv(a,b, op = +, corr = interval(-1,1));
@@ -168,13 +167,23 @@
 
         @test all(map(!,d.bounded))
 
-    end
+        ops = [+, -, *, /, min, max];
 
-    ###
-    #   Need to add testing for:
-    #       ->  Shapes
-    #       ->  Verify with Monte Carlo?
-    #       ->  Double loop Mc for Frechet?
-    ###
+        for op in ops
+
+            x1 = U(-1,1)
+            x2 = U(1,2)
+
+            c = convFrechet(x1, x2, op = op)
+
+            cI = convIndep(x1, x2, op = op)
+            cP = convPerfect(x1, x2, op = op)
+            cO = convOpposite(x1, x2, op = op)
+
+            @test all( c.u .<= cI.u) && all( c.d .>= cI.d)
+            @test all( c.u .<= cP.u) && all( c.d .>= cP.d)
+            @test all( c.u .<= cO.u) && all( c.d .>= cO.d)
+        end
+    end
 
 end
