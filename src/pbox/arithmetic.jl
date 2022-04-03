@@ -823,20 +823,7 @@ function convFrechetNaive(x::Real, y::Real; op = *)
     c = sort(map(op,X,Y));
     Zu = c[1:n];
 
-    #mean
-    m = mean(x) * mean(y);          # Should maybe be op(mean(x),mean(y))
-    a = sqrt(var(x) * var(y));      # Simularly
-    ml = m - a;
-    mh = m + a;
-
-    VK = VKmeanproduct(x,y);
-    m = imp(pbox(interval(ml,mh)), VK);
-
-    # Variance
-    vl = 0;
-    vh = Inf;
-
-    return pbox(Zu, Zd,  ml = left(m), mh = right(m), vl=vl, vh=vh);
+    return pbox(Zu, Zd);
 
 end
 
