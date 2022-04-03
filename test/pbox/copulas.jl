@@ -183,7 +183,3 @@ end
     end
 
 end
-
-@testset "bivariate p-boxes" begin
-
-end

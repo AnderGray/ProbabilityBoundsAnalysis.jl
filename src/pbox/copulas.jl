@@ -739,52 +739,6 @@ function mass(Biv :: bivpbox, X :: Interval, Y :: Interval)
     return interval(Mlo, Mhi)
 end
 
-function conditionalX(J :: bivpbox, xVal :: Real)
-
-    #Nsx, Nsy = size(J.C.cdfU)
-    yGridU = J.marg2.u;
-    yGridD = J.marg2.d;
-
-    diff = maximum(yGridU[2:end] .- yGridU[1:end-1])
-
-    zU = (left.(J(xVal + diff/2, yGridU) - left.(J(xVal - diff/2, yGridU))))/diff
-    zD = (right.(J(xVal + diff/2, yGridD) - right.(J(xVal - diff/2, yGridD))))/diff
-
-    uIndex = findfirst(xVal .< yGridU);
-    dIndex = findfirst(xVal .< yGridD);
-
-    mass = 1/parametersPBA.steps
-    densityU = mass/(yGridU[uIndex] - yGridU[uIndex-1])
-    densityD = mass/(yGridD[dIndex] - yGridD[dIndex-1])
-
-    zU = zU ./densityU;     zD = zD ./densityD;
-
-    inverseBox = pbox(zU,zD)
-
-    us = left.(cdf.(inverseBox,yGridU))
-    ds = right.(cdf.(inverseBox,yGridD))
-
-
-    return pbox(us,ds)
-
-end
-
-
-function conditionalY(J :: bivpbox, yVal :: Real)
-
-    Nsx, Nsy = size(J.C.cdfU)
-
-    xGridU = J.marg2.u;
-    xGridD = J.marg2.d;
-
-    diff = maximum(xGridU[2:end] .- xGridU[1:end-1])
-    zU = (left.(J(xGridU, yVal + diff/2) - left.(J(xGridU, yVal - diff/2))))/diff
-    zD = (right.(J(xGridD,yVal + diff/2) - right.(J(xGridD,yVal - diff/2))))/diff
-
-    return pbox(zU, zD)
-
-end
-
 ###
 #   Sampling biv pbox
 ###
