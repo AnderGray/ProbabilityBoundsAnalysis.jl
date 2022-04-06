@@ -221,4 +221,18 @@
             end
         end
     end
+
+    @testset "P-box unary" begin
+
+        a = U(1,2)
+        aneg = -a
+        aRecep = 1/a
+
+        c0 = convOpposite(a, aneg, op=+)
+        c1 = convOpposite(a, aRecep, op=*)
+
+        @test  c0(0) == interval(0,1)
+        @test  c1(1) == interval(0,1)
+
+    end
 end
