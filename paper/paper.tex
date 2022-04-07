@@ -2,7 +2,6 @@
 \documentclass{juliacon}
 \setcounter{page}{1}
 \usepackage{caption}
-\usepackage{csquotes}
 \usepackage{amsmath}
 \usepackage{xcolor}
 %\bibliographystyle{juliacon}
@@ -39,12 +38,9 @@ Imprecise probability is effectively a generalisation of probability theory wher
 
 
 \iffalse
-Probability bounds analysis is a combination of the methods of standard interval analysis \cite{moore1996interval, jaulin2001interval} and classical probability theory (see, inter alia, \cite{feller1968probability, feller1971probability}).  The idea of bounding probability has a very long tradition throughout the history of probability theory. Indeed, George Boole \cite{boole1854investigation, hailperin1986boole} used the notion of interval bounds on probability. Chebyshev \cite{chebyshev1874valeurs} described bounds on a distribution when only the mean and variance of the variable are known, and Markov \cite{markoff1900question} found bounds on a positive variable when only the mean is known.  Fréchet \cite{frechet1935generalisation} discovered how to make calculations with uncertain estimates of joint probabilities without making independence assumptions.  Bounding probabilities has continued to the present day \cite{walley1991statistical, klir2013uncertainty, troffaes2014lower, augustin2014introduction}, culminating into the modern theory of Imprecise Probabilities.
+Probability bounds analysis is a combination of the methods of standard interval analysis \cite{moore1996interval, jaulin2001interval} and classical probability theory (see, inter alia, \cite{feller1968probability, feller1971probability}).  The idea of bounding probability has a very long tradition throughout the history of probability theory. Indeed, George Boole \cite{boole1854investigation, hailperin1986boole} used the notion of interval bounds on probability. Chebyshev \cite{chebyshev1874valeurs} described bounds on a distribution when only the mean and variance of the variable are known, and Markov \cite{markoff1900question} found bounds on a positive variable when only the mean is known. Fréchet \cite{frechet1935generalisation} discovered how to make calculations with uncertain estimates of joint probabilities without making independence assumptions. Bounding probabilities has continued to the present day \cite{walley1991statistical, klir2013uncertainty, troffaes2014lower, augustin2014introduction}, culminating into the modern theory of Imprecise Probabilities.
 
 An arithmetic of probability distributions has held a long interest among mathematicians and engineers
-
-
-
 
 Computations with probabilities are usually performed by Monte-Carlo style simulations, where essentially many random realisations of functions are required to be run. These sampling methods require many thousands of realisations to be accurate, and even then will only produce an approximation of the desired probabilistic quantity. In contrast, the methods ProbabilityBoundsAnalysis.jl are exact rather than approximate, and give no restriction to the distribution shape or dependency.
 \fi
