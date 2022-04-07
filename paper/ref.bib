@@ -1,14 +1,24 @@
 @article{bezanson2017julia,
-  title={Julia: A fresh approach to numerical computing},
-  author={Bezanson, Jeff and Edelman, Alan and Karpinski, Stefan and Shah, Viral B.},
-  journal={SIAM review},
-  volume={59},
-  number={1},
-  pages={65--98},
-  year={2017},
-  publisher={SIAM}
-}
+author = {Bezanson, Jeff and Edelman, Alan and Karpinski, Stefan and Shah, Viral B.},
+title = {Julia: A Fresh Approach to Numerical Computing},
+journal = {SIAM Review},
+volume = {59},
+number = {1},
+pages = {65-98},
+year = {2017},
+doi = {10.1137/141000671},
 
+URL = { 
+        https://doi.org/10.1137/141000671
+    
+},
+eprint = { 
+        https://doi.org/10.1137/141000671
+    
+}
+,
+    abstract = { Bridging cultures that have often been distant, Julia combines expertise from the diverse fields of computer science and computational science to create a new approach to numerical computing. Julia is designed to be easy and fast and questions notions generally held to be “laws of nature" by practitioners of numerical computing: \beginlist \item High-level dynamic programs have to be slow. \item One must prototype in one language and then rewrite in another language for speed or deployment. \item There are parts of a system appropriate for the programmer, and other parts that are best left untouched as they have been built by the experts. \endlist We introduce the Julia programming language and its design---a dance between specialization and abstraction. Specialization allows for custom treatment. Multiple dispatch, a technique from computer science, picks the right algorithm for the right circumstance. Abstraction, which is what good computation is really about, recognizes what remains the same after differences are stripped away. Abstractions in mathematics are captured as code through another technique from computer science, generic programming. Julia shows that one can achieve machine performance without sacrificing human convenience. }
+}
 @article{Moore1990,
 	author = {Moore, James T. and Bard, Jonathan F.},
 	doi = {10.1287/opre.38.5.911},
@@ -33,10 +43,17 @@
   publisher={Prentice-Hall Englewood Cliffs, NJ}
 }
 @book{jaulin2001interval,
-  title={Applied Interval analysis},
-  author={Jaulin, Luc and Kieffer, Michel and Didrit, Olivier and Walter, Eric},
-  year={2001},
-  publisher={Springer}
+  TITLE = {{Applied Interval Analysis with Examples in Parameter and State Estimation, Robust Control and Robotics}},
+  AUTHOR = {Jaulin, Luc and Kieffer, Michel and Didrit, Olivier and Walter, Eric},
+  URL = {https://hal.archives-ouvertes.fr/hal-00845131},
+  NOTE = {http://www.springer.com/engineering/computational+intelligence+and+complexity/book/978-1-4471-1067-5},
+  PUBLISHER = {{Springer London Ltd}},
+  PAGES = {398},
+  YEAR = {2001},
+  MONTH = Aug,
+  PDF = {https://hal.archives-ouvertes.fr/hal-00845131/file/contentaia_LISA2001.pdf},
+  HAL_ID = {hal-00845131},
+  HAL_VERSION = {v1},
 }
 @book{feller1968probability,
   title={An Introduction to Probability Theory and Its Applications Volume 1.},
@@ -91,26 +108,37 @@
   title={Statistical reasoning with imprecise probabilities},
   author={Walley, Peter},
   year={1991},
-  publisher={Chapman and Hall, London}
+  publisher={Chapman and Hall, London},
+  isbn = {9780412286605}
 }
 @book{troffaes2014lower,
-  title={Lower previsions},
-  author={Troffaes, Matthias C.M. and De Cooman, Gert},
-  year={2014},
-  publisher={John Wiley \& Sons}
+  author       = {{Troffaes, Matthias CM and De Cooman, Gert}},
+  isbn         = {{9780470723777}},
+  keywords     = {{Choquet integral,probabilities,integration,natural extension,coherence,statistical decision,Lower prevision,symmetry,linear prevision}},
+  language     = {{eng}},
+  pages        = {{434}},
+  publisher    = {{John Wiley and Sons}},
+  series       = {{Wiley series in probability and statistics}},
+  title        = {{Lower previsions}},
+  year         = {{2014}}
 }
 @book{augustin2014introduction,
-  title={Introduction to imprecise probabilities},
-  author={Augustin, Thomas and Coolen, Frank P.A. and De Cooman, Gert and Troffaes, Matthias C.M.},
-  year={2014},
-  publisher={John Wiley \& Sons}
+  editor       = {{Augustin, Thomas and Coolen, Frank PA and De Cooman, Gert and Troffaes, Matthias CM}},
+  isbn         = {{978-0-470-97381-3}},
+  language     = {{eng}},
+  pages        = {{432}},
+  publisher    = {{John Wiley and Sons}},
+  series       = {{Wiley Series in Probability and Statistics}},
+  title        = {{Introduction to imprecise probabilities}},
+  year         = {{2014}},
 }
 @book{klir2013uncertainty,
   title={Uncertainty-based information: elements of generalized information theory},
   author={Klir, George J. and Wierman, Mark J.},
   volume={15},
   year={2013},
-  publisher={Physica}
+  publisher={Physica, Heidelberg},
+  doi = {10.1007/978-3-7908-1869-7}
 }
 @article{makarov1982estimates,
   title={Estimates for the distribution function of a sum of two random variables when the marginal distributions are fixed},
@@ -142,7 +170,8 @@
   title={Constructing probability boxes and {Dempster-Shafer} structures},
   author={Ferson, Scott and Kreinovich, Vladik and Grinzburg, Lev and Myers, Davis and Sentz, Kari},
   year={2015},
-  institution={Sandia National Lab., Albuquerque, NM (United States)}
+  institution={Sandia National Lab., Albuquerque, NM (United States)},
+  dio = {10.2172/809606}
 }
 @article{ferson1996whereof,
   title={Whereof one cannot speak: when input distributions are unknown},
@@ -158,7 +187,8 @@
   number={1-3},
   pages={135--152},
   year={2004},
-  publisher={Elsevier}
+  publisher={Elsevier},
+  doi = {10.1016/j.ress.2004.03.008}
 }
 @phdthesis{williamson1989probabilistic,
   title={Probabilistic arithmetic},
@@ -174,95 +204,124 @@
   number={2},
   pages={89--158},
   year={1990},
-  publisher={Elsevier}
+  publisher={Elsevier},
+  doi = {10.1016/0888-613X(90)90022-T}
 }
-@incollection{dempster2008upper,
-  title={Upper and lower probabilities induced by a multivalued mapping},
-  author={Dempster, Arthur P.},
-  booktitle={Classic works of the Dempster-Shafer theory of belief functions},
-  pages={57--72},
-  year={2008},
-  publisher={Springer}
+@inbook{dempster2008upper,
+author="Dempster, Arthur P.",
+editor="Yager, Roland R.
+and Liu, Liping",
+title="Upper and Lower Probabilities Induced by a Multivalued Mapping",
+bookTitle="Classic Works of the Dempster-Shafer Theory of Belief Functions",
+year="2008",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="57--72",
+abstract="A multivalued mapping from a space X to a space S carries a probability measure defined over subsets of X into a system of upper and lower probabilities over subsets of S. Some basic properties of such systems are explored in Sects. 1 and 2. Other approaches to upper and lower probabilities are possible and some of these are related to the present approach in Sect. 3. A distinctive feature of the present approach is a rule for conditioning, or more generally, a rule for combining sources of information, as discussed in Sects. 4 and 5. Finally, the context in statistical inference from which the present theory arose is sketched briefly in Sect. 6.",
+isbn="978-3-540-44792-4",
+doi="10.1007/978-3-540-44792-4\_3",
+url="https://doi.org/10.1007/978-3-540-44792-4\_3"
 }
 @book{shafer1976mathematical,
-  title={A mathematical theory of evidence},
-  author={Shafer, Glenn},
-  volume={42},
-  year={1976},
-  publisher={Princeton university press}
+  author = {Glenn Shafer},
+  doi = {doi:10.1515/9780691214696},
+  url = {https://doi.org/10.1515/9780691214696},
+  title = {A Mathematical Theory of Evidence},
+  year = {2021},
+  publisher = {Princeton University Press},
+  ISBN = {9780691214696}
 }
 @book{molchanov2005theory,
   title={Theory of random sets},
   author={Molchanov, Ilya},
   volume={2},
   year={2005},
-  publisher={Springer}
+  publisher={Springer},
+  doi={10.1007/1-84628-150-4}
 }
 @article{zadeh1978fuzzy,
-  title={Fuzzy sets as a basis for a theory of possibility},
-  author={Zadeh, Lotfi Asker},
-  journal={Fuzzy sets and systems},
-  volume={1},
-  number={1},
-  pages={3--28},
-  year={1978},
-  publisher={North-Holland}
+  title = {Fuzzy sets as a basis for a theory of possibility},
+  journal = {Fuzzy Sets and Systems},
+  volume = {1},
+  number = {1},
+  pages = {3-28},
+  year = {1978},
+  issn = {0165-0114},
+  doi = {https://doi.org/10.1016/0165-0114(78)90029-5},
+  url = {https://www.sciencedirect.com/science/article/pii/0165011478900295},
+  author = {L.A Zadeh},
+  abstract = {The theory of possibility described in this paper is related to the theory of fuzzy sets by defining the concept of a possibility distribution as a fuzzy restriction which acts as an elastic constraint on the values that may be assigned to a variable. More specifically, if F is a fuzzy subset of a universe of discourse U = {u} which is characterized by its membership function μF, then a proposition of the form “X is F”, where X is a variable taking values in U, induces a possibility distribution t̊x which equates the possibility of X taking the value u to μF(u)—the compatibility of u with F. In this way, X becomes a fuzzy variable which is associated with the possibility distribution t̊x in much the same way as a random variable is associated with a probability distribution. In general, a variable may be associated both with a possibility distribution and a probability distribution, with the weak connection between the two expressed as the possibility/probability consistency principle. A thesis advanced in this paper is that the imprecision that is intrinsic in natural languages is, in the main, possibilistic rather than probabilistic in nature. Thus, by employing the concept of a possibility distribution, a proposition, p, in a natural language may be translated into a procedure which computes the probability distribution of a set of attributes which are implied by p. Several types of conditional translation rules are discussed and, in particular, a translation rule for propositions of the form “X is F is α-possible”, where α is a number in the interval [0,1], is formulated and illustrated by examples.}
 }
 @article{dubois1988possibility,
-  title={Possibility theory: Approach to computerized processing of uncertainty},
-  journal={Plennm N. 4},
-  author={Dubois, D. and Prade, H.},
-  year={1988}
+  title={Possibility theory: an approach to computerized processing of uncertainty},
+  author={Dubois, Didier and Prade, Henri},
+  year={2012},
+  publisher={Springer Science \& Business Media}
 }
 @article{hose2019possibilistic,
-  title={Possibilistic calculus as a conservative counterpart to probabilistic calculus},
-  author={Hose, Dominik and Hanss, Michael},
-  journal={Mechanical Systems and Signal Processing},
-  volume={133},
-  pages={106290},
-  year={2019},
-  publisher={Elsevier}
+  title = {Possibilistic calculus as a conservative counterpart to probabilistic calculus},
+  journal = {Mechanical Systems and Signal Processing},
+  volume = {133},
+  pages = {106290},
+  year = {2019},
+  issn = {0888-3270},
+  doi = {https://doi.org/10.1016/j.ymssp.2019.106290},
+  url = {https://www.sciencedirect.com/science/article/pii/S0888327019305059},
+  author = {Dominik Hose and Michael Hanss},
+  keywords = {Possibility theory, Fuzzy arithmetic, Extension principle, Uncertainty propagation, Imprecise probabilities, Probability-possibility consistency, Joint Possibility distribution aggregation},
+  abstract = {This contribution is intended to promote possibility theory as a maturing general framework for the quantification of epistemic and aleatory uncertainties. For this purpose, we revisit Zadeh’s Extension Principle in the context of imprecise probabilities. Therein the aggregation of the possibility distributions is performed by the minimum-operator, corresponding to non-interactivity of the uncertain variables. Yet, this notion is not equivalent to well-established terms from probability theory such as stochastic independence. In order to use possibilistic calculus for propagating multivariate imprecise probabilities through models, we present suitable aggregation operations, corresponding to simple modifications of the Extension Principle, and we prove preservation of probability-possibility consistency, the fundamental concept in possibility theory. For the purpose of demonstration, the possibilistic solutions of two benchmark problems of uncertainty quantification are presented.}
 }
 @book{martin2015inferential,
   title={Inferential models: reasoning with uncertainty},
   author={Martin, Ryan and Liu, Chuanhai},
   volume={145},
   year={2015},
-  publisher={CRC Press}
+  publisher={Chapman and Hall/CRC},
+  doi = {10.1201/b19269}
 }
 @article{liu2020inferential,
   title={Inferential models and possibility measures},
   author={Liu, Chuanhai and Martin, Ryan},
   journal={arXiv e-prints},
   pages={arXiv--2008},
-  year={2020}
+  year={2020},
+  doi = {10.48550/ARXIV.2008.06874},
+  url = {https://arxiv.org/abs/2008.06874}
 }
 @inproceedings{fersoncomputing,
   author          = {Ferson, Scott and Balch, Michael and Sentz, Kari and Siegrist, Jack},
   title           = {Computing with Confidence},
   booktitle       = {proceedings of the 8th International Symposium on Imprecise Probability: Theories and Applications},
-  year            = {2013}
+  year            = {2013},
+  url = {https://www.sipta.org/isipta13/proceedings/papers/s013.pdf}
 }
 @inproceedings{ferson2021distribution,
   title           ={Distribution-free uncertainty propagation},
   author          ={Ferson, Scott and Gray, Ander},
   booktitle       = {proceedings of the 9th International Workshop on Reliable Engineering Computing (REC2021)},
-  year            ={2021}
+  year            ={2021},
+  url = {https://livrepository.liverpool.ac.uk/id/eprint/3124146}
 }
 @article{montes2015sklar,
-  title={Sklar's theorem in an imprecise setting},
-  author={Montes, Ignacio and Miranda, Enrique and Pelessoni, Renato and Vicig, Paolo},
-  journal={Fuzzy Sets and Systems},
-  volume={278},
-  pages={48--66},
-  year={2015},
-  publisher={Elsevier}
+  title = {Sklar's theorem in an imprecise setting},
+  journal = {Fuzzy Sets and Systems},
+  volume = {278},
+  pages = {48-66},
+  year = {2015},
+  note = {Special Issue on uncertainty and imprecision modelling in decision making (EUROFUSE 2013)},
+  issn = {0165-0114},
+  doi = {https://doi.org/10.1016/j.fss.2014.10.007},
+  url = {https://www.sciencedirect.com/science/article/pii/S0165011414004539},
+  author = {Ignacio Montes and Enrique Miranda and Renato Pelessoni and Paolo Vicig},
+  keywords = {Sklar's theorem, Copula, -boxes, Natural extension, Independent products, Stochastic orders},
+  abstract = {Sklar's theorem is an important tool that connects bidimensional distribution functions with their marginals by means of a copula. When there is imprecision about the marginals, we can model the available information by means of p-boxes, that are pairs of ordered distribution functions. Similarly, we can consider a set of copulas instead of a single one. We study the extension of Sklar's theorem under these conditions, and link the obtained results to stochastic ordering with imprecision.}
 }
 @book{nelsen2007introduction,
   title={An introduction to copulas},
   author={Nelsen, Roger B.},
   year={2007},
-  publisher={Springer Science \& Business Media}
+  publisher={Springer Science \& Business Media},
+  doi = {10.1007/0-387-28678-0}
 }
 @software{david_p_sanders_2021_5519761,
   author       = {David P. Sanders and
@@ -277,20 +336,24 @@
   url          = {https://doi.org/10.5281/zenodo.5519761}
 }
 @article{yager1986arithmetic,
-  title={Arithmetic and other operations on {Dempster-Shafer} structures},
-  author={Yager, Ronald R.},
-  journal={International Journal of Man-Machine Studies},
-  volume={25},
-  number={4},
-  pages={357--366},
-  year={1986},
-  publisher={Elsevier}
+  title = {Arithmetic and other operations on Dempster-Shafer structures},
+  journal = {International Journal of Man-Machine Studies},
+  volume = {25},
+  number = {4},
+  pages = {357-366},
+  year = {1986},
+  issn = {0020-7373},
+  doi = {https://doi.org/10.1016/S0020-7373(86)80066-9},
+  url = {https://www.sciencedirect.com/science/article/pii/S0020737386800669},
+  author = {Ronald R. Yager},
+  abstract = {We show how variables whose values are represented by Dempster-Shafer structures can be combined under arithmetic operations such as addition. We then generalize this procedure to allow for the combination of these types of variables under more general operations. We note that Dempster's rule is a special case of this situation under the intersection operation.}
 }
 @book{levi1983enterprise,
   title={The enterprise of knowledge: An essay on knowledge, credal probability, and chance},
   author={Levi, Isaac},
   year={1983},
-  publisher={MIT press}
+  publisher={MIT press},
+  doi = {10.2307/2184951}
 }
 @book{ferson2002ramas,
   title={{RAMAS Risk Calc} 4.0 software: risk assessment with uncertain numbers},
@@ -303,5 +366,6 @@
   author={Gray, Nick and De Angelis, Marco and Ferson, Scott},
   booktitle={Proceedings of the 3rd International Conference on Uncertainty Quantification in Computational Sciences and Engineering (UNCECOMP 2019)},
   year={2019},
-  organization={Institute of Structural Analysis and Antiseismic Research School of Civil}
+  organization={Institute of Structural Analysis and Antiseismic Research School of Civil},
+  doi = {10.7712/120219.6354.18702}
 }
