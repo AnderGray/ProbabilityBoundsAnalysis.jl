@@ -47,7 +47,7 @@ import IntervalArithmetic: Interval, interval, AbstractInterval, isequal, ⊂
 
 import Base: show, -,
     +, *, /, //,
-    <, >, ⊆, ^, intersect, issubset, <=, >=, ==, ∪, ∩, union, intersect,
+    <, >, ⊆, ^, intersect, issubset, <=, >=, ==, ∪, ∩,
     rand, sin, cos, tan, sinh, cosh, tanh, asin, acos, atan, exp, log, Threads.@spawn,
     Threads.@threads
 

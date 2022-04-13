@@ -20,9 +20,7 @@ iii()   = [  parametersPBA.bOt; collect((1:(parametersPBA.steps-1)) / parameters
 jj()    = [           collect((1:(parametersPBA.steps-1)) / parametersPBA.steps); 1 ];
 jjj()   = [           collect((1:(parametersPBA.steps-1)) / parametersPBA.steps); parametersPBA.tOp ];
 
-##
-# Should be able to env an array of p-boxes.
-##
+
 """
     env(x :: pbox, y :: pbox)
 
@@ -65,16 +63,14 @@ end
 env(a...) = reduce(env, a)
 env(a::Vector{UncertainNumber}) = reduce(env, a)
 
+∪(x :: pbox, y :: pbox) = env(x, y)
 ∪(x :: pbox, y :: UncertainNumber) = env(x, y)
 ∪(x :: UncertainNumber, y :: pbox) = env(x, y)
 
-###
-#   Computes the imprint (imposition)
-###
 """
     imp(x :: pbox, y :: pbox)
 
-Imprint. Returns the intersection of pboxes. Any number of pboxes may be input
+Imprint. Returns the intersection of pboxes
 
 # Examples
 ```jldoctest
@@ -87,35 +83,32 @@ Pbox: 	  ~  ( range=[1.0, 2.0], mean=1.5, var=0.083333)
 ```
 See also: [`env`](@ref), [`makepbox`](@ref)
 """
-function imp(x...; naRm = false )
-    elts = makepbox(x...);
-    u = elts[1].u;
-    d = elts[1].d;
-    ml = elts[1].ml;
-    mh = elts[1].mh;
-    vl = elts[1].vl;
-    vh = elts[1].vh;
-    na = elts[1].name;
-    sh = elts[1].shape;
-    bounded =elts[1].bounded;
+function imp(x :: UncertainNumber, y :: UncertainNumber)
 
-    for i =2:length(elts)
-        u = max.(u,elts[i].u);
-        d = min.(d,elts[i].d);
-        ml = max(ml,elts[i].ml);
-        mh = min(mh,elts[i].mh);
-        vl = max(vl,elts[i].vl);
-        vh = min(vh,elts[i].vh);
-        bounded[1] = max(bounded[1], elts[i].bounded[1]);
-        bounded[2] = max(bounded[2], elts[i].bounded[2]);
-    end
+    x = makepbox(x);
+    y = makepbox(y);
 
-    if (any(d[:] < u[:])) throw(ArgumentError("Imprint does not exist"));
+    bounded = x.bounded;
+
+    u = max.(x.u, y.u);
+    d = min.(x.d, y.d);
+    ml = max(x.ml, y.ml);
+    mh = min(x.mh, y.mh);
+    vl = max(x.vl, y.vl);
+    vh = min(x.vh, y.vh);
+    bounded[1] = max(x.bounded[1], y.bounded[1]);
+    bounded[2] = max(x.bounded[2], y.bounded[2]);
+
+    if (any(d[:] < u[:])) throw(ArgumentError("Intersection does not exist"));
     else
         return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, bounded = bounded)
     end
-
 end
+
+imp(a...) = reduce(imp, a)
+imp(a::Vector{UncertainNumber}) = reduce(imp, a)
+
+∩(x :: pbox, y :: pbox) = imp(x, y)
 ∩(x :: pbox, y :: UncertainNumber) = imp(x, y)
 ∩(x :: UncertainNumber, y :: pbox) = imp(x, y)
 
