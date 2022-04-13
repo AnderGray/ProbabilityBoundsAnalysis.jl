@@ -51,6 +51,13 @@ using Distributions
         @test mean(c) == mean(b)
         @test var(c) == var(b)
 
+        c = a ∩ b
+
+        @test c.u == b.u
+        @test c.d == b.d
+        @test mean(c) == mean(b)
+        @test var(c) == var(b)
+
         b2 = U(1, interval(2, 3))
 
         c2 = imp(a, b2)
@@ -66,6 +73,13 @@ using Distributions
 
         b = U(2, 3)
         c = env(a, b)
+
+        @test c.d == b.d
+        @test c.u == a.u
+        @test mean(c) == hull(mean(a), mean(b))
+        @test var(c) == hull(var(a), var(b))
+
+        c = a ∪ b
 
         @test c.d == b.d
         @test c.u == a.u

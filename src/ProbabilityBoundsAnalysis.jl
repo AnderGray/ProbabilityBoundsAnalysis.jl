@@ -47,7 +47,7 @@ import IntervalArithmetic: Interval, interval, AbstractInterval, isequal, ⊂
 
 import Base: show, -,
     +, *, /, //,
-    <, >, ⊆, ^, intersect, issubset, <=, >=, ==,
+    <, >, ⊆, ^, intersect, issubset, <=, >=, ==, ∪, ∩, union, intersect,
     rand, sin, cos, tan, sinh, cosh, tanh, asin, acos, atan, exp, log, Threads.@spawn,
     Threads.@threads
 
@@ -60,6 +60,7 @@ import Distributions: cdf #Normal, Beta, Uniform
 
 abstract type AbstractPbox <: Real end
 
+UncertainNumber = Union{AbstractPbox, AbstractInterval, Real}
 
 ## Global Variables (we may want to avoid these)
 
@@ -135,7 +136,7 @@ export
     negate, reciprocate, complement, shift,
 
     # Comparisons
-    <, >, <=, >=, ⊆, ⊂, ==,
+    <, >, <=, >=, ⊆, ⊂, ==, ∪, ∩,
 
     # Univariate functions
     sin, cos, tan, sinh, cosh, tanh, asin, acos, atan,

@@ -24,9 +24,9 @@ jjj()   = [           collect((1:(parametersPBA.steps-1)) / parametersPBA.steps)
 # Should be able to env an array of p-boxes.
 ##
 """
-    env(x :: pbox, y :: pbox, ...)
+    env(x :: pbox, y :: pbox)
 
-Envelope. Returns the union of pboxes. Any number of pboxes may be input
+Envelope. Returns the union of pboxes.
 
 # Examples
 ```jldoctest
@@ -39,35 +39,34 @@ Pbox: 	  ~ uniform ( range=[0.0, 2.0], mean=[0.5, 1.5], var=0.083333)
 ```
 See also: [`imp`](@ref), [`makepbox`](@ref)
 """
-function env(x...; naRm = false )
-    elts = makepbox(x...);
-    u = elts[1].u;
-    d = elts[1].d;
-    ml = elts[1].ml;
-    mh = elts[1].mh;
-    vl = elts[1].vl;
-    vh = elts[1].vh;
-    na = elts[1].name;
-    sh = elts[1].shape;
-    bounded =elts[1].bounded;
+function env(x :: UncertainNumber, y :: UncertainNumber)
+    x = makepbox(x);
+    y = makepbox(y);
 
-    for i =2:length(elts)
-        u = min.(u,elts[i].u);
-        d = max.(d,elts[i].d);
-        ml = min(ml,elts[i].ml);
-        mh = max(mh,elts[i].mh);
-        vl = min(vl,elts[i].vl);
-        vh = max(vh,elts[i].vh);
-        bounded[1] = min(bounded[1], elts[i].bounded[1]);
-        bounded[2] = min(bounded[2], elts[i].bounded[2]);
+    na = x.name;
+    sh = x.shape;
+    bounded = x.bounded;
 
-        if (elts[i].name != na) na = "";end
-        if (elts[i].shape != sh) sh = "";end
-    end
+    u = min.(x.u, y.u);
+    d = max.(x.d, y.d);
+    ml = min(x.ml, y.ml);
+    mh = max(x.mh, y.mh);
+    vl = min(x.vl, y.vl);
+    vh = max(x.vh, y.vh);
+    bounded[1] = min(x.bounded[1], y.bounded[1]);
+    bounded[2] = min(x.bounded[2], y.bounded[2]);
+
+    if (y.name != na) na = "";end
+    if (y.shape != sh) sh = "";end
+
     return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, name=na, shape=sh, bounded = bounded)
 
 end
+env(a...) = reduce(env, a)
+env(a::Vector{UncertainNumber}) = reduce(env, a)
 
+∪(x :: pbox, y :: UncertainNumber) = env(x, y)
+∪(x :: UncertainNumber, y :: pbox) = env(x, y)
 
 ###
 #   Computes the imprint (imposition)
@@ -117,6 +116,8 @@ function imp(x...; naRm = false )
     end
 
 end
+∩(x :: pbox, y :: UncertainNumber) = imp(x, y)
+∩(x :: UncertainNumber, y :: pbox) = imp(x, y)
 
 
 ###
