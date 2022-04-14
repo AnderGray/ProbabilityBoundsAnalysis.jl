@@ -18,7 +18,7 @@ Probability bounds analysis combines interval arithmetic with probability theory
 \label{sec:intro}
 An arithmetic of probability distributions has long held interest among mathematicians and scientists. Indeed it was Kolmogorov who originally asked about the result of an operation between two random variables without knowing their joint distribution. This was answered for the sum by Makarov \cite{makarov1982estimates}, who showed the result was a set of distributions and was able to provide bounds on this function. Sklar, Schweizer and Frank generalised this result to other positive binary operations \cite{frank1987best,schweizer2011probabilistic}. In this pursuit they created copulas, a general way to encode probabilistic dependence independently from marginals. These are now an essential object used in probabilistic modelling. In his dissertation \cite{williamson1989probabilistic}, Williamson described an algorithm for efficiently performing these arithmetic operations, which can give guaranteed bounds on probability distributions in terms of an upper and lower cumulative distribution function (cdf). He called his method \textit{probabilistic arithmetic} and his sets of distributions \textit{dependency bounds}. Since then the method has been generalised \cite{ferson2015constructing,ferson1996whereof,ferson2004arithmetic} to most of the base binary and unary operations that would be present in a programming language. Probability boxes (p-boxes) are the name now given to these structures.
 
-The goal of \texttt{ProbabilityBoundsAnalysis.jl}\footnote{https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl} is to \textbf{compute guaranteed bounds on functions of random variables given only partial knowledge of the input probability distributions and their dependencies}. That is, to compute with partial knowledge about the input joint distribution. Ideally, all of the available information about random variables should be used, but without making any extra assumptions beyond what are justified by what is known.
+The goal of \texttt{ProbabilityBoundsAnalysis.jl} is to \textbf{compute guaranteed bounds on functions of random variables given only partial knowledge of the input probability distributions and their dependencies}. That is, to compute with partial knowledge about the input joint distribution. Ideally, all of the available information about random variables should be used, but without making any extra assumptions beyond what are justified by what is known.
 
 The idea of bounding probability has a long tradition throughout the history of probability theory. George Boole \cite{boole1854investigation, hailperin1986boole} used the notion of interval bounds on probability. Chebyshev \cite{chebyshev1874valeurs} described bounds on a distribution when only the mean and variance of the variable are known, and Markov \cite{markoff1900question} found bounds on a positive variable when only the mean is known.  Fréchet \cite{frechet1935generalisation} discovered how to bound joint distributions solely from knowing the marginal distributions, without making independence assumptions. Bounding probabilities has continued to the present day, culminating into the modern theory of imprecise probabilities \cite{walley1991statistical, klir2013uncertainty, troffaes2014lower, augustin2014introduction}.
 
@@ -40,7 +40,7 @@ Computations with probabilities are usually performed by Monte-Carlo style simul
   \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig1/fig1_interval.pdf}\hfill
   \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig1/fig1_pbox.pdf}
   
-  \caption{A precise distribution, an interval and a probability box}
+  \caption{A precise distribution, interval and probability box.}
   \label{fig:figure1}
   
 \end{figure*}
@@ -72,7 +72,7 @@ An uncertain programming language would require \textit{source-to-source} transf
   \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox1.pdf}\hfill
   \includegraphics[width=.3\textwidth]{../examples/JuliaCon/fig2/fig2_pbox3.pdf}
   
-  \caption{Various outer representations of distribution functions, left $4$ steps and centre $25$ steps, and a p-box (right) with 10 steps}
+  \caption{Various outer representations of distribution functions, left $4$ steps and centre $25$ steps, and a p-box (right) with 10 steps.}
   \label{fig:figure2}
   
 \end{figure*}
@@ -97,7 +97,7 @@ A real-valued random variable is characterised by its distribution function $F$,
       F \in \bm{F}. \\%&&&&&&& \text{(distribution family)} \\
   \end{aligned}$
   \end{enumerate}
-\noindent That is, a random variable is a member of a p-box if its cdf $F$ falls within the cdf bounds of the p-box $F(x) \in [\underline{F}(x), \overline{F}(x)]$ for all $x$, its moments are inside the interval moments of the p-box, and it belongs to a family of distribution functions (e.g. normal, uniform) considered by the p-box. Some of the constraints may be missing. For example, if the distribution family is unknown then the set is defined solely from the cdf and moment bounds. Such p-boxes are sometimes called non-parametric, since its members do not belong to any particular class of distribution. Some constraints may also be inferred from others. For example, the interval moments may be bounded from the cdf bounds, and cdf may be bounded from moment information (explored further in section \ref{section:Moments}). Figure\footnote{Scripts for all figures can be found in /examples/JuliaCon.} \ref{fig:figure1} shows an example of a distribution function, interval and a p-box. The grey shaded region in the interval and p-box bounds an infinite collection of probability distributions.
+\noindent That is, a random variable is a member of a p-box if its cdf $F$ falls within the cdf bounds of the p-box $F(x) \in [\underline{F}(x), \overline{F}(x)]$ for all $x$, its moments are inside the interval moments of the p-box, and it belongs to a family of distribution functions (e.g. normal, uniform) considered by the p-box. Some of the constraints may be missing. For example, if the distribution family is unknown then the set is defined solely from the cdf and moment bounds. Such p-boxes are sometimes called non-parametric, since its members do not belong to any particular class of distribution. Some constraints may also be inferred from others. For example, the interval moments may be bounded from the cdf bounds, and cdf may be bounded from moment information (explored further in section \ref{section:Moments}). Figure \ref{fig:figure1} (scripts for figures found in \texttt{/examples/JuliaCon}) shows an example of a distribution function, interval and a p-box. The grey shaded region in the interval and p-box bounds an infinite collection of probability distributions.
 
 Real-valued statistics and features of distributions typically become intervals for p-boxes. The cdf of a p-box is
 \begin{equation*}
@@ -128,7 +128,7 @@ Real-valued statistics and features of distributions typically become intervals 
   \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig3/cauchy.pdf}
   
 
-  \caption{Various parametrically constructed p-boxes with interval parameters}
+  \caption{Various parametrically constructed p-boxes with interval parameters.}
   \label{fig:figure3}
 \end{figure*}
 P-boxes generalise precise distributions and intervals in the following way. A distribution is a p-box with a precise cdf and moments, i.e. when
@@ -176,7 +176,7 @@ The vectors $u$ and $d$ are a collection of "real" or "physical" evaluations of 
 \end{align*}
 That is, in the region $[p_{i}, p_{i+1})$, $u[i]$ is a lower bound on $\overline{F}^{-1}$ and $d[i]$ is an upper bound on $\underline{F}^{-1}$ in $(p_{i}, p_{i+1}]$. In the case that the p-box characterises a precise distribution and $\overline{F}^{-1}(p) = \underline{F}^{-1}(p)$ gives:  $u[i+1] = d[i]$. Figure \ref{fig:figure2} shows examples of a distribution and a p-box with various outer representations.
 
-A minimal\footnote{Code can be found in examples/minimal.} p-box structure is as follows
+A minimal p-box structure (supplementary code found in \texttt{/examples/minimal}) is as follows
 \begin{lstlisting}[language = Julia]
   using IntervalArithmetic
 
@@ -316,7 +316,7 @@ An arithmetic operation involving an interval and a precise distribution will pr
     Z_moms.var, F.shape)
   end
 \end{lstlisting}
-\noindent How moment transformations are performed are not described here, however they are available in \texttt{MomentArithmetic.jl}\footnote{https://github.com/AnderGray/MomentArithmetic.jl} \cite{ferson2021distribution}. Figure \ref{fig:figure4} shows an example of an operation between a precise distribution and an interval.
+\noindent How moment transformations are performed are not described here, however they are available in \texttt{MomentArithmetic.jl} \cite{ferson2021distribution}. Figure \ref{fig:figure4} shows an example of an operation between a precise distribution and an interval.
 \begin{figure}[htp]
   \centering
   \includegraphics[width=0.12\textwidth]{../examples/JuliaCon/fig4/fig4_dist.pdf}
@@ -388,7 +388,7 @@ A bivariate copula (2-copula) $C$ is any function $C:[0,1]^2 \rightarrow [0,  1]
   \centering
   \includegraphics[width=0.45\textwidth]{../examples/JuliaCon/fig7/biv_cdf.pdf}\hfill
   \includegraphics[width=0.45\textwidth]{../examples/JuliaCon/fig7/samples.pdf}
-  \caption{Cdf bounds of a bivariate p-box (top) with $X \sim \text{Beta}([4,8], 3)$, $Y \sim \text{N}([0,2], 2)$, and $\rho_{XY} = -0.8$, and 100 samples (bottom)}
+  \caption{Cdf bounds of a bivariate p-box (right) with $X \sim \text{Beta}([4,8], 3)$, $Y \sim \text{N}([0,2], 2)$, and $\rho_{XY} = -0.8$, and 100 samples (left).}
   \label{fig:figure7}
 \end{figure*}
 \noindent where $W$ encodes maximally negative correlation, $\Pi$ encodes stochastic independence, and $M$ encodes maximally positive correlation. Moreover, $W$ and $M$ are bounds on all 2-copulas: $W(u,v) \leq C(u,v) \leq M(u,v)$. A bivariate cdf $F_{XY}$ can be constructed from two marginal cdfs $F_{X}$ and $F_{Y}$ and copula $C$ using Sklar's theorem
@@ -425,11 +425,11 @@ Samples and the probability measure can also be found from a bivariate p-box. Li
   \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig8/fig8_pbox7.pdf}\hfill
   \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig8/fig8_pbox8.pdf}
   
-  \caption{Top left shows an initial p-box, and others show results of unary operations on this p-box}
+  \caption{Top left shows an initial p-box, and others show results of unary operations on this p-box.}
   \label{fig:figure8}
   
 \end{figure*}
-A minimal structure, cdf, random sample and probability measure of a bivariate p-box is \footnote{https://github.com/AnderGray/BivariateCopulas.jl}
+A minimal structure, cdf, random sample and probability measure of a bivariate p-box is
 \begin{lstlisting}[language = Julia]
   using BivariateCopulas
   using BivariateCopulas: sample
@@ -545,7 +545,7 @@ It is well known that the result of above convolution $f_{Z}$ corresponds to the
   \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig9/fig9_pbox7.pdf}\hfill
   \includegraphics[width=.25\textwidth]{../examples/JuliaCon/fig9/fig9_pbox8.pdf}
 
-  \caption{Top left shows two initial p-boxes $X, Y \sim U([1,2], 4)$, and others show results of binary operations on these two p-boxes with different dependencies. Each colour represents a different copula. The colour code is $C = \{$ {\color{purple} $W$} (opposite), {\color{green} $\Phi_{-0.5}$ }(correlation -0.5), {\color{red} $\Pi$} (independence), {\color{orange} $\Phi_{0.5}$} (correlation 0.5), {\color{blue} $M$}(perfect) $\}$}
+  \caption{Top left shows two initial p-boxes $X, Y \sim U([1,2], 4)$, and others show results of binary operations on these two p-boxes with different dependencies. Each colour represents a different copula. The colour code is $C = \{$ {\color{purple} $W$} (opposite), {\color{green} $\Phi_{-0.5}$ }(correlation -0.5), {\color{red} $\Pi$} (independence), {\color{orange} $\Phi_{0.5}$} (correlation 0.5), {\color{blue} $M$}(perfect) $\}$.}
   \label{fig:figure9}
 \end{figure*}
 A binary operation between two random variables $X$ and $Y$ with cdfs $F_{X}$ and $F_{Y}$ and copula $C$ can be computed with the following Lebesgue-Stieltjes integral
