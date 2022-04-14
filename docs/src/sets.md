@@ -5,7 +5,7 @@ Comparisons
 
 Comparisons `(<, >, <=, >=, ==)` between p-boxes, intervals and scalars can be performed. However unlike for comparisons between real numbers which yield Boolean values (`true` or `false`), comparisons with p-boxes generally yield interval probabilities, giving the uncertainty that the random variable characterised by a p-box meets the condition.
 
-__*NOTE: unlike `IntervalArithmetic.jl`, comparisons in `ProbabilityBoundsAnalysis.jl` will generally give non-Boolean values (interval probabilities). This may cause crashes when evaluating control-flow (if-else) with uncertainty*__
+__*NOTE: unlike `IntervalArithmetic.jl`, comparisons in `ProbabilityBoundsAnalysis.jl` will generally give non-Boolean values (interval probabilities). This may cause crashes when evaluating control-flow (if-else) with uncertainty.*__
 
 ### Comparisons of p-boxes and scalars
 
@@ -24,7 +24,7 @@ julia> X = uniform(0, 1)
 julia> X <= 0.7
 [0.695, 0.705001]
 
-julia> X > 0.4
+julia> X >= 0.4
 [0.594999, 0.605]
 
 julia> X = normal(interval(-0.5, 0.5), interval(1, 1.5))
@@ -32,14 +32,14 @@ julia> X >= 1
 [0.0649999, 0.37]
 ```
 
-Boolean values are returned if condition is gauranteed
+Boolean values are returned if the condition is guaranteed
 
 ```julia
 julia> X = uniform(0, 1)
 julia> X <= 2
 true
 
-julia> X > 2
+julia> X >= 2
 false
 ```
 
@@ -61,13 +61,13 @@ julia> Y = interval(0.7, 2)
 julia> X <= Y
 [0.695, 1]
 
-julia> X > Y
+julia> X >= Y
 [0, 0.305]
 
 julia> X <= interval(2, 3)
 true
 
-julia> X > interval(2, 3)
+julia> X >= interval(2, 3)
 false
 ```
 
@@ -103,7 +103,7 @@ julia> Y = uniform(0.5, 1.5)
 julia> <=(X,Y, corr = 0)
 [0.869999, 0.880001]
 
-julia> >(X,Y, corr = 0)
+julia> >=(X,Y, corr = 0)
 [0.119999, 0.130001]
 
 julia> <=(X,Y, corr = 1)
@@ -112,7 +112,7 @@ true
 julia> <=(X,Y, corr = -1)
 [0.744999, 0.755001]
 
-julia> >(X,Y, corr = 0.5)
+julia> >=(X,Y, corr = 0.5)
 [0.04, 0.0550001]
 ```
 
