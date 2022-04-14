@@ -133,18 +133,18 @@ P-boxes generalise precise distributions and intervals in the following way. A d
 \end{align*}
 \noindent where $\epsilon_k$ is
 \begin{equation*}
-   \epsilon_k(x) = \begin{cases} 0 &\text{when } x < k \\ 1 &\text{when } x \geq k. \end{cases} 
+   \epsilon_k(x) = \begin{cases} 0 &\text{when } x < k, \\ 1 &\text{when } x \geq k. \end{cases} 
 \end{equation*}
 \noindent Moreover, theoretical bounds on the mean and variance of an interval can be found~\cite{ferson2002ramas}
 \begin{align*}
   \mu &\in [a, b], \\
   \sigma^2 &\in [0, (b - a)^{2}/4].
 \end{align*}
-\noindent That is, it is not possible to find a distribution inside $[a, b]$ with a variance greater than $(b-a)^{2}/4$. The lower bound on the variance is zero, since scalars are also included in the interval. Under this definition of an interval, a random sample will always be the interval $[a, b]$, the cdf returns 0 when $x < a$, the interval $[0,1]$ when $a \leq x < b$, and $1$ when $b \leq x$. Further, the probability measure of the interval $X = [a, b]$ will be: 
+\noindent That is, it is not possible to find a distribution inside $[a, b]$ with a variance greater than $(b-a)^{2}/4$. The lower bound on the variance is zero, since scalars are also included in the interval. Under this definition of an interval, a random sample will always be the interval $[a, b]$, the cdf returns 0 when $x < a$, the interval $[0,1]$ when $a \leq x < b$, and $1$ when $b \leq x$. Further, the probability measure of the interval $X = [a, b]$ is
 \begin{equation*}
   \mathbb{P}_{X}(U) = \begin{cases}
-    0 & \text{when } U \cap [a,b] = \emptyset \\
-    1 & \text{when } [a,b] \subseteq U  \\
+    0 & \text{when } U \cap [a,b] = \emptyset, \\
+    1 & \text{when } [a,b] \subseteq U,  \\
     [0, 1] & \text{otherwise.}\\
   \end{cases}
 \end{equation*}
@@ -267,19 +267,19 @@ It is well known that generally a random variables distribution function cannot 
 
 These p-boxes are constructed using the Chebyshev (mean and variance)~\cite{chebyshev1874valeurs}, Markov (mean and one bound)~\cite{markoff1900question} and Cantelli (mean and range) inequalities from probability theory. These inequalities allow for the cdf to be bounded from various range and moment information. For example, the Chebyshev inequality can be used to find p-box bounds from the random variables mean and variance
 \begin{equation*}
-  \underline{F}_{X}(x) = \begin{cases} 1 / (1 + (x - \mu_{X})^2 / \sigma^{2}_{X}),& \text{if } \mu_{X}<x \\
-    1,& \text{if } x\leq \mu_{X} \end{cases}
+  \underline{F}_{X}(x) = \begin{cases} 1 / (1 + (x - \mu_{X})^2 / \sigma^{2}_{X}) & \text{if } \mu_{X}<x, \\
+    1 & \text{if } x\leq \mu_{X}, \end{cases}
 \end{equation*}
 \begin{equation*}
-  \overline{F}_{X}(x)  = \begin{cases} 1 / (1 + \sigma^{2}_{X}/(x - \mu_{X})^2),& \text{if } x<\mu_{X} \\
-  1,& \text{if } \mu_{X}\leq x \end{cases}
+  \overline{F}_{X}(x)  = \begin{cases} 1 / (1 + \sigma^{2}_{X}/(x - \mu_{X})^2) & \text{if } x<\mu_{X} \\
+  1 & \text{if } \mu_{X}\leq x. \end{cases}
 \end{equation*}
 \noindent A list of available distribution-free constructors are
 \begin{itemize}
   \item \textbf{MeanVar (or MeanStd)}: using Chebyshev,
   \item \textbf{MeanMin (or MeanMax)}: using Markov,
   \item \textbf{MeanMinMax}: using Cantelli,
-  \item \textbf{MinMaxMeanVar (or MinMaxMeanStd)}: using~\cite{ferson2021distribution}
+  \item \textbf{MinMaxMeanVar (or MinMaxMeanStd)}: using~\cite{ferson2021distribution}.
 \end{itemize}
 \noindent All distribution-free constructors may also take interval moments parameters.
 \subsubsection{Operations involving intervals and distributions}
@@ -364,13 +364,6 @@ A bivariate copula (2-copula) $C$ is any function $C:[0,1]^2 \rightarrow [0,  1]
   \Pi(u,v) &= uv, \\
   M(u,v) &= \mathrm{min}(u,v),
 \end{align*}
-\begin{figure*}[t!]
-  \centering
-  \includegraphics[width=0.45\textwidth]{../examples/JuliaCon/fig7/biv_cdf.pdf}\hfill
-  \includegraphics[width=0.45\textwidth]{../examples/JuliaCon/fig7/samples.pdf}
-  \caption{Cdf bounds of a bivariate p-box (right) with $X \sim \text{Beta}([4,8], 3)$, $Y \sim \text{N}([0,2], 2)$, and $\rho_{XY} = -0.8$, and 100 samples (left).}
-  \label{fig:figure7}
-\end{figure*}
 \noindent where $W$ encodes maximally negative correlation, $\Pi$ encodes stochastic independence, and $M$ encodes maximally positive correlation. Moreover, $W$ and $M$ are bounds on all 2-copulas: $W(u,v) \leq C(u,v) \leq M(u,v)$. A bivariate cdf $F_{XY}$ can be constructed from two marginal cdfs $F_{X}$ and $F_{Y}$ and copula $C$ using Sklar's theorem
 \begin{equation*}
   F_{XY}(x,y) = C(F_{X}(x), F_{Y}(y)),
@@ -380,6 +373,13 @@ A bivariate copula (2-copula) $C$ is any function $C:[0,1]^2 \rightarrow [0,  1]
   C(u,v) = F_{XY}(F^{-1}_{X}(u), F^{-1}_{Y}(v)).
 \end{equation*}
 \noindent Copulas also give a very convenient way to sample from $F_{XY}$ in a generalisation of inverse transform sampling, where first the copula is sampled $(u,v) \sim C$, and then transformed through the inverses of the marginals $(F^{-1}_{X}(u), F^{-1}_{Y}(v))$.
+\begin{figure*}[t!]
+  \centering
+  \includegraphics[width=0.45\textwidth]{../examples/JuliaCon/fig7/biv_cdf.pdf}\hfill
+  \includegraphics[width=0.45\textwidth]{../examples/JuliaCon/fig7/samples.pdf}
+  \caption{Cdf bounds of a bivariate p-box (right) with $X \sim \text{Beta}([4,8], 3)$, $Y \sim \text{N}([0,2], 2)$, and $\rho_{XY} = -0.8$, and 100 samples (left).}
+  \label{fig:figure7}
+\end{figure*}
 
 Sklar's theorem has a straightforward imprecise extension~\cite{montes2015sklar}, where the two bivariate bounds of a p-box $[\underline{F}_{XY}(x,y), \overline{F}_{XY}(x,y)]$ can expanded in terms of two marginal p-boxes and bounds on a copula $[\underline{C}(u,v), \overline{C}(u,v)]$
 \begin{align*}
