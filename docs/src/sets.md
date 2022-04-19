@@ -171,5 +171,7 @@ julia> plot(a, name = "ab", col = "red", fontsize = 22)
 julia> plot(b, name = "ab", col = "blue", fontsize = 22)
 julia> plot(c, fontsize = 22)
 ```
-!["envelope of an interval and a gaussian"](./plots/intersection1.png) 
-!["envelope of an interval and a gaussian"](./plots/intersection2.png)
+```@raw html
+<img src="./plots/intersection1.png" width="49.5%"/>
+<img src="./plots/intersection2.png" width="49.5%"/>
+```

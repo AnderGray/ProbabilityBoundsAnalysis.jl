@@ -97,16 +97,33 @@ julia> convOpposite(a, b, op = *)
 Binary operations with a specified correlation coefficient may also be performed:
 
 ```julia
-julia> a = normal(0,1);
-julia> b = normal(1,1);
-julia> conv(a,b, op = +, corr = 0.5)
- Pbox: 	  ~  ( range=[-5.18046,7.18046], mean=1.0, var=[2.57835,3.96457])
+julia> conv(a, b, op = *, corr = -0.5)
+ Pbox: 	  ~  ( range=[6.9098, 26.18], mean=15.0, var=[5.5032, 7.9116])
+
+julia> conv(a, b, op = *, corr = 0.5)
+ Pbox: 	  ~  ( range=[6.9098, 26.18], mean=15.0, var=[12.985, 16.804])
 ```
+```@raw html
+<img src="./plots/prodCor1.png" width="49.5%"/>
+<img src="./plots/prodCor2.png" width="49.5%"/>
+```
+
 This assumes that a and b follow a Gaussian Copula. You may however perform the operation with any copula by using the function
 ```julia
-julia> convCorr(a, b, C = C, op = +)
+julia> C1 = clayton(5)
+julia> convCorr(a, b, op = *, C = C1)
+ Pbox: 	  ~  ( range=[6.9098, 26.18], mean=[15.024, 15.473], var=[15.738, 19.714])
+
+julia> C2 = Frank(-2)
+julia> convCorr(a, b, op = *, C = C2)
+ Pbox: 	  ~  ( range=[6.9098, 26.18], mean=15.0, var=[6.78, 9.5713])
 ```
 where C is a copula (see section on dependence modelling).
+
+```@raw html
+<img src="./plots/prodCop1.png" width="49.5%"/>
+<img src="./plots/prodCop2.png" width="49.5%"/>
+```
 
 Note that:
 

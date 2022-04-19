@@ -41,3 +41,23 @@ savefig("sumOpposite.png")
 plot(convOpposite(a, b, op = *), fontsize = 22)
 PyPlot.xlabel("a * b (opposite)", fontsize = 26)
 savefig("prodOpposite.png")
+
+
+plot(conv(a, b, op = *, corr = -0.5), fontsize = 22)
+PyPlot.xlabel("a * b (r = -0.5)", fontsize = 26)
+savefig("prodCor1.png")
+
+plot(conv(a, b, op = *, corr = 0.5), fontsize = 22)
+PyPlot.xlabel("a * b (r = 0.5)", fontsize = 26)
+savefig("prodCor2.png")
+
+C1 = Clayton(5)
+C2 = Frank(-2)
+
+plot(convCorr(a, b, op = *, C = C1), fontsize = 22)
+PyPlot.xlabel("a * b (C = Clayton(5))", fontsize = 26)
+savefig("prodCop1.png")
+
+plot(convCorr(a, b, op = *, C = C2), fontsize = 22)
+PyPlot.xlabel("a * b (C = Frank(-2))", fontsize = 26)
+savefig("prodCop2.png")
