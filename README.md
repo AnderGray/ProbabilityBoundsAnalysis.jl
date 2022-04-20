@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.com/AnderGray/ProbabilityBoundsAnalysis.jl.svg?branch=master)](https://travis-ci.com/github/AnderGray/ProbabilityBoundsAnalysis.jl)
 [![codecov](https://codecov.io/gh/AnderGray/ProbabilityBoundsAnalysis.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/AnderGray/ProbabilityBoundsAnalysis.jl)
 [![DOI](https://zenodo.org/badge/204744026.svg)](https://zenodo.org/badge/latestdoi/204744026)
+[![status](https://proceedings.juliacon.org/papers/41644cd3e3844116d843e5efa1a5cd30/status.svg)](https://proceedings.juliacon.org/papers/41644cd3e3844116d843e5efa1a5cd30)
 
 [Probability bounds analysis](https://en.wikipedia.org/wiki/Probability_bounds_analysis) in Julia, a package for performing arithmetic between uncertain numbers. `ProbabilityBoundsAnalysis.jl` computes guaranteed bounds on functions of random variables, given only partial information about their marginals and dependence. Considered to be a form of rigorous computing with random variables.
 
