@@ -404,7 +404,7 @@ Pi() = πCop()
 
 function Frank(s = 1)                       #   s is real; inf for perfect, 0 for indep, -inf for opposite
 
-    if !(s ∈ interval(-Inf,Inf)); throw(ArgumentError("coefficient must be ∈ [-Inf, Inf]\n $s ∉ [-Inf, Inf]"));end
+    if !(s ∈ interval(-Inf,Inf)) && s != -Inf && s != Inf; throw(ArgumentError("coefficient must be ∈ [-Inf, Inf]\n $s ∉ [-Inf, Inf]"));end
 
     if s == -Inf         # Limit should be set earlier
         C = W()
@@ -441,7 +441,7 @@ end
 
 function Clayton(t = 0)                     #   t>-1; -1 for opposite, 0 for indep and inf for perfect
 
-    if !(t ∈ interval(-1,Inf)); throw(ArgumentError("coefficient must be ∈ [-1, Inf]\n $t ∉ [-1, Inf]"));end
+    if !(t ∈ interval(-1,Inf)) && t != Inf; throw(ArgumentError("coefficient must be ∈ [-1, Inf]\n $t ∉ [-1, Inf]"));end
 
     if t == 0
         C = πCop()
@@ -504,17 +504,7 @@ function GauCopula(r :: Interval)
     return copula(envelope.cdfU, envelope.cdfD, family= "Gaussian", param = r)
 end
 
-function Frechet()
-
-    n = parametersPBA.steps
-    x = range(0,stop = 1,length = n);
-
-    cdfU = [perf(xs,ys) for xs in x, ys in x]
-    cdfD = [opp(xs,ys) for xs in x, ys in x]
-
-    return copula(cdfU, cdfD, family = "Frechet");
-end
-
+Frechet() = env(W(), M())
 
 function τCopula( τ = 0 )   # Imprecise copula from kendal tau
 
@@ -641,6 +631,26 @@ function CholeskyGaussian(N = 1, correlation = 0)
     return hcat(u[:,1],u[:,2])
 end
 
+###
+#   Swap variables
+###
+
+function swap(C :: copula)
+
+    cdfD_ = C.cdfD;
+    cdfU_ = C.cdfU;
+
+    is,js = size(cdfD_);
+
+    cdfD_new = zeros(size(cdfD_));
+    cdfU_new = zeros(size(cdfU_));
+
+    [cdfD_new[i,j] = cdfD_[j,i] for i = 1:is, j =1:js];
+    [cdfU_new[i,j] = cdfU_[j,i] for i = 1:is, j =1:js];
+
+    return copula(cdfD_new, cdfU_new)
+
+end
 
 ###
 #   Copula rotations. Rotates the mass by 90° (makes M -> W), 180° or 270°
@@ -727,52 +737,6 @@ function mass(Biv :: bivpbox, X :: Interval, Y :: Interval)
     Mlo = max(H22.lo - H21.hi - H12.hi + H11.lo, 0)
 
     return interval(Mlo, Mhi)
-end
-
-function conditionalX(J :: bivpbox, xVal :: Real)
-
-    #Nsx, Nsy = size(J.C.cdfU)
-    yGridU = J.marg2.u;
-    yGridD = J.marg2.d;
-
-    diff = maximum(yGridU[2:end] .- yGridU[1:end-1])
-
-    zU = (left.(J(xVal + diff/2, yGridU) - left.(J(xVal - diff/2, yGridU))))/diff
-    zD = (right.(J(xVal + diff/2, yGridD) - right.(J(xVal - diff/2, yGridD))))/diff
-
-    uIndex = findfirst(xVal .< yGridU);
-    dIndex = findfirst(xVal .< yGridD);
-
-    mass = 1/parametersPBA.steps
-    densityU = mass/(yGridU[uIndex] - yGridU[uIndex-1])
-    densityD = mass/(yGridD[dIndex] - yGridD[dIndex-1])
-
-    zU = zU ./densityU;     zD = zD ./densityD;
-
-    inverseBox = pbox(zU,zD)
-
-    us = left.(cdf.(inverseBox,yGridU))
-    ds = right.(cdf.(inverseBox,yGridD))
-
-
-    return pbox(us,ds)
-
-end
-
-
-function conditionalY(J :: bivpbox, yVal :: Real)
-
-    Nsx, Nsy = size(J.C.cdfU)
-
-    xGridU = J.marg2.u;
-    xGridD = J.marg2.d;
-
-    diff = maximum(xGridU[2:end] .- xGridU[1:end-1])
-    zU = (left.(J(xGridU, yVal + diff/2) - left.(J(xGridU, yVal - diff/2))))/diff
-    zD = (right.(J(xGridD,yVal + diff/2) - right.(J(xGridD,yVal - diff/2))))/diff
-
-    return pbox(zU, zD)
-
 end
 
 ###

@@ -28,56 +28,102 @@ Supported dependent arithmetic between uncertain numbers:
 Most of the fundamental binary operations can be performed between uncertain numbers of all types:
 
 ```julia
-julia> a = normal(-1,1); 
-julia> b = interval(1,2);
+julia> a = normal(10,1); 
+julia> b = uniform(1,2);
 julia> a + b
- Pbox: 	  ~  ( range=[-3.09023,4.090232], mean=[0.0,1.0], var=[1.0,1.25])
+ Pbox: 	  ~  ( range=[7.9098, 15.09], mean=11.5, var=[0.38392, 2.1086])
 
 julia> a - b
- Pbox: 	  ~  ( range=[-6.090232,1.0902323], mean=[-3.0,-2.0], var=[1.0,1.25])
+ Pbox: 	  ~  ( range=[4.9098, 12.09], mean=8.5, var=[0.38392, 2.1086])
 
 julia> a * b
- Pbox: 	  ~  ( range=[-4.090232,4.180464], mean=[-1.015451,-1.9690], var=[0.99763,3.99053])
+ Pbox: 	  ~  ( range=[6.9098, 26.18], mean=[12.194, 18.069], var=[0.6576, 32.544])
 
 julia> a / b
- Pbox: 	  ~  ( range=[-2.045116,2.0902323], mean=[-0.50772,-0.984548], var=[0.249408,0.99763])
+ Pbox: 	  ~  ( range=[3.4549, 13.09], mean=[5.6205, 8.3861], var=[0.13574, 7.6644])
 ```
-
-All of the above operations assume independence. For unknown dependence:
+```@raw html
+<img src="./plots/sumFrechet.png" width="49.5%"/>
+<img src="./plots/subFrechet.png" width="49.5%"/>
+<img src="./plots/prodFrechet.png"width="49.5%"/>
+<img src="./plots/divFrechet.png" width="49.5%"/>
+```
+By default all arithmetic operations in `ProbabilityBoundsAnalysis.jl` are _Frechet_ operations, operations which consider all possible dependencies (copulas). Therefore we naturally get p-boxes even if we began with precise distributions. For independence:
 ```julia
-julia> convFrechet(a, b, op = +)
- Pbox: 	  ~  ( range=[-3.09023,4.090232], mean=[0.0,1.0], var=[0.383917,2.1086384])
+julia> convIndep(a, b, op = +)
+ Pbox: 	  ~  ( range=[7.9098, 15.09], mean=11.5, var=1.0833)
 
-julia> convFrechet(a, b, op = -)
- Pbox: 	  ~  ( range=[-6.09023,1.090232], mean=[-3.0,-2.0], var=[0.383917,2.108638])
+julia> convIndep(a, b, op = -)
+ Pbox: 	  ~  ( range=[4.9098, 12.09], mean=8.5, var=1.0833)
+
+julia> convIndep(a, b, op = *)
+ Pbox: 	  ~  ( range=[6.9098, 26.18], mean=15.0, var=[10.052, 11.538])
+
+julia> convIndep(a, b, op = /)
+ Pbox: 	  ~  ( range=[3.4549, 13.09], mean=[6.919, 6.944], var=[2.3032, 2.6815])
 ```
 
-The resulting p-boxes are much wider than the independence case.
+The resulting p-boxes are precise.
+
+```@raw html
+<img src="./plots/sumIndep.png" width="49.5%"/>
+<img src="./plots/subIndep.png" width="49.5%"/>
+<img src="./plots/prodIndep.png"width="49.5%"/>
+<img src="./plots/divIndep.png" width="49.5%"/>
+```
 
 Perfect and opposite convolutions can also be performed:
 ```julia
-julia> a = normal(0,1);
-julia> b = normal(1,1);
 julia> convPerfect(a, b, op = +)
- Pbox: 	  ~  ( range=[-5.18046,7.18046], mean=[0.96909,1.030903], var=[3.80050,4.18248])
+ Pbox: 	  ~  ( range=[7.9098, 15.09], mean=[11.482, 11.518], var=[1.5807, 1.7096])
+
+julia> convPerfect(a, b, op = *)
+ Pbox: 	  ~  ( range=[6.9098, 26.18], mean=[15.234, 15.33], var=[18.661, 19.605])
 
 julia> convOpposite(a, b, op = +)
- Pbox: 	  ~  ( range=[0.48559,1.51440], mean=[0.96909,1.03090], var=[0.0,0.00840])
+ Pbox: 	  ~  ( range=[8.9048, 14.095], mean=[11.482, 11.518], var=[0.47843, 0.55648])
+
+julia> convOpposite(a, b, op = *)
+ Pbox: 	  ~  ( range=[12.162, 16.638], mean=[14.67, 14.766], var=[2.0885, 2.3469])
+```
+
+```@raw html
+<img src="./plots/sumPerfect.png" width="49.5%"/>
+<img src="./plots/prodPerfect.png" width="49.5%"/>
+<img src="./plots/sumOpposite.png"width="49.5%"/>
+<img src="./plots/prodOpposite.png" width="49.5%"/>
 ```
 
 Binary operations with a specified correlation coefficient may also be performed:
 
 ```julia
-julia> a = normal(0,1);
-julia> b = normal(1,1);
-julia> conv(a,b, op = +, corr = 0.5)
- Pbox: 	  ~  ( range=[-5.18046,7.18046], mean=1.0, var=[2.57835,3.96457])
+julia> conv(a, b, op = *, corr = -0.5)
+ Pbox: 	  ~  ( range=[6.9098, 26.18], mean=15.0, var=[5.5032, 7.9116])
+
+julia> conv(a, b, op = *, corr = 0.5)
+ Pbox: 	  ~  ( range=[6.9098, 26.18], mean=15.0, var=[12.985, 16.804])
 ```
+```@raw html
+<img src="./plots/prodCor1.png" width="49.5%"/>
+<img src="./plots/prodCor2.png" width="49.5%"/>
+```
+
 This assumes that a and b follow a Gaussian Copula. You may however perform the operation with any copula by using the function
 ```julia
-julia> convCorr(a, b, C = C, op = +)
+julia> C1 = clayton(5)
+julia> convCorr(a, b, op = *, C = C1)
+ Pbox: 	  ~  ( range=[6.9098, 26.18], mean=[15.024, 15.473], var=[15.738, 19.714])
+
+julia> C2 = Frank(-2)
+julia> convCorr(a, b, op = *, C = C2)
+ Pbox: 	  ~  ( range=[6.9098, 26.18], mean=15.0, var=[6.78, 9.5713])
 ```
 where C is a copula (see section on dependence modelling).
+
+```@raw html
+<img src="./plots/prodCop1.png" width="49.5%"/>
+<img src="./plots/prodCop2.png" width="49.5%"/>
+```
 
 Note that:
 

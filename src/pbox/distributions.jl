@@ -20,13 +20,11 @@ iii()   = [  parametersPBA.bOt; collect((1:(parametersPBA.steps-1)) / parameters
 jj()    = [           collect((1:(parametersPBA.steps-1)) / parametersPBA.steps); 1 ];
 jjj()   = [           collect((1:(parametersPBA.steps-1)) / parametersPBA.steps); parametersPBA.tOp ];
 
-##
-# Should be able to env an array of p-boxes.
-##
-"""
-    env(x :: pbox, y :: pbox, ...)
 
-Envelope. Returns the union of pboxes. Any number of pboxes may be input
+"""
+    env(x :: pbox, y :: pbox)
+
+Envelope. Returns the union of pboxes.
 
 # Examples
 ```jldoctest
@@ -39,43 +37,40 @@ Pbox: 	  ~ uniform ( range=[0.0, 2.0], mean=[0.5, 1.5], var=0.083333)
 ```
 See also: [`imp`](@ref), [`makepbox`](@ref)
 """
-function env(x...; naRm = false )
-    elts = makepbox(x...);
-    u = elts[1].u;
-    d = elts[1].d;
-    ml = elts[1].ml;
-    mh = elts[1].mh;
-    vl = elts[1].vl;
-    vh = elts[1].vh;
-    na = elts[1].name;
-    sh = elts[1].shape;
-    bounded =elts[1].bounded;
+function env(x :: UncertainNumber, y :: UncertainNumber)
+    x = makepbox(x);
+    y = makepbox(y);
 
-    for i =2:length(elts)
-        u = min.(u,elts[i].u);
-        d = max.(d,elts[i].d);
-        ml = min(ml,elts[i].ml);
-        mh = max(mh,elts[i].ml);
-        vl = min(vl,elts[i].vl);
-        vh = max(vh,elts[i].vh);
-        bounded[1] = min(bounded[1], elts[i].bounded[1]);
-        bounded[2] = min(bounded[2], elts[i].bounded[2]);
+    na = x.name;
+    sh = x.shape;
+    bounded = x.bounded;
 
-        if (elts[i].name != na) na = "";end
-        if (elts[i].shape != sh) sh = "";end
-    end
+    u = min.(x.u, y.u);
+    d = max.(x.d, y.d);
+    ml = min(x.ml, y.ml);
+    mh = max(x.mh, y.mh);
+    vl = min(x.vl, y.vl);
+    vh = max(x.vh, y.vh);
+    bounded[1] = min(x.bounded[1], y.bounded[1]);
+    bounded[2] = min(x.bounded[2], y.bounded[2]);
+
+    if (y.name != na) na = "";end
+    if (y.shape != sh) sh = "";end
+
     return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, name=na, shape=sh, bounded = bounded)
 
 end
+env(a...) = reduce(env, a)
+env(a::Vector{UncertainNumber}) = reduce(env, a)
 
+∪(x :: pbox, y :: pbox) = env(x, y)
+∪(x :: pbox, y :: UncertainNumber) = env(x, y)
+∪(x :: UncertainNumber, y :: pbox) = env(x, y)
 
-###
-#   Computes the imprint (imposition)
-###
 """
     imp(x :: pbox, y :: pbox)
 
-Imprint. Returns the intersection of pboxes. Any number of pboxes may be input
+Imprint. Returns the intersection of pboxes
 
 # Examples
 ```jldoctest
@@ -88,35 +83,34 @@ Pbox: 	  ~  ( range=[1.0, 2.0], mean=1.5, var=0.083333)
 ```
 See also: [`env`](@ref), [`makepbox`](@ref)
 """
-function imp(x...; naRm = false )
-    elts = makepbox(x...);
-    u = elts[1].u;
-    d = elts[1].d;
-    ml = elts[1].ml;
-    mh = elts[1].mh;
-    vl = elts[1].vl;
-    vh = elts[1].vh;
-    na = elts[1].name;
-    sh = elts[1].shape;
-    bounded =elts[1].bounded;
+function imp(x :: UncertainNumber, y :: UncertainNumber)
 
-    for i =2:length(elts)
-        u = max.(u,elts[i].u);
-        d = min.(d,elts[i].d);
-        ml = max(ml,elts[i].ml);
-        mh = min(mh,elts[i].mh);
-        vl = max(vl,elts[i].vl);
-        vh = min(vh,elts[i].vh);
-        bounded[1] = max(bounded[1], elts[i].bounded[1]);
-        bounded[2] = max(bounded[2], elts[i].bounded[2]);
-    end
+    x = makepbox(x);
+    y = makepbox(y);
 
-    if (any(d[:] < u[:])) throw(ArgumentError("Imprint does not exist"));
+    bounded = x.bounded;
+
+    u = max.(x.u, y.u);
+    d = min.(x.d, y.d);
+    ml = max(x.ml, y.ml);
+    mh = min(x.mh, y.mh);
+    vl = max(x.vl, y.vl);
+    vh = min(x.vh, y.vh);
+    bounded[1] = max(x.bounded[1], y.bounded[1]);
+    bounded[2] = max(x.bounded[2], y.bounded[2]);
+
+    if (any(d[:] < u[:])) throw(ArgumentError("Intersection does not exist"));
     else
         return pbox(u, d, ml=ml, mh=mh, vl=vl, vh=vh, bounded = bounded)
     end
-
 end
+
+imp(a...) = reduce(imp, a)
+imp(a::Vector{UncertainNumber}) = reduce(imp, a)
+
+∩(x :: pbox, y :: pbox) = imp(x, y)
+∩(x :: pbox, y :: UncertainNumber) = imp(x, y)
+∩(x :: UncertainNumber, y :: pbox) = imp(x, y)
 
 
 ###
@@ -267,20 +261,6 @@ end
 #   Other Parametric distribution constructors
 ###
 
-#=
-function Sbeta(α, β, name="")
-
-    a = Beta(α, β);
-    m = mean(a); v = var(a);
-
-    return pbox(quantile.(a,ii()), quantile.(a,jj()), shape="beta", name=name, ml=m, mh=m, vl=v, vh=v)
-
-end
-
-beta(α, β, x...) = envConst(Sbeta, α, β, x...)
-=#
-
-
 ###
 #   Constructs a pbox from a parametric distribution. Takes endpoints of given intervals.
 #   Will work for all parametric functions up to 2 parameter. And if pbox is envelope of endpoints
@@ -304,18 +284,6 @@ function envConstFunc1(Dist, i, name, shape, Bounded)
     a = env(
     Sdist1(Dist, left(i),  name, shape, Bounded),
     Sdist1(Dist, right(i), name, shape, Bounded))
-
-    return a;
-
-end
-
-function envConstFunc3(Dist, i, j, k,  name, shape, Bounded)
-
-    a = env(
-    Sdist(Dist, left(i),  left(j),  name, shape, Bounded),
-    Sdist(Dist, right(i), right(j), name, shape, Bounded),
-    Sdist(Dist, left(i),  right(j), name, shape, Bounded),
-    Sdist(Dist, right(i), left(j),  name, shape, Bounded));
 
     return a;
 
@@ -392,12 +360,9 @@ chi(        k,              name = "")      = envConstFunc1(    Chi,        k,  
 chisq(      k,              name = "")      = envConstFunc1(    Chisq,      k,    name, "chusq",        [true,false])   # http://en.wikipedia.org/wiki/Chi-squared_distribution
 cosine(     α,      β,      name = "")      = envConstFunc(     Cosine,     α, β, name, "cosine",       [true,true])    # http://en.wikipedia.org/wiki/Raised_cosine_distribution
 epanechnikov(α,     β,      name = "")      = envConstFunc(     Epanechnikov, α, β, name, "epanechnikov",[true,true])
-erlang(     α=1,    β=1,    name = "")      = envConstFunc(     Erlang,     α, β, name, "erlang",       [true,false])   # http://en.wikipedia.org/wiki/Erlang_distribution
 exponential(θ=1,            name = "")      = envConstFunc1(    Exponential, θ,   name, "exponential",  [true,false])   # http://en.wikipedia.org/wiki/Exponential_distribution
 fDist(      ν1,     ν2,     name = "")      = envConstFunc(     FDist,     ν1,ν2, name, "fDist",        [true,false])   # http://en.wikipedia.org/wiki/F-distribution
-frechet(    α=1,    θ=1,    name = "")      = envConstFunc(     Frechet,    α, θ, name, "frechet",      [true,false])   # http://en.wikipedia.org/wiki/Fréchet_distribution
 gamma(      α=1,    θ=1,    name = "")      = envConstFunc(     Gamma,      α, θ, name, "gamma",        [true,false])   # http://en.wikipedia.org/wiki/Gamma_distribution
-ksdist(     n,              name = "")      = envConstFunc1(    KSDist,     n,    name, "ksdist",       [true,true])
 laplace(    μ=0,    θ=1,    name = "")      = envConstFunc(     Laplace,    μ, θ, name, "laplace",      [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
 levy(       μ=0,    θ=1,    name = "")      = envConstFunc(     Levy,       μ, θ, name, "levy",         [false,false])  # http://en.wikipedia.org/wiki/Laplace_distribution
 
@@ -478,7 +443,7 @@ end
 
 Chebyshev(x...) = meanVar(x...);    chebyshev(x...) = meanVar(x...);
 cheb(x...)      = meanVar(x...);    MeanVar(x...)   = meanVar(x...);
-minvar(x...)    = meanVar(x...);
+meanvar(x...)    = meanVar(x...);
 
 meanStd(mean,std, name = "") = meanVar(mean, std^2, name)
 
@@ -601,15 +566,6 @@ end
 ###
 #   Ferson Pbox (min - max - mean - var)
 ###
-function fersonEvalEasy(min = 0, max = 1,  mean = 0.5, var = 0.1, name = "")
-
-    fer = pbox(imp(meanVar(mean,var), imp(meanmin(mean,min),meanmax(mean,max))),
-    ml = left(mean), mh = right(mean), vl = left(var), vh =right(var), bounded = [true, true])
-    fer.shape = "ferson"; fer.name = name;
-
-    return fer
-end
-
 function mmms(minimum :: Real, maximum :: Real, mean :: Real, stddev :: Real; steps = 200)
 
     if iszero(maximum - minimum); return pbox((maximum + minimum)/2); end
@@ -692,24 +648,6 @@ minMaxMeanVar(minimum :: Real, maximum :: Real, mean :: Real, var :: Real; steps
 minMaxMeanStd(minimum :: Real, maximum :: Real, mean :: Real, std :: Real; steps = 200) = mmmv(minimum , maximum , mean, std^2; steps = steps)
 
 
-#=
-function minMaxMeanVar(min = 0, max = 1, mean = 0.5, var = 0.1, name = "")
-
-    min1,max1,mean1,var1 = checkMomentsAndRanges(min,max,mean,var);
-
-    if all(!isa([mean, var], Interval));
-        return fersonEvalEasy(left(min),right(max),mean,var,name);
-    end
-
-    Envelope = env(
-        fersonEvalEasy(left(min1), right(max1), left(mean1), right(var1)),            # pba.r has it like this (left(var) not used?)
-        fersonEvalEasy(left(min1), right(max1), right(mean1), right(var1)),
-    )
-    Envelope.shape = "ferson"; Envelope.name = name;
-    return Envelope
-
-end
-=#
 Ferson(x...)        = minMaxMeanVar(x...);         ferson(x...) = minMaxMeanVar(x...);
 MinMaxMeanVar(x...) = minMaxMeanVar(x...);  minmaxmeanvar(x...) = minMaxMeanVar(x...);
 

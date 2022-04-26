@@ -39,6 +39,7 @@ Pbox: 	  ~ normal ( range=[-5.18046,7.1804646], mean=[-1.0,1.0], var=[1.0,4.0])
 and may be plotted as follows:
 
 ```julia
+julia> using PyPlot
 julia> plot(f)
 ```
 !["a probability box"](./plots/PbaPlot1.png)

@@ -17,6 +17,7 @@ A copula can be created and plotted in the following way:
 julia> C = GauCopula(0.7)
  Copula ~ Gau(r=0.7)
 
+julia> using PyPlot
 julia> plot(C)
 ```
 !["Gaussian copula with a correlation of 0.7"](./plots/GaussianCopula.png)

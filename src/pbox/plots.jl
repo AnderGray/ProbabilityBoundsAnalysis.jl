@@ -14,7 +14,6 @@
 function plot(s ::pbox, fill = true; name = missing, col = missing, heading = missing, plotting = true, save = false, alpha = 0.2, fontsize = 12)
 
     if (isvacuous(s)); throw(ArgumentError("Pbox is vacuous"));end
-    #if (ismissing(name)) name = s.id; end
 
     col1 = "red"; col2 = "black"; fillcol = "grey"
     if !(ismissing(col)); col1 = col2 = fillcol = col;end
@@ -42,13 +41,13 @@ function plot(s ::pbox, fill = true; name = missing, col = missing, heading = mi
     ion()
 end
 
-plot(s :: Union{<:Real, Interval{<:Real}}, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 12) = plot(makepbox(s), fill, name = name, col = col, alpha = alpha, fontsize = fontsize)
+plot(s :: Union{<:Real, Interval{<:Real}}, fill = true; name = missing, col = missing, plotting = true, alpha = 0.2, fontsize = 12) = plot(makepbox(s), fill, name = name, col = col, plotting = plotting, alpha = alpha, fontsize = fontsize)
 
-#plot(s ::pbox, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 12) = plot(makepbox(s), fill, name=name, col=col, alpha=alpha, fontsize=fontsize)
 
 ###
 #   Prepares bounds for use with fill between
 ###
+
 function prepFillBounds(x)
 
     d = x.d; u = x.u;
@@ -62,8 +61,7 @@ function prepFillBounds(x)
     Ylb = zeros(nums,1); Yub = zeros(nums,1);
 
     for i = 1:2:nums
-        #indUb = findfirst(Xs[i] .<= d)
-        #indLb = findlast(Xs[i]  .>= u)
+
         indUb = findlast(Xs[i]  .>= u)
         indLb = findfirst(Xs[i] .<= d)
 
@@ -108,9 +106,6 @@ function plotStep(cop :: copula; name = missing, pn = 50, fontsize = 18, alpha =
     if m < pn; ppn = m; else ppn = pn; end      #pn is the plot "sub-sample", we can't plot all elements
 
     x = y = range(0, stop = 1,length=m)
-    #xgrid = repeat(x',ppn,1)
-    #ygrid = repeat(y,1,ppn)
-
     nm = round(m/ppn);
 
     x = x[1:Int(nm):end]
@@ -222,7 +217,6 @@ function prepPolysU(us, x)
 
     sides = unique(sides, dims=1)
 
-    #return tops
     return [tops; sides]
 
 end
@@ -263,42 +257,6 @@ function prepPolysD(us, x)
     p4 = [x[2]; x[3]; us[1, 1]]
 
     sides = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-#=
-    for i = 2:1:ppn-1
-        for j = i:1:ppn-1
-
-            p1 = [x[i-1]; x[j-1]; us[i-1,j]]
-            p2 = [x[i-1]; x[j-1]; us[i, j]]
-            p3 = [x[i-1]; x[j]; us[i, j]]
-            p4 = [x[i-1]; x[j]; us[i-1, j]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-
-            p1 = [x[i-1]; x[j-1]; us[i,j-1]]
-            p2 = [x[i-1]; x[j-1]; us[i, j]]
-            p3 = [x[i]; x[j-1]; us[i, j]]
-            p4 = [x[i]; x[j-1]; us[i, j-1]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-
-            p1 = [x[j-1]; x[i-1]; us[j-1,i]]
-            p2 = [x[j-1]; x[i-1]; us[j, i]]
-            p3 = [x[j-1]; x[i]; us[j, i]]
-            p4 = [x[j-1]; x[i]; us[j-1, i]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-
-            p1 = [x[j-1]; x[i-1]; us[j,i-1]]
-            p2 = [x[j-1]; x[i-1]; us[j, i]]
-            p3 = [x[j]; x[i-1]; us[j, i]]
-            p4 = [x[j]; x[i-1]; us[j, i-1]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-
-        end
-    end
-    =#
-
 
     for i = 1:1:ppn-1
         for j = i:1:ppn-1
@@ -309,14 +267,6 @@ function prepPolysD(us, x)
             p4 = [x[i]; x[j+1]; us[i+1, j]]
             this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
             sides = [sides; this]
-            #=
-            p1 = [x[i+1]; x[j]; us[i,j+1]]
-            p2 = [x[i+1]; x[j]; us[i+1, j]]
-            p3 = [x[i]; x[j]; us[i+1, j]]
-            p4 = [x[i]; x[j]; us[i, j+1]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            =#
 
             p1 = [x[j]; x[i]; us[j,i+1]]
             p2 = [x[j]; x[i]; us[j, i]]
@@ -325,14 +275,6 @@ function prepPolysD(us, x)
             this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
             sides = [sides; this]
 
-            #=
-            p1 = [x[j]; x[i]; us[j+1,i]]
-            p2 = [x[j]; x[i]; us[j+1, i+1]]
-            p3 = [x[j+1]; x[i]; us[j+1, i+1]]
-            p4 = [x[j+1]; x[i]; us[j+1, i]]
-            this = [[tuple(p1...); tuple(p2...); tuple(p3...); tuple(p4...)]]
-            sides = [sides; this]
-            =#
         end
     end
 
@@ -362,7 +304,6 @@ function plot(x :: copula; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
 
     if ismissing(name); fig = figure(figsize=(10,10)) else fig = figure(name,figsize=(10,10));end
     ax = fig.add_subplot(1,1,1,projection="3d")
-    #ax = fig.add_subplot(2,1,1)
 
     plot_surface(xgrid, ygrid, zD, rstride=2,edgecolors="b", cstride=2, alpha=1, linewidth=1, cmap=ColorMap("Blues"))
     plot_surface(xgrid, ygrid, zU, rstride=2,edgecolors="r", cstride=2, alpha=alpha, linewidth=1, cmap=ColorMap("RdGy"))
@@ -374,7 +315,6 @@ function plot(x :: copula; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
     ax.zaxis.set_rotate_label(false);
     zlabel("C(u,v)", rotation = 0, fontsize = fontsize)
     xticks(fontsize = fontsize ÷ 1.3); yticks(fontsize = fontsize ÷ 1.3);
-    #PyPlot.title(title,fontsize=fontsize)
     tight_layout()
 end
 
@@ -401,7 +341,7 @@ function plot(x :: bivpbox; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
 
     if ismissing(name); fig = figure(figsize=(10,10)) else fig = figure(name,figsize=(10,10));end
     ax = fig.add_subplot(1,1,1,projection="3d")
-   #ax = fig.add_subplot(2,1,1)
+
 
     plot_surface(dGridx, dGridy, zD, rstride=2,edgecolors="b", cstride=2, alpha=1, linewidth=1, cmap=ColorMap("Blues"))
     plot_surface(uGridx, uGridy, zU, rstride=2,edgecolors="r", cstride=2, alpha=alpha, linewidth=1, cmap=ColorMap("RdGy"))
@@ -412,8 +352,6 @@ function plot(x :: bivpbox; name = missing, pn = 50, fontsize = 18, alpha = 0.7)
     ylabel("x",fontsize = fontsize)
     ax.zaxis.set_rotate_label(false);
     zlabel("H(x,y)", rotation = 0, fontsize = fontsize)
-    #xticks(fontsize = fontsize); yticks(fontsize = fontsize);
-    #PyPlot.title(title,fontsize=fontsize)
     tight_layout()
 end
 
@@ -435,10 +373,8 @@ function scatter(a :: Array{Float64,2}; title = "samples")
 
     # histogram on the attached axes
     x_hist.hist(x, 40, histtype="stepfilled", orientation="vertical", color="gray")
-    #x_hist.invert_yaxis()
 
     y_hist.hist(y, 40, histtype="stepfilled", orientation="horizontal", color="gray")
-    #y_hist.invert_xaxis()
 
 end
 
@@ -451,7 +387,6 @@ function plotBoxes(xs :: Array{Interval{T},1}, ys  :: Array{Interval{T},1},  sub
     Asize = length(xs)
     for i = 1:Asize
 
-        #println(" $(a[i]) |  $(a[i+1])")
         xlo = xs[i].lo; xhi = xs[i].hi
         ylo = ys[i].lo; yhi = ys[i].hi
 
@@ -474,8 +409,6 @@ function scatter(a :: Array{Interval{T},2}; title = "samples", fontsize = 18) wh
     grid = plt.GridSpec(4, 4, hspace=0.2, wspace=0.2)
     main_ax = fig.add_subplot(get(grid, (slice(1,4),slice(0,3))))
 
-    # scatter points on the main axes
-    #main_ax.plot(xMids, yMids, "o", markersize=3, alpha=0.2)
     plotBoxes(x, y, main_ax,linewidth = 0.5, alpha=0.1, fillcol= "grey")
 
     xticks(fontsize = fontsize); yticks(fontsize = fontsize)
@@ -507,46 +440,3 @@ function scatter(a :: Array{Interval{T},2}; title = "samples", fontsize = 18) wh
     y_hist.step([0;0;i],[yPbox.u[1];yPbox.d[1];yPbox.d[:]], color = col2,     where = "pre");
 
 end
-
-
-
-#=
-function plotpbox(s ::pbox; cumulative=ProbabilityBoundsAnalysis.cumulative, name = missing, col = missing)
-    if (!isvacuous(s))
-        if (ismissing(name)) name = s.name; end
-
-        if cumulative ylab = "Cumulative probability" ; else ylab = "Exceedance probability";end
-
-        j = (0:(s.n-1))/s.n;
-
-        if (ismissing(col)) col = :red;end
-        plot([s.u[:];s.u[s.n];s.d[s.n]], [j;1;1], colour = :red,linetype=:steppre, xlabel = "Distribution Range", ylabel = "CDF",legend = false,);
-
-        i = (1:(s.n))/s.n;
-        plot!([s.u[1];s.d[1];s.d[:]], [0;0;i], colour = :black,linetype=:steppost,legend = false);
-
-        #plot!([s.u[:];s.u[s.n];s.d[s.n]], [j;1;1], fill = ([s.u[1];s.d[1];s.d[:]], [0;0;i], 0.5, :grey))
-
-
-    end
-end
-=#
-
-
-
-#=
-@recipes function f(x :: AbstractPbox)
-
-
-    seriestype := :steppre;
-    arrow = :arrow;
-    linealpha --> 0.5;
-    linewidth = 4;
-
-
-end
-
-@recipes function f(x :: AbstractInterval)
-
-end
-=#

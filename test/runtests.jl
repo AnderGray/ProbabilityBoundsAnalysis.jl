@@ -8,6 +8,12 @@
 using Test, ProbabilityBoundsAnalysis, IntervalArithmetic, Distributions, Documenter
 
 include("pbox/pbox.jl")
+include("pbox/special.jl")
+include("pbox/comparisons.jl")
 include("pbox/distributions.jl")
+include("pbox/copulas.jl")
+include("pbox/bivariate_pbox.jl")
 include("pbox/arithmetic.jl")
 include("pbox/parameter_change.jl")
+include("pbox/show.jl")
+include("pbox/plots.jl")

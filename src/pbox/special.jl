@@ -42,11 +42,6 @@ isvacuous(x::AbstractInterval) = return ((x.lo == -Inf) && (x.hi == Inf));
 straddles(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<=0) && (0<=right(x)));   # includes zero
 straddlingzero(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<0) && (0<right(x)));   # neglects zero as an endpoint
 
-function degenerate(x :: AbstractInterval)
-    if x.lo == x.hi; return x.lo; end
-    return x
-end
-
 issubset(x :: AbstractVector, y :: IntervalBox{N,T}) where {N,T} = ∈(x,y)
 issubset(x :: IntervalBox, y :: Interval) = issubset(x[1],y)
 issubset(x :: Interval, y :: IntervalBox) = issubset(x,y[1])
@@ -60,11 +55,11 @@ end
 intersect(x :: AbstractInterval, y ::Union{Float64,Int64}) = intersect(y,x)
 
 
-function noNesting(x::Array{<:AbstractInterval})
+function no_nesting(x::Array{<:AbstractInterval})
 
     N = length(x);
     a=copy(x);
-    sort!(a,lt=compareByLo);
+    sort!(a,lt= (x,y) -> (x.lo <= y.lo));
 
     for i =2:N
         if a[i].hi < a[i-1].hi
@@ -80,39 +75,6 @@ function touching(a,b)
     return false
 end
 
-
-# Sorts item, and sorts follow the same way. Function changes item and follow
-function doublequick(item :: Array{<:Real,1}, follow :: Array{<:Real,1}, left = 1, right = length(item))
-
-    i = left;
-    j = right;
-
-    x = item[Int(round((left+right)/2))];
-
-    while (i<=j)
-        while (item[i] < x && i < right) i+=1;end
-        while (x < item[j] && j > left) j -=1;end
-        if (i <= j)
-
-			y = item[i];
-			item[i] = item[j];
-			item[j] = y;
-
-            y = follow[i];
-			follow[i] = follow[j];
-			follow[j] = y;
-
-			i+=1;
-			j-=1;
-        end
-    end
-
-	if (left < j) doublequick(item, follow, left,j);end
-	if (i < right) doublequick(item, follow, i,right);end
-
-end
-
-
 function Base.show(io::IO, z::pbox)
 
     digits = 5
@@ -127,21 +89,3 @@ function Base.show(io::IO, z::pbox)
     print(io, "Pbox: \t $(z.name) ~ $(z.shape) ( range=$statement1, mean=$statement2, var=$statement3)");
 
 end
-
-
-# Only checks sides and moments, for stricter use ==
-
-#= Not working yet. Requires redefinition of ==
-
-function isequal(x::pbox, y::pbox)
-    if (x.u == y.u && x.d == y.d && x.ml == y.ml && x.mh == y.mh && x.vl == y.vl && x.vh == y.vh)
-        return true;
-    else return false; end
-end
-isequal(x::pbox, y::AbstractInterval) = return isequal(x,makepbox(y));
-isequal(x::AbstractInterval, y::pbox) = return isequal(y,x);
-
-isequal(x::pbox, y::Real) = return isequal(x,makepbox(y));
-isequal(x::Real, y::pbox) = return isequal(y,x);
-
-=#

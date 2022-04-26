@@ -152,7 +152,6 @@
         @test all(DistCdf .∈ pbaCdf)
     end
 
-
     @testset "Frechet" begin
 
         d = conv(a,b, op = +, corr = interval(-1,1));
@@ -168,13 +167,72 @@
 
         @test all(map(!,d.bounded))
 
+        ops = [+, -, *, /, min, max];
+
+        for op in ops
+
+            x1 = U(-1,1)
+            x2 = U(1,2)
+
+            c = convFrechet(x1, x2, op = op)
+
+            cI = convIndep(x1, x2, op = op)
+            cP = convPerfect(x1, x2, op = op)
+            cO = convOpposite(x1, x2, op = op)
+
+            @test all( c.u .<= cI.u) && all( c.d .>= cI.d)
+            @test all( c.u .<= cP.u) && all( c.d .>= cP.d)
+            @test all( c.u .<= cO.u) && all( c.d .>= cO.d)
+        end
     end
 
-    ###
-    #   Need to add testing for:
-    #       ->  Shapes
-    #       ->  Verify with Monte Carlo?
-    #       ->  Double loop Mc for Frechet?
-    ###
+    @testset "Partially known dependence" begin
 
+        x1 = U(1, 3)
+        x2 = N(10, 1)
+
+        ops = [+, *, min, max];
+
+        Cs = Vector{copula}(undef, 9)
+
+        Cs[1] = M()
+        Cs[5] = πCop()
+        Cs[end] = W()
+
+        corrs = [0.8, 0.5, 0.2, -0.2, -0.5, -0.8]
+        Gs = GauCopula.(corrs)
+
+        Cs[2:4] = Gs[1:3]
+        Cs[6:8] = Gs[4:end]
+
+        for op in ops
+
+            partial = [tauRho(x1, x2, op = op, C = C) for C in Cs]
+            precise = [sigma(x1, x2, op = op, C = C) for C in Cs]
+
+            precise[1] = convPerfect(x1, x2, op = op)
+            precise[end] = convOpposite(x1, x2, op = op)
+
+            for i = 1:length(partial)
+                for j = 1:i
+                    @test imp(precise[j], partial[i]) ⊆ partial[i]
+                    @test partial[j] ⊆ partial[i]
+                end
+            end
+        end
+    end
+
+    @testset "P-box unary" begin
+
+        a = U(1,2)
+        aneg = -a
+        aRecep = 1/a
+
+        c0 = convOpposite(a, aneg, op=+)
+        c1 = convOpposite(a, aRecep, op=*)
+
+        @test  c0(0) == interval(0,1)
+        @test  c1(1) == interval(0,1)
+
+    end
 end

@@ -17,7 +17,7 @@ makedocs(
         "Constructing p-boxes" => "pboxes.md",
         "Arithmetic" => "arithmetic.md",
         "Dependence" => "copulas.md",
-        "Set operations and comparisons" => "sets.md",
+        "Comparisons and set operations" => "sets.md",
         "Examples" => "examples.md",
         "API" => "api.md"
         ]
