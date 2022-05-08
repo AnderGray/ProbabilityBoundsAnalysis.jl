@@ -21,7 +21,6 @@ function plot(s ::pbox, fill = true; name = missing, col = missing, heading = mi
     if !plotting; ioff();end
     if (ismissing(name)); fig = figure(figsize=(10,10)); else fig = figure(name,figsize=(10,10));end
 
-    ax = fig.add_subplot()
     j = (0:(s.n-1))/s.n;
 
     PyPlot.step([s.u[:];s.u[s.n];s.d[s.n]], [j;1;1], color = col1, where = "pre");
@@ -31,7 +30,7 @@ function plot(s ::pbox, fill = true; name = missing, col = missing, heading = mi
 
     if fill
         Xs, Ylb, Yub = prepFillBounds(s);
-        ax.fill_between(Xs, Ylb, Yub, alpha=alpha, color =fillcol)
+        fill_between(Xs, Ylb, Yub, alpha=alpha, color =fillcol)
     end
     if !(ismissing(heading)); title(heading, fontsize = fontsize);end
     xticks(fontsize = fontsize); yticks(fontsize = fontsize)
@@ -39,6 +38,7 @@ function plot(s ::pbox, fill = true; name = missing, col = missing, heading = mi
 
     if save; savefig("$name.png"); close(fig);end
     ion()
+    fig.canvas.draw()
 end
 
 plot(s :: Union{<:Real, Interval{<:Real}}, fill = true; name = missing, col = missing, plotting = true, alpha = 0.2, fontsize = 12) = plot(makepbox(s), fill, name = name, col = col, plotting = plotting, alpha = alpha, fontsize = fontsize)
