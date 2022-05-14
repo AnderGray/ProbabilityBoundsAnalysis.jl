@@ -68,7 +68,7 @@ mutable struct pbox <: AbstractPbox
     bounded :: Array{Bool,1}            # Is it bounded?
 
     function pbox(u::Union{Missing, Array{<:Real}, Real} = missing, d=u; shape = "", name = "", ml= missing, mh = missing,
-        vl = missing, vh = missing, interpolation = "linear", bounded = [false, false])
+        vl = missing, vh = missing, bounded = [false, false])
 
         steps = parametersPBA.steps;                  # Reading global varaibles costly, creating local for multiple use
 
@@ -94,10 +94,16 @@ mutable struct pbox <: AbstractPbox
             if (typeof(u)<:AbstractInterval) u = u.lo; end
             if (typeof(d)<:AbstractInterval) d = d.hi; end
 
+            iis = ProbabilityBoundsAnalysis.iii()
+            jjs = ProbabilityBoundsAnalysis.jjj()
+
+            if bounded[1]; iis = ProbabilityBoundsAnalysis.ii(); end
+            if bounded[2]; jjs = ProbabilityBoundsAnalysis.jj(); end
+
             # Should we always be interpolating? What if we convolve 2 pboxes of different steps and ProbabilityBoundsAnalysis.steps is larger
             # The resulting pbox should have the smaller of the 3
-            if (length(u) != steps) u = Interpolate(u,interpolation,true);end
-            if (length(d) != steps) d = Interpolate(d,interpolation,false);end
+            if (length(u) != steps) u = linearInterpolation(u, iis); end
+            if (length(d) != steps) d = linearInterpolation(d, jjs); end
 
             p = new(u,d,steps,"",-∞,∞,0,∞,"", bounded);
         end
@@ -621,18 +627,8 @@ pbox(x :: Vector{Interval{T}}, w :: Vector{<:Real} ) where T <: Real = mixture(x
 # the pointlist() constructor when you have a point
 # list description of the p-box.
 
-function Interpolate(x::Union{Array{<:Real},Real}, interpolation::String = "linear", left::Bool = true)
 
-    if (interpolation == "linear") return linearInterpolation(x);
-    #elseif (interpolation == "outer") return outerInterpolation(x,left);
-    #elseif (interpolation == "step") return stepInterpolation(x);
-    #elseif (interpolation == "spline") return splineInterpolation(x);
-    else throw(ArgumentError("Interpolation option not valid. The available schemes are linear, outer, step and spline"));
-    end
-
-end
-
-function linearInterpolation( V::Union{Array{<:Real}, Real} )
+function linearInterpolation( V::Union{Array{<:Real}, Real}, ps )
 
     steps = parametersPBA.steps;
 
@@ -640,7 +636,7 @@ function linearInterpolation( V::Union{Array{<:Real}, Real} )
     if (parametersPBA.steps == 1) return [min(V), max(V)];end
 
     ipt = interpolate((range(0, 1, length = length(V)),), V, Gridded(Linear()))
-    return ipt(range(0, 1, length = steps));
+    return ipt(ps);
 end
 
 ###
