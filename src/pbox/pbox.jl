@@ -632,28 +632,15 @@ function Interpolate(x::Union{Array{<:Real},Real}, interpolation::String = "line
 
 end
 
-function linearInterpolation( V::Union{Array{<:Real},Real} )
+function linearInterpolation( V::Union{Array{<:Real}, Real} )
 
     steps = parametersPBA.steps;
 
-    m = length(V) - 1;
-    if (m == 0) return ([V for i=1:steps]);end
+    if (length(V) == 1) return ([V for i=1:steps]);end
     if (parametersPBA.steps == 1) return [min(V), max(V)];end
 
-    d = 1/m;
-    n = Int(round(d * steps * 20));
-    if (n==0) c = V;
-    else
-        c = [];
-        for i = 1:m
-            v = V[i];
-            w = V[i+1];
-            c = [c;LinRange(v,w,n)];
-        end
-    end
-    u = zeros(1,steps);
-    for k = 1:steps; u[k] = c[1+Int(round((length(c)-1)*(k-1)/(steps-1)))]; end
-    return u;
+    ipt = interpolate((range(0, 1, length = length(V)),), V, Gridded(Linear()))
+    return ipt(range(0, 1, length = steps));
 end
 
 ###
