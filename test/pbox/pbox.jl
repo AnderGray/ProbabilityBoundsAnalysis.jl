@@ -34,9 +34,7 @@
     x = pbox([0,1]);
 
     @test !isinterval(x)
-    @test x.ml == x.mh
-    @test x.ml == 0.5
-    @test x.vh == x.vl
+    @test 0.5 ∈ mean(x)
 
     x = pbox(interval(0,4), ml=1, mh = 3, vl = 0.2, vh = 2)
 
