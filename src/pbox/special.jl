@@ -43,8 +43,6 @@ straddles(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<=0) && (
 straddlingzero(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<0) && (0<right(x)));   # neglects zero as an endpoint
 
 issubset(x :: AbstractVector, y :: IntervalBox{N,T}) where {N,T} = ∈(x,y)
-issubset(x :: IntervalBox, y :: Interval) = issubset(x[1],y)
-issubset(x :: Interval, y :: IntervalBox) = issubset(x,y[1])
 
 function intersect(x:: Union{Float64,Int64}, y :: AbstractInterval)
     if x ∈ y
