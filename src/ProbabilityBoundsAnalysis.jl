@@ -41,9 +41,9 @@ module ProbabilityBoundsAnalysis
 using Base: Float64
 using Distributions, Interpolations, Distributed, Requires
 
-using IntervalArithmetic, Distributed, Statistics, LinearAlgebra
+using IntervalArithmetic, Distributed, Statistics, LinearAlgebra, RecipesBase
 
-import IntervalArithmetic: Interval, interval, AbstractInterval, isequal, ⊂
+import IntervalArithmetic: Interval, interval, isequal, ⊂
 
 import Base: show, -,
     +, *, /, //,
@@ -51,7 +51,7 @@ import Base: show, -,
     rand, sin, cos, tan, sinh, cosh, tanh, asin, acos, atan, exp, log, Threads.@spawn,
     Threads.@threads
 
-import IntervalArithmetic: intersect, issubset
+import IntervalArithmetic: intersect, issubset, IntervalBox, ⊂
 
 import Statistics: mean, var, std
 
@@ -60,7 +60,7 @@ import Distributions: cdf #Normal, Beta, Uniform
 
 abstract type AbstractPbox <: Real end
 
-UncertainNumber = Union{AbstractPbox, AbstractInterval, Real}
+UncertainNumber = Union{AbstractPbox, Interval, Real}
 
 ## Global Variables (we may want to avoid these)
 
@@ -94,7 +94,7 @@ end
 
 export
     # Constructors
-    Interval, interval, AbstractInterval, AbstractPbox, pbox, makepbox, parametersPBA,
+    Interval, interval, Interval, AbstractPbox, pbox, makepbox, parametersPBA,
 
     # Parametric
     normal, gaussian, N,
@@ -173,22 +173,23 @@ include("pbox/arithmetic.jl")
 include("pbox/comparisons.jl")
 include("pbox/distributions.jl")
 include("pbox/special.jl")
+include("pbox/plots_recipes.jl")
 
-function __init__()
+# function __init__()
 
-    @require PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee" begin
-        @require PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0" begin
+#     @require PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee" begin
+#         @require PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0" begin
 
-            using .PyPlot, .PyCall
-            import .PyPlot: plot, scatter
+#             using .PyPlot, .PyCall
+#             import .PyPlot: plot, scatter
 
-            pyimport_conda("mpl_toolkits.mplot3d", "mpl_toolkits")
-            art3d = PyObject(PyPlot.art3D)
-            mpl = pyimport("matplotlib")
-            using3D()
-            include("pbox/plots.jl")
-        end
-    end
-end
+#             pyimport_conda("mpl_toolkits.mplot3d", "mpl_toolkits")
+#             art3d = PyObject(PyPlot.art3D)
+#             mpl = pyimport("matplotlib")
+#             using3D()
+#             include("pbox/plots.jl")
+#         end
+#     end
+# end
 
 end # module ProbabilityBoundsAnalysis

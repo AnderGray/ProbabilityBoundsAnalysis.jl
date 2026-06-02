@@ -91,8 +91,8 @@ mutable struct pbox <: AbstractPbox
                 throw(ArgumentError("Bounds of a p-box must be numeric"))
             end
 
-            if (typeof(u)<:AbstractInterval) u = u.lo; end
-            if (typeof(d)<:AbstractInterval) d = d.hi; end
+            if (typeof(u)<:Interval) u = u.lo; end
+            if (typeof(d)<:Interval) d = d.hi; end
 
             iis = ProbabilityBoundsAnalysis.iii()
             jjs = ProbabilityBoundsAnalysis.jjj()

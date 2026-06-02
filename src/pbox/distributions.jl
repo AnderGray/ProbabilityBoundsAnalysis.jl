@@ -173,7 +173,7 @@ See also: [`uniform`](@ref), [`lognormal`](@ref), [`meanMinMax`](@ref), [`plot`]
 normal(mean = 0, std = 1, x...) = envConstruct(Snormal, mean, std, x...);
 N = gaussian = normal
 
-#Normal(mean :: Union{AbstractInterval,AbstractPbox}, std :: Union{AbstractInterval,AbstractPbox}, x...) = normal(mean, std, x...);
+#Normal(mean :: Union{Interval,AbstractPbox}, std :: Union{Interval,AbstractPbox}, x...) = normal(mean, std, x...);
 
 #Normal(mean, std) = normal(mean, std)
 #Normal(mean, std, x...) = normal(mean, std, x...);

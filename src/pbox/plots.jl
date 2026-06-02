@@ -19,7 +19,7 @@ function plot(s ::pbox, fill = true; name = missing, col = missing, heading = mi
     if !(ismissing(col)); col1 = col2 = fillcol = col;end
 
     if !plotting; ioff();end
-    if (ismissing(name)); fig = figure(figsize=(10,10)); else fig = figure(name,figsize=(10,10));end
+    if (ismissing(name)); fig = figure(figsize=(10,10)); else fig = figure(name, figsize=(10,10));end
 
     j = (0:(s.n-1))/s.n;
 

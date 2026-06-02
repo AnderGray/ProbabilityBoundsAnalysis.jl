@@ -10,13 +10,13 @@
 #
 ######
 
-interval(a::AbstractInterval, b :: AbstractInterval) = hull(a, b)
+interval(a::Interval, b :: Interval) = hull(a, b)
 
 left(x::Real) = x;
 right(x::Real) = x;
 
-left(x::AbstractInterval) = x.lo;
-right(x::AbstractInterval) = x.hi;
+left(x::Interval) = x.lo;
+right(x::Interval) = x.hi;
 
 left(x::AbstractPbox)   = x.u[1];
 right(x::AbstractPbox)  = x.d[end];
@@ -24,7 +24,7 @@ right(x::AbstractPbox)  = x.d[end];
 lefts(x::AbstractPbox)   = x.u
 rights(x::AbstractPbox)  = x.d
 
-isinterval(x) = return (typeof(x)<:AbstractInterval ||
+isinterval(x) = return (typeof(x)<:Interval ||
 (typeof(x) <: AbstractPbox &&  ((x.d[1]==x.d[x.n]) &&  (x.u[1]==x.u[(x.n)]))))
 
 ispbox(x) = return typeof(x)<:AbstractPbox
@@ -37,23 +37,23 @@ function isscalar(x)
 end
 
 isvacuous(x::AbstractPbox) = return ((all(x.u .== -Inf)) && (all(x.d .== Inf)));
-isvacuous(x::AbstractInterval) = return ((x.lo == -Inf) && (x.hi == Inf));
+isvacuous(x::Interval) = return ((x.lo == -Inf) && (x.hi == Inf));
 
-straddles(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<=0) && (0<=right(x)));   # includes zero
-straddlingzero(x:: Union{AbstractInterval, AbstractPbox}) = return ((left(x)<0) && (0<right(x)));   # neglects zero as an endpoint
+straddles(x:: Union{Interval, AbstractPbox}) = return ((left(x)<=0) && (0<=right(x)));   # includes zero
+straddlingzero(x:: Union{Interval, AbstractPbox}) = return ((left(x)<0) && (0<right(x)));   # neglects zero as an endpoint
 
 issubset(x :: AbstractVector, y :: IntervalBox{N,T}) where {N,T} = ∈(x,y)
 
-function intersect(x:: Union{Float64,Int64}, y :: AbstractInterval)
+function intersect(x:: Union{Float64,Int64}, y :: Interval)
     if x ∈ y
         return x
     end
     return ∅
 end
-intersect(x :: AbstractInterval, y ::Union{Float64,Int64}) = intersect(y,x)
+intersect(x :: Interval, y ::Union{Float64,Int64}) = intersect(y,x)
 
 
-function no_nesting(x::Array{<:AbstractInterval})
+function no_nesting(x::Array{<:Interval})
 
     N = length(x);
     a=copy(x);
